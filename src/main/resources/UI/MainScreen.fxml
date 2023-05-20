@@ -41,7 +41,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.PrimaryController">
+<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainScreenController">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -82,7 +82,7 @@
         </Menu>
             <Menu mnemonicParsing="false">
                <graphic>
-                  <ComboBox prefWidth="150.0" promptText="Select Confidentiality Analysis" />
+                  <ComboBox onAction="#handleAnalysisSelection" onMouseClicked="#handleAnalysisSelectionClick" prefWidth="150.0" promptText="Select Confidentiality Analysis" />
                </graphic>
             </Menu>
       </menus>

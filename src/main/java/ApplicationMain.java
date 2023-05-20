@@ -8,10 +8,11 @@ public class ApplicationMain extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("AssumptionEntryUI.fxml"));
+        loader.setLocation(getClass().getResource("UI/MainScreen.fxml"));
         VBox vbox = loader.load();
 
         Scene scene = new Scene(vbox);
+        stage.setTitle("Assumption Specifier");
         stage.setScene(scene);
         stage.show();
     }
