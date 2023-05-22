@@ -48,4 +48,16 @@ public class Assumption {
     public void setAnalyzed(boolean analyzed) {
         this.analyzed = analyzed;
     }
+
+    @Override
+    public String toString() {
+        return "Assumption{" +
+                "type=" + type +
+                ", description='" + description + '\'' +
+                ", probabilityOfViolation=" + probabilityOfViolation +
+                ", risk=" + risk +
+                ", impact='" + impact + '\'' +
+                ", analyzed=" + analyzed +
+                '}';
+    }
 }

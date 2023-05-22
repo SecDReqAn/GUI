@@ -16,24 +16,24 @@
          <children>
             <HBox prefHeight="34.0" prefWidth="362.0">
                <children>
-                  <RadioButton alignment="CENTER_LEFT" mnemonicParsing="false" prefHeight="59.0" prefWidth="181.0" style="-fx-padding: 5pt;" text="Introduce Uncertainty">
+                  <RadioButton fx:id="resolveUncertaintyToggle" alignment="CENTER_LEFT" mnemonicParsing="false" prefHeight="34.0" prefWidth="170.0" style="-fx-padding: 5pt;" text="Resolve Uncertainty">
                      <toggleGroup>
-                        <ToggleGroup fx:id="NewAssumptionTypeGroup" />
+                        <ToggleGroup fx:id="typeToggleGroup" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton alignment="CENTER_RIGHT" mnemonicParsing="false" prefHeight="65.0" prefWidth="170.0" style="-fx-padding: 5pt;" text="Resolve Uncertainty" toggleGroup="$NewAssumptionTypeGroup" />
+                  <RadioButton fx:id="introduceUncertaintyToggle" alignment="CENTER_RIGHT" mnemonicParsing="false" prefHeight="65.0" prefWidth="170.0" style="-fx-padding: 5pt;" text="Introduce Uncertainty" toggleGroup="$typeToggleGroup" />
                </children>
             </HBox>
             <TextArea fx:id="descriptionTextArea" prefHeight="91.0" prefWidth="362.0" promptText="Description..." />
             <HBox prefHeight="54.0" prefWidth="362.0" style="-fx-padding: 5pt;">
                <children>
-                  <TextField promptText="Violation probability..." style="-fx-padding: 5pt;" />
-                  <TextField promptText="Risk..." style="-fx-padding: 5pt;" />
+                  <TextField fx:id="violationProbabilityTextField" promptText="Violation probability..." style="-fx-padding: 5pt;" />
+                  <TextField fx:id="riskTextField" promptText="Risk..." style="-fx-padding: 5pt;" />
                </children>
             </HBox>
-            <TextArea prefHeight="62.0" prefWidth="362.0" promptText="Impact" />
+            <TextArea fx:id="impactTextArea" prefHeight="62.0" prefWidth="362.0" promptText="Impact" />
             <CheckBox alignment="CENTER" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onAction="#handleAnalyzedToggle" style="-fx-padding: 10pt;" text="Analyzed" />
-            <Button alignment="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="84.0" style="-fx-padding: 5pt; -fx-background-color: #99bef7; -fx-border-color: black;" text="Insert" />
+            <Button alignment="CENTER" mnemonicParsing="false" onAction="#handleInsertButton" prefHeight="30.0" prefWidth="84.0" style="-fx-padding: 5pt; -fx-background-color: #99bef7; -fx-border-color: black;" text="Insert" />
          </children>
       </VBox>
    </children>
