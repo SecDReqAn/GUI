@@ -1,5 +1,6 @@
 package controllers;
 
+import general.Assumption;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -16,10 +17,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MainScreenController {
     private String analysis = "";
 
+    private ArrayList<Assumption> assumptions = new ArrayList<>();
     @FXML
     public void handleNewAssumption(ActionEvent actionEvent) {
         if (this.analysis.isEmpty()) {
@@ -38,12 +41,17 @@ public class MainScreenController {
             loader.setLocation(getClass().getResource("../UI/AssumptionSpecificationScreen.fxml"));
             AnchorPane root = loader.load();
 
+            AssumptionSpecificationScreenController controller = loader.getController();
+            Assumption newAssumption = new Assumption();
+            controller.initAssumption(newAssumption);
+            this.assumptions.add(newAssumption);
+
             var stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setTitle("New Assumption Specification");
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow().getScene().getWindow());
-            stage.show();
+            stage.showAndWait();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

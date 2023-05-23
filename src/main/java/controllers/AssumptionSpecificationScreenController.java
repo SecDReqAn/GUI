@@ -3,13 +3,15 @@ package controllers;
 import general.Assumption;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 
 public class AssumptionSpecificationScreenController {
     /**
      * The {@link Assumption} that is being specified.
      */
-    private final Assumption assumption;
+    private Assumption assumption;
 
     @FXML
     private ToggleGroup typeToggleGroup;
@@ -26,8 +28,8 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private TextArea impactTextArea;
 
-    public AssumptionSpecificationScreenController() {
-        this.assumption = new Assumption();
+    public void initAssumption(Assumption assumption) {
+        this.assumption = assumption;
     }
 
     @FXML
@@ -71,8 +73,8 @@ public class AssumptionSpecificationScreenController {
     }
 
     @FXML
-    public void handleInsertButton(){
-        // TODO Transfer assumption back to main screen.
-        System.out.println(this.assumption);
+    public void handleInsertButton(ActionEvent actionEvent) {
+        var stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        stage.close();
     }
 }
