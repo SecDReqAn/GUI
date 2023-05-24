@@ -7,13 +7,13 @@ public class Assumption {
 
     private AssumptionType type;
     private String description;
-    private double probabilityOfViolation;
-    private double risk;
+    private Double probabilityOfViolation;
+    private Double risk;
     private String impact;
-    private boolean analyzed;
+    private Boolean analyzed;
 
     public Assumption(){
-
+        // Implicitly set all fields to null.
     }
 
     public Assumption(AssumptionType type, String description, double probabilityOfViolation, double risk, String impact, boolean analyzed) {
@@ -25,6 +25,17 @@ public class Assumption {
         this.analyzed = analyzed;
     }
 
+    public boolean isFullySpecified(){
+        return this.type != null &&
+                this.description != null &&
+                this.probabilityOfViolation != null &&
+                this.risk != null &&
+                this.impact != null &&
+                this.analyzed != null &&
+                !this.impact.isEmpty() &&
+                !this.description.isEmpty();
+    }
+
     public void setType(AssumptionType type) {
         this.type = type;
     }
@@ -33,11 +44,11 @@ public class Assumption {
         this.description = description;
     }
 
-    public void setProbabilityOfViolation(double probabilityOfViolation) {
+    public void setProbabilityOfViolation(Double probabilityOfViolation) {
         this.probabilityOfViolation = probabilityOfViolation;
     }
 
-    public void setRisk(double risk) {
+    public void setRisk(Double risk) {
         this.risk = risk;
     }
 
@@ -45,8 +56,32 @@ public class Assumption {
         this.impact = impact;
     }
 
-    public void setAnalyzed(boolean analyzed) {
+    public void setAnalyzed(Boolean analyzed) {
         this.analyzed = analyzed;
+    }
+
+    public AssumptionType getType() {
+        return type;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public double getProbabilityOfViolation() {
+        return probabilityOfViolation;
+    }
+
+    public double getRisk() {
+        return risk;
+    }
+
+    public String getImpact() {
+        return impact;
+    }
+
+    public boolean isAnalyzed() {
+        return analyzed;
     }
 
     @Override

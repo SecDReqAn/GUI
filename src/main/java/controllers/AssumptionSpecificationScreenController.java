@@ -27,9 +27,18 @@ public class AssumptionSpecificationScreenController {
     private TextField riskTextField;
     @FXML
     private TextArea impactTextArea;
+    @FXML
+    private Button insertButton;
 
     public void initAssumption(Assumption assumption) {
         this.assumption = assumption;
+
+        // Analyzed is defaulted to false.
+        this.assumption.setAnalyzed(false);
+    }
+
+    private void checkForCompletenessOfSpecification(){
+        this.insertButton.setDisable(!this.assumption.isFullySpecified());
     }
 
     @FXML
@@ -41,28 +50,53 @@ public class AssumptionSpecificationScreenController {
         // Listen for changes with regard to the toggle-group.
         this.typeToggleGroup.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
             this.assumption.setType((Assumption.AssumptionType) newToggle.getUserData());
+            this.checkForCompletenessOfSpecification();
         });
 
         // Listen for changes of the text in the description TextArea.
         this.descriptionTextArea.textProperty().addListener((observable, oldText, newText) -> {
             this.assumption.setDescription(newText);
+            this.checkForCompletenessOfSpecification();
         });
 
         // Listen for changes of the text in the probability of violation TextField.
         this.violationProbabilityTextField.textProperty().addListener((observable, oldText, newText) -> {
-            // TODO Error handling.
-            this.assumption.setProbabilityOfViolation(Double.parseDouble(newText));
+            try {
+                this.assumption.setProbabilityOfViolation(Double.parseDouble(newText));
+
+                // Clear potential red error border.
+                this.violationProbabilityTextField.setStyle(null);
+                this.violationProbabilityTextField.setStyle("-fx-padding: 5pt");
+            } catch (NullPointerException | NumberFormatException exception){
+                // Invalidate probability of violation field in assumption.
+                this.assumption.setProbabilityOfViolation(null);
+                this.violationProbabilityTextField.setStyle(this.violationProbabilityTextField.getStyle() + "; -fx-text-box-border: red; -fx-focus-color: red ;");
+            }
+
+            this.checkForCompletenessOfSpecification();
         });
 
         // Listen for changes of the text in the risk TextField.
         this.riskTextField.textProperty().addListener((observable, oldText, newText) -> {
-            // TODO Error handling.
-            this.assumption.setRisk(Double.parseDouble(newText));
+            try {
+                this.assumption.setRisk(Double.parseDouble(newText));
+
+                // Clear potential red error border.
+                this.riskTextField.setStyle(null);
+                this.riskTextField.setStyle("-fx-padding: 5pt");
+            } catch (NullPointerException | NumberFormatException exception){
+                // Invalidate risk field in assumption.
+                this.assumption.setRisk(null);
+                this.riskTextField.setStyle(this.riskTextField.getStyle() + "; -fx-text-box-border: red; -fx-focus-color: red ;");
+            }
+
+            this.checkForCompletenessOfSpecification();
         });
 
         // Listen for changes of the text in the impact TextArea.
         this.impactTextArea.textProperty().addListener((observable, oldText, newText) -> {
             this.assumption.setImpact(newText);
+            this.checkForCompletenessOfSpecification();
         });
     }
 
@@ -70,6 +104,7 @@ public class AssumptionSpecificationScreenController {
     public void handleAnalyzedToggle(ActionEvent actionEvent) {
         var checkBox = (CheckBox) actionEvent.getSource();
         this.assumption.setAnalyzed(checkBox.isSelected());
+        this.checkForCompletenessOfSpecification();
     }
 
     @FXML

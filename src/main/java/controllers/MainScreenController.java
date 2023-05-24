@@ -44,7 +44,6 @@ public class MainScreenController {
             AssumptionSpecificationScreenController controller = loader.getController();
             Assumption newAssumption = new Assumption();
             controller.initAssumption(newAssumption);
-            this.assumptions.add(newAssumption);
 
             var stage = new Stage();
             stage.setScene(new Scene(root));
@@ -52,8 +51,18 @@ public class MainScreenController {
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow().getScene().getWindow());
             stage.showAndWait();
+
+            // Only add assumption in case it was fully specified by the user.
+            if(newAssumption.isFullySpecified()){
+                this.assumptions.add(newAssumption);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+
+        // TODO Delete
+        for(var assumption : this.assumptions){
+            System.out.println(assumption);
         }
     }
 

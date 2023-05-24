@@ -33,7 +33,7 @@
             </HBox>
             <TextArea fx:id="impactTextArea" prefHeight="62.0" prefWidth="362.0" promptText="Impact" />
             <CheckBox alignment="CENTER" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onAction="#handleAnalyzedToggle" style="-fx-padding: 10pt;" text="Analyzed" />
-            <Button alignment="CENTER" mnemonicParsing="false" onAction="#handleInsertButton" prefHeight="30.0" prefWidth="84.0" style="-fx-padding: 5pt; -fx-background-color: #99bef7; -fx-border-color: black;" text="Insert" />
+            <Button fx:id="insertButton" alignment="CENTER" disable="true" mnemonicParsing="false" onAction="#handleInsertButton" prefHeight="30.0" prefWidth="84.0" style="-fx-padding: 5pt; -fx-background-color: #99bef7; -fx-border-color: black;" text="Insert" />
          </children>
       </VBox>
    </children>
