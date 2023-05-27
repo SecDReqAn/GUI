@@ -12,7 +12,7 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="388.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AssumptionSpecificationScreenController">
    <children>
-      <VBox layoutX="80.0" layoutY="148.0" prefHeight="400.0" prefWidth="361.0" style="-fx-padding: 10pt;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox fx:id="topLevelVBox" layoutX="80.0" layoutY="148.0" prefHeight="400.0" prefWidth="388.0" style="-fx-padding: 10pt;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <HBox prefHeight="34.0" prefWidth="362.0">
                <children>
@@ -33,7 +33,7 @@
             </HBox>
             <TextArea fx:id="impactTextArea" prefHeight="62.0" prefWidth="362.0" promptText="Impact" />
             <CheckBox alignment="CENTER" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onAction="#handleAnalyzedToggle" style="-fx-padding: 10pt;" text="Analyzed" />
-            <Button fx:id="insertButton" alignment="CENTER" disable="true" mnemonicParsing="false" onAction="#handleInsertButton" prefHeight="30.0" prefWidth="84.0" style="-fx-padding: 5pt; -fx-background-color: #99bef7; -fx-border-color: black;" text="Insert" />
+            <Button fx:id="insertButton" alignment="CENTER" contentDisplay="CENTER" disable="true" mnemonicParsing="false" onAction="#handleInsertButton" prefHeight="30.0" prefWidth="84.0" style="-fx-padding: 5pt; -fx-background-radius: 5pt; -fx-border-radius: 5pt; -fx-background-color: #99bef7; -fx-border-color: black;" text="Insert" />
          </children>
       </VBox>
    </children>

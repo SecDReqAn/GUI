@@ -3,8 +3,10 @@ package controllers;
 import general.Assumption;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class AssumptionSpecificationScreenController {
@@ -13,6 +15,8 @@ public class AssumptionSpecificationScreenController {
      */
     private Assumption assumption;
 
+    @FXML
+    private VBox topLevelVBox;
     @FXML
     private ToggleGroup typeToggleGroup;
     @FXML
@@ -43,6 +47,8 @@ public class AssumptionSpecificationScreenController {
 
     @FXML
     public void initialize() {
+        this.topLevelVBox.setAlignment(Pos.CENTER);
+
         // Init user data for the toggle buttons.
         resolveUncertaintyToggle.setUserData(Assumption.AssumptionType.RESOLVE_UNCERTAINTY);
         introduceUncertaintyToggle.setUserData(Assumption.AssumptionType.INTRODUCE_UNCERTAINTY);
@@ -55,7 +61,7 @@ public class AssumptionSpecificationScreenController {
 
         // Listen for changes of the text in the description TextArea.
         this.descriptionTextArea.textProperty().addListener((observable, oldText, newText) -> {
-            this.assumption.setDescription(newText);
+            this.assumption.setDescription(newText.trim());
             this.checkForCompletenessOfSpecification();
         });
 
@@ -95,7 +101,7 @@ public class AssumptionSpecificationScreenController {
 
         // Listen for changes of the text in the impact TextArea.
         this.impactTextArea.textProperty().addListener((observable, oldText, newText) -> {
-            this.assumption.setImpact(newText);
+            this.assumption.setImpact(newText.trim());
             this.checkForCompletenessOfSpecification();
         });
     }
