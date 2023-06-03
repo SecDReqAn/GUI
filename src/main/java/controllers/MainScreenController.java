@@ -1,6 +1,8 @@
 package controllers;
 
 import general.Assumption;
+import general.Configuration;
+import io.ConfigManager;
 import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -22,18 +24,21 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MainScreenController {
     private final String defaultSaveLocation;
     private HostServices hostServices;
     private File saveFile;
-    private String analysis = "";
+    private String analysisPath = "/home/tbaechle/git/UncertaintyImpactAnalysis\n";
+    private String modelName = "CoronaWarnApp";
 
     @FXML
     private ListView<Assumption> assumptions;
 
     public MainScreenController() {
-        this.defaultSaveLocation = System.getProperty("user.home") + System.getProperty("file.separator") + "NewAssumptionSet.asf";
+        this.defaultSaveLocation = System.getProperty("user.home") + System.getProperty("file.separator") + "NewAssumptionSet.xml";
     }
 
     public void setHostServices(HostServices hostServices) {
@@ -42,16 +47,16 @@ public class MainScreenController {
 
     private ObservableList<String> getAvailableAnalyses() {
         // TODO Determine the available analyses.
-        return FXCollections.observableArrayList("Abunai", "Analysis 2", "Analysis 3");
+        return FXCollections.observableArrayList("Abunai");
     }
 
     @FXML
     private void handleNewAssumption(ActionEvent actionEvent) {
-        if (this.analysis.isEmpty()) {
+        if (this.analysisPath.isEmpty()) {
             var alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Warning");
             alert.setHeaderText("Unable to create a new assumption!");
-            alert.setContentText("An analysis has to be selected before creating a new assumption.");
+            alert.setContentText("The path to an analysis has to be set.");
 
             alert.showAndWait();
             return;
@@ -96,12 +101,20 @@ public class MainScreenController {
             // Add number suffix until there is no conflict.
             int suffix = 1;
             do {
-                this.saveFile = new File(this.defaultSaveLocation.substring(0, this.defaultSaveLocation.length() - 4) + suffix + ".asf");
+                this.saveFile = new File(this.defaultSaveLocation.substring(0, this.defaultSaveLocation.length() - 4) + suffix + ".xml");
                 suffix++;
             } while (this.saveFile.exists());
         }
 
-        // Write to save file.
+        // Write to save-file.
+        Set<Assumption> assumptions = new HashSet<>(this.assumptions.getItems());
+        try {
+            this.saveFile.createNewFile();
+            ConfigManager.writeConfig(this.saveFile, new Configuration(this.analysisPath, this.modelName, assumptions));
+        } catch (Exception e){
+            // TODO
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -112,9 +125,9 @@ public class MainScreenController {
         fileChooser.setTitle("Select Save Location");
         fileChooser.setInitialFileName("NewAssumptions.xml");
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        File chosenFile = fileChooser.showSaveDialog(stage);
+        this.saveFile = fileChooser.showSaveDialog(stage);
 
-        System.out.println(chosenFile);
+        this.saveToFile();
     }
 
     @FXML
@@ -142,6 +155,6 @@ public class MainScreenController {
     @FXML
     private void handleAnalysisSelection(ActionEvent actionEvent) {
         ComboBox<String> comboBox = (ComboBox<String>) actionEvent.getSource();
-        this.analysis = comboBox.getValue();
+        this.analysisPath = comboBox.getValue();
     }
 }

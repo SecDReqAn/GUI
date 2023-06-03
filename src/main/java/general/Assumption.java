@@ -1,12 +1,14 @@
 package general;
 
 import java.util.Set;
+import java.util.UUID;
 
 public class Assumption {
     public enum AssumptionType {
         INTRODUCE_UNCERTAINTY, RESOLVE_UNCERTAINTY;
     }
 
+    private UUID id;
     private AssumptionType type;
     private Set<Assumption> dependencies;
     private String description;
@@ -15,8 +17,9 @@ public class Assumption {
     private String impact;
     private Boolean analyzed;
 
-    public Assumption(){
-        // Implicitly set all fields to null.
+    public Assumption() {
+        this.id = UUID.randomUUID();
+        // Implicitly set all other fields to null.
     }
 
     public Assumption(AssumptionType type, String description, double probabilityOfViolation, double risk, String impact, boolean analyzed) {
@@ -28,7 +31,7 @@ public class Assumption {
         this.analyzed = analyzed;
     }
 
-    public boolean isFullySpecified(){
+    public boolean isFullySpecified() {
         return this.type != null &&
                 this.description != null &&
                 this.probabilityOfViolation != null &&
@@ -63,28 +66,36 @@ public class Assumption {
         this.analyzed = analyzed;
     }
 
+    public UUID getId() {
+        return this.id;
+    }
+
     public AssumptionType getType() {
-        return type;
+        return this.type;
+    }
+
+    public Set<Assumption> getDependencies() {
+        return this.dependencies;
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public double getProbabilityOfViolation() {
-        return probabilityOfViolation;
+        return this.probabilityOfViolation;
     }
 
     public double getRisk() {
-        return risk;
+        return this.risk;
     }
 
     public String getImpact() {
-        return impact;
+        return this.impact;
     }
 
     public boolean isAnalyzed() {
-        return analyzed;
+        return this.analyzed;
     }
 
     @Override
