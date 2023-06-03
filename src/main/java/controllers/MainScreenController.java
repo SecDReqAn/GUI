@@ -16,21 +16,35 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 
 public class MainScreenController {
+    private final String defaultSaveLocation;
     private HostServices hostServices;
+    private File saveFile;
     private String analysis = "";
 
     @FXML
     private ListView<Assumption> assumptions;
 
-    public void setHostServices(HostServices hostServices){
+    public MainScreenController() {
+        this.defaultSaveLocation = System.getProperty("user.home") + System.getProperty("file.separator") + "NewAssumptionSet.asf";
+    }
+
+    public void setHostServices(HostServices hostServices) {
         this.hostServices = hostServices;
     }
+
+    private ObservableList<String> getAvailableAnalyses() {
+        // TODO Determine the available analyses.
+        return FXCollections.observableArrayList("Abunai", "Analysis 2", "Analysis 3");
+    }
+
     @FXML
     private void handleNewAssumption(ActionEvent actionEvent) {
         if (this.analysis.isEmpty()) {
@@ -61,7 +75,7 @@ public class MainScreenController {
             stage.showAndWait();
 
             // Only add assumption in case it was fully specified by the user.
-            if(newAssumption.isFullySpecified()){
+            if (newAssumption.isFullySpecified()) {
                 this.assumptions.getItems().add(newAssumption);
             }
         } catch (IOException e) {
@@ -71,7 +85,40 @@ public class MainScreenController {
     }
 
     @FXML
-    private void handleQuit(){
+    private void saveToFile() {
+        // Use default file if not otherwise set by the user.
+        if(this.saveFile == null){
+            this.saveFile = new File(this.defaultSaveLocation);
+        }
+
+        // Avoid overwriting in case a file with the default name already exists.
+        if(this.saveFile.exists() && this.saveFile.getAbsolutePath().equals(this.defaultSaveLocation)){
+            // Add number suffix until there is no conflict.
+            int suffix = 1;
+            do {
+                this.saveFile = new File(this.defaultSaveLocation.substring(0, this.defaultSaveLocation.length() - 4) + suffix + ".asf");
+                suffix++;
+            } while (this.saveFile.exists());
+        }
+
+        // Write to save file.
+    }
+
+    @FXML
+    private void saveAs(ActionEvent actionEvent) {
+        var stage = (Stage) ((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow();
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Save Location");
+        fileChooser.setInitialFileName("NewAssumptions.xml");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        File chosenFile = fileChooser.showSaveDialog(stage);
+
+        System.out.println(chosenFile);
+    }
+
+    @FXML
+    private void handleQuit() {
         Platform.exit();
     }
 
@@ -96,10 +143,5 @@ public class MainScreenController {
     private void handleAnalysisSelection(ActionEvent actionEvent) {
         ComboBox<String> comboBox = (ComboBox<String>) actionEvent.getSource();
         this.analysis = comboBox.getValue();
-    }
-
-    private ObservableList<String> getAvailableAnalyses() {
-        // TODO Determine the available analyses.
-        return FXCollections.observableArrayList("Abunai", "Analysis 2", "Analysis 3");
     }
 }

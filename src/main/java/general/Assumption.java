@@ -1,11 +1,14 @@
 package general;
 
+import java.util.Set;
+
 public class Assumption {
     public enum AssumptionType {
         INTRODUCE_UNCERTAINTY, RESOLVE_UNCERTAINTY;
     }
 
     private AssumptionType type;
+    private Set<Assumption> dependencies;
     private String description;
     private Double probabilityOfViolation;
     private Double risk;
