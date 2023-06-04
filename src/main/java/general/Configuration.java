@@ -7,9 +7,24 @@ public class Configuration {
     private String modelName;
     private Set<Assumption> assumptions;
 
-    public Configuration(String analysisPath, String modelName, Set<Assumption> assumptions){
+    public Configuration() {
+    }
+
+    public Configuration(String analysisPath, String modelName, Set<Assumption> assumptions) {
         this.analysisPath = analysisPath;
         this.modelName = modelName;
+        this.assumptions = assumptions;
+    }
+
+    public void setAnalysisPath(String analysisPath) {
+        this.analysisPath = analysisPath;
+    }
+
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
+    }
+
+    public void setAssumptions(Set<Assumption> assumptions) {
         this.assumptions = assumptions;
     }
 

@@ -1,5 +1,6 @@
 package general;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -10,15 +11,23 @@ public class Assumption {
 
     private UUID id;
     private AssumptionType type;
-    private Set<Assumption> dependencies;
+    private Set<UUID> dependencies;
     private String description;
     private Double probabilityOfViolation;
     private Double risk;
     private String impact;
+
     private Boolean analyzed;
 
     public Assumption() {
         this.id = UUID.randomUUID();
+        this.dependencies = new HashSet<>();
+        // Implicitly set all other fields to null.
+    }
+
+    public Assumption(UUID id) {
+        this.id = id;
+        this.dependencies = new HashSet<>();
         // Implicitly set all other fields to null.
     }
 
@@ -44,6 +53,10 @@ public class Assumption {
 
     public void setType(AssumptionType type) {
         this.type = type;
+    }
+
+    public void setDependencies(Set<UUID> dependencies) {
+        this.dependencies = dependencies;
     }
 
     public void setDescription(String description) {
@@ -74,7 +87,7 @@ public class Assumption {
         return this.type;
     }
 
-    public Set<Assumption> getDependencies() {
+    public Set<UUID> getDependencies() {
         return this.dependencies;
     }
 
@@ -101,7 +114,9 @@ public class Assumption {
     @Override
     public String toString() {
         return "Assumption{" +
-                "type=" + type +
+                "id=" + id +
+                ", type=" + type +
+                ", dependencies=" + dependencies +
                 ", description='" + description + '\'' +
                 ", probabilityOfViolation=" + probabilityOfViolation +
                 ", risk=" + risk +

@@ -48,10 +48,10 @@
         <Menu mnemonicParsing="false" text="Action">
           <items>
             <MenuItem mnemonicParsing="false" onAction="#handleNewAssumption" text="New Assumption" />
-                  <MenuItem mnemonicParsing="false" text="New Analysis" />
+                  <MenuItem mnemonicParsing="false" onAction="#newAnalysis" text="New Analysis" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Open…" />
-            <Menu mnemonicParsing="false" text="Open Recent" />
+            <MenuItem mnemonicParsing="false" onAction="#openFromFile" text="Open…" />
+            <Menu mnemonicParsing="false" onAction="#openRecent" text="Open Recent" />
             <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" onAction="#saveToFile" text="Save" />
             <MenuItem mnemonicParsing="false" onAction="#saveAs" text="Save As…" />

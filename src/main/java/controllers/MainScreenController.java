@@ -90,14 +90,63 @@ public class MainScreenController {
     }
 
     @FXML
+    private void newAnalysis() {
+        // TODO
+        System.out.println("Not implemented!");
+    }
+
+    @FXML
+    private void openFromFile(ActionEvent actionEvent) {
+        var stage = (Stage) ((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow();
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select an existing File");
+        fileChooser.setInitialFileName("NewAssumptions.xml");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        var selectedFile = fileChooser.showOpenDialog(stage);
+
+        // File selection has been aborted by the user.
+        if(selectedFile == null){
+            return;
+        }
+
+        if (!selectedFile.exists() || !selectedFile.isFile()) {
+            var alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Warning");
+            alert.setHeaderText("Loading Failed");
+            alert.setContentText("The specified file could not be read!");
+
+            alert.show();
+        }
+
+        try {
+            Configuration configuration = ConfigManager.readConfig(selectedFile);
+
+            this.analysisPath = configuration.getAnalysisPath();
+            this.modelName = configuration.getModelName();
+            this.assumptions.getItems().clear();
+            this.assumptions.getItems().addAll(configuration.getAssumptions());
+            this.saveFile = selectedFile;
+        } catch (Exception e){
+            // TODO
+        }
+    }
+
+    @FXML
+    private void openRecent() {
+        // TODO
+        System.out.println("Not implemented!");
+    }
+
+    @FXML
     private void saveToFile() {
         // Use default file if not otherwise set by the user.
-        if(this.saveFile == null){
+        if (this.saveFile == null) {
             this.saveFile = new File(this.defaultSaveLocation);
         }
 
         // Avoid overwriting in case a file with the default name already exists.
-        if(this.saveFile.exists() && this.saveFile.getAbsolutePath().equals(this.defaultSaveLocation)){
+        if (this.saveFile.exists() && this.saveFile.getAbsolutePath().equals(this.defaultSaveLocation)) {
             // Add number suffix until there is no conflict.
             int suffix = 1;
             do {
@@ -111,7 +160,7 @@ public class MainScreenController {
         try {
             this.saveFile.createNewFile();
             ConfigManager.writeConfig(this.saveFile, new Configuration(this.analysisPath, this.modelName, assumptions));
-        } catch (Exception e){
+        } catch (Exception e) {
             // TODO
             e.printStackTrace();
         }

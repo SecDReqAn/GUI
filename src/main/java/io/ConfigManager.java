@@ -3,13 +3,15 @@ package io;
 import general.Assumption;
 import general.Configuration;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.StringWriter;
+import javax.xml.namespace.QName;
+import javax.xml.stream.*;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+import java.io.*;
+import java.util.HashSet;
+import java.util.UUID;
 
 public class ConfigManager {
     private static void writeIsolatedElement(XMLStreamWriter streamWriter, String elementName, String value) throws XMLStreamException {
@@ -18,8 +20,102 @@ public class ConfigManager {
         streamWriter.writeEndElement();
     }
 
+    public static Configuration readConfig(File target) throws FileNotFoundException, XMLStreamException {
+        Configuration readConfiguration = new Configuration();
+
+        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+        XMLEventReader eventReader = inputFactory.createXMLEventReader(new FileInputStream(target));
+
+        Assumption currentAssumption = null;
+
+        parseLoop:
+        while (eventReader.hasNext()) {
+            XMLEvent nextEvent = eventReader.nextEvent();
+            if (nextEvent.isStartElement()) {
+                StartElement startElement = nextEvent.asStartElement();
+                switch (startElement.getName().getLocalPart()) {
+                    case "analysisPath" -> {
+                        nextEvent = eventReader.nextEvent();
+                        readConfiguration.setAnalysisPath(nextEvent.asCharacters().getData());
+                    }
+                    case "modelName" -> {
+                        nextEvent = eventReader.nextEvent();
+                        readConfiguration.setModelName(nextEvent.asCharacters().getData());
+                    }
+                    case "assumptions" -> readConfiguration.setAssumptions(new HashSet<>());
+                    case "assumption" -> {
+                        Attribute assumptionID = startElement.getAttributeByName(new QName("id"));
+                        if (assumptionID != null) {
+                            currentAssumption = new Assumption(UUID.fromString(assumptionID.getValue()));
+                        }
+                    }
+                    case "type" -> {
+                        if (currentAssumption != null) {
+                            nextEvent = eventReader.nextEvent();
+                            currentAssumption.setType(Assumption.AssumptionType.valueOf(nextEvent.asCharacters().getData()));
+                        }
+                    }
+                    case "dependencies" -> {
+                        if (currentAssumption != null) {
+                            currentAssumption.setDependencies(new HashSet<>());
+                        }
+                    }
+                    case "dependency" -> {
+                        if (currentAssumption != null && currentAssumption.getDependencies() != null) {
+                            nextEvent = eventReader.nextEvent();
+                            currentAssumption.getDependencies().add(UUID.fromString(nextEvent.asCharacters().getData()));
+                        }
+                    }
+                    case "description" -> {
+                        if (currentAssumption != null) {
+                            nextEvent = eventReader.nextEvent();
+                            currentAssumption.setDescription(nextEvent.asCharacters().getData());
+                        }
+                    }
+                    case "probabilityOfViolation" -> {
+                        if (currentAssumption != null) {
+                            nextEvent = eventReader.nextEvent();
+                            currentAssumption.setProbabilityOfViolation(Double.parseDouble(nextEvent.asCharacters().getData()));
+                        }
+                    }
+                    case "risk" -> {
+                        if (currentAssumption != null) {
+                            nextEvent = eventReader.nextEvent();
+                            currentAssumption.setRisk(Double.parseDouble(nextEvent.asCharacters().getData()));
+                        }
+                    }
+                    case "impact" -> {
+                        if (currentAssumption != null) {
+                            nextEvent = eventReader.nextEvent();
+                            currentAssumption.setImpact(nextEvent.asCharacters().getData());
+                        }
+                    }
+                    case "analyzed" -> {
+                        if (currentAssumption != null) {
+                            nextEvent = eventReader.nextEvent();
+                            currentAssumption.setAnalyzed(Boolean.valueOf(nextEvent.asCharacters().getData()));
+                        }
+                    }
+                }
+            }
+            if (nextEvent.isEndElement()) {
+                EndElement endElement = nextEvent.asEndElement();
+                switch (endElement.getName().getLocalPart()) {
+                    case "configuration" -> {
+                        break parseLoop;
+                    }
+                    case "assumption" -> {
+                        readConfiguration.getAssumptions().add(currentAssumption);
+                        currentAssumption = null;
+                    }
+                }
+            }
+        }
+
+        return readConfiguration;
+    }
+
     public static void writeConfig(File target, Configuration configuration) throws FileNotFoundException, XMLStreamException {
-        StringWriter stringWriter = new StringWriter();
         XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
         XMLStreamWriter streamWriter = outputFactory.createXMLStreamWriter(new FileOutputStream(target));
 
@@ -44,9 +140,9 @@ public class ConfigManager {
 
             // Write Assumption::dependencies
             streamWriter.writeStartElement("dependencies");
-            if(assumption.getDependencies() != null) {
-                for (Assumption dependency : assumption.getDependencies()) {
-                    ConfigManager.writeIsolatedElement(streamWriter, "dependency", dependency.getId().toString());
+            if (assumption.getDependencies() != null) {
+                for (UUID dependency : assumption.getDependencies()) {
+                    ConfigManager.writeIsolatedElement(streamWriter, "dependency", dependency.toString());
                 }
             }
             streamWriter.writeEndElement();
