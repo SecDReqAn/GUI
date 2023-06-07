@@ -1,0 +1,8 @@
+.CustomBar{
+    -fx-background-color: #3C3F41;
+    -fx-text-fill: #B8B5B3;
+}
+
+.ClickableEntryUnselected{
+    -fx-text-fill: #B8B5B3;
+}

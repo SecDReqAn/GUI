@@ -206,4 +206,14 @@ public class MainScreenController {
         ComboBox<String> comboBox = (ComboBox<String>) actionEvent.getSource();
         this.analysisPath = comboBox.getValue();
     }
+
+    @FXML
+    private void handleAnalysisPathSelection(MouseEvent mouseEvent){
+        // TODO
+    }
+
+    @FXML
+    private void handleModelNameSelection(MouseEvent mouseEvent){
+        // TODO
+    }
 }

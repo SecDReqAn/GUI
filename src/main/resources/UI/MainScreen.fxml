@@ -33,28 +33,32 @@
 -->
 
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainScreenController">
+<VBox prefHeight="400.0" prefWidth="640.0" styleClass="MainScreenStyle.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainScreenController">
   <children>
-    <MenuBar VBox.vgrow="NEVER">
+    <MenuBar styleClass="CustomBar" stylesheets="@MainScreenStyle.css" VBox.vgrow="NEVER">
       <menus>
         <Menu mnemonicParsing="false" text="Action">
           <items>
             <MenuItem mnemonicParsing="false" onAction="#handleNewAssumption" text="New Assumption" />
                   <MenuItem mnemonicParsing="false" onAction="#newAnalysis" text="New Analysis" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" onAction="#openFromFile" text="Open…" />
-            <Menu mnemonicParsing="false" onAction="#openRecent" text="Open Recent" />
+            <MenuItem mnemonicParsing="false" onAction="#openFromFile" text="Open Configuration…" />
+            <Menu mnemonicParsing="false" onAction="#openRecent" text="Open Recent Configuration" />
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" onAction="#saveToFile" text="Save" />
-            <MenuItem mnemonicParsing="false" onAction="#saveAs" text="Save As…" />
+            <MenuItem mnemonicParsing="false" onAction="#saveToFile" text="Save Configuration" />
+            <MenuItem mnemonicParsing="false" onAction="#saveAs" text="Save Configuration As…" />
             <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" text="Preferences…" />
             <SeparatorMenuItem mnemonicParsing="false" />
@@ -87,10 +91,23 @@
             </Menu>
       </menus>
     </MenuBar>
-    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="306.0" prefWidth="640.0" VBox.vgrow="ALWAYS">
       <children>
-            <ListView fx:id="assumptions" layoutX="28.0" layoutY="77.0" prefHeight="378.0" prefWidth="640.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <ListView fx:id="assumptions" layoutX="28.0" layoutY="77.0" prefHeight="378.0" prefWidth="640.0" style="-fx-background-color: #2B2B2B;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       </children>
     </AnchorPane>
+      <GridPane alignment="CENTER" style="-fx-padding: 0pt 5pt 0pt 5pt;" styleClass="CustomBar" stylesheets="@MainScreenStyle.css">
+        <columnConstraints>
+          <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label onMouseClicked="#handleAnalysisPathSelection" styleClass="ClickableEntryUnselected" stylesheets="@MainScreenStyle.css" text="No analysis selected" />
+            <Label onMouseClicked="#handleModelNameSelection" styleClass="ClickableEntryUnselected" stylesheets="@MainScreenStyle.css" text="No model selected" GridPane.columnIndex="1" />
+         </children>
+      </GridPane>
   </children>
 </VBox>
