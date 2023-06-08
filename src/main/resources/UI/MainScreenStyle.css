@@ -1,8 +1,19 @@
-.CustomBar{
+.BaseBar {
     -fx-background-color: #3C3F41;
+}
+
+.BaseBar .label {
     -fx-text-fill: #B8B5B3;
 }
 
-.ClickableEntryUnselected{
-    -fx-text-fill: #B8B5B3;
+.menu-item .label{
+    -fx-text-fill: black;
+}
+
+.ClickableLabel {
+    -fx-padding: 5pt 5pt 5pt 5pt;
+}
+
+.ClickableLabel:hover {
+    -fx-background-color: #303234;
 }

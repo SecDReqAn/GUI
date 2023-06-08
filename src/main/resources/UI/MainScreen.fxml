@@ -32,7 +32,6 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
@@ -47,11 +46,11 @@
 
 <VBox prefHeight="400.0" prefWidth="640.0" styleClass="MainScreenStyle.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainScreenController">
   <children>
-    <MenuBar styleClass="CustomBar" stylesheets="@MainScreenStyle.css" VBox.vgrow="NEVER">
+    <MenuBar styleClass="BaseBar" stylesheets="@MainScreenStyle.css" VBox.vgrow="NEVER">
       <menus>
-        <Menu mnemonicParsing="false" text="Action">
+        <Menu mnemonicParsing="false" styleClass="CustomMenu" text="Action">
           <items>
-            <MenuItem mnemonicParsing="false" onAction="#handleNewAssumption" text="New Assumption" />
+            <MenuItem mnemonicParsing="false" onAction="#handleNewAssumption" styleClass="CustomMenuItem" text="New Assumption" />
                   <MenuItem mnemonicParsing="false" onAction="#newAnalysis" text="New Analysis" />
                   <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" onAction="#openFromFile" text="Open Configuration…" />
@@ -84,11 +83,6 @@
             <MenuItem mnemonicParsing="false" onAction="#openDocumentation" text="Documentation" />
           </items>
         </Menu>
-            <Menu mnemonicParsing="false">
-               <graphic>
-                  <ComboBox onAction="#handleAnalysisSelection" onMouseClicked="#handleAnalysisSelectionClick" prefWidth="150.0" promptText="Select Confidentiality Analysis" />
-               </graphic>
-            </Menu>
       </menus>
     </MenuBar>
     <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="306.0" prefWidth="640.0" VBox.vgrow="ALWAYS">
@@ -96,18 +90,19 @@
             <ListView fx:id="assumptions" layoutX="28.0" layoutY="77.0" prefHeight="378.0" prefWidth="640.0" style="-fx-background-color: #2B2B2B;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       </children>
     </AnchorPane>
-      <GridPane alignment="CENTER" style="-fx-padding: 0pt 5pt 0pt 5pt;" styleClass="CustomBar" stylesheets="@MainScreenStyle.css">
-        <columnConstraints>
-          <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <Label onMouseClicked="#handleAnalysisPathSelection" styleClass="ClickableEntryUnselected" stylesheets="@MainScreenStyle.css" text="No analysis selected" />
-            <Label onMouseClicked="#handleModelNameSelection" styleClass="ClickableEntryUnselected" stylesheets="@MainScreenStyle.css" text="No model selected" GridPane.columnIndex="1" />
-         </children>
-      </GridPane>
+    <GridPane alignment="CENTER" styleClass="BaseBar" stylesheets="@MainScreenStyle.css">
+      <columnConstraints>
+        <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+      </columnConstraints>
+      <rowConstraints>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+      </rowConstraints>
+      <Label fx:id="analysisPathLabel" onMouseClicked="#handleAnalysisPathSelection" styleClass="ClickableLabel"
+             stylesheets="@MainScreenStyle.css" text="No analysis folder selected" wrapText="true"/>
+      <Label fx:id="modelNameLabel" onMouseClicked="#handleModelNameSelection" styleClass="ClickableLabel"
+             stylesheets="@MainScreenStyle.css" text="No model folder selected" wrapText="true"
+             GridPane.columnIndex="1"/>
+    </GridPane>
   </children>
 </VBox>

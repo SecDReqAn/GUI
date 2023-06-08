@@ -40,7 +40,7 @@ public class ConfigManager {
                     }
                     case "modelName" -> {
                         nextEvent = eventReader.nextEvent();
-                        readConfiguration.setModelName(nextEvent.asCharacters().getData());
+                        readConfiguration.setModelPath(nextEvent.asCharacters().getData());
                     }
                     case "assumptions" -> readConfiguration.setAssumptions(new HashSet<>());
                     case "assumption" -> {
@@ -125,7 +125,7 @@ public class ConfigManager {
         // Write Configuration::analysisPath
         ConfigManager.writeIsolatedElement(streamWriter, "analysisPath", configuration.getAnalysisPath());
         // Write Configuration::modelName
-        ConfigManager.writeIsolatedElement(streamWriter, "modelName", configuration.getModelName());
+        ConfigManager.writeIsolatedElement(streamWriter, "modelName", configuration.getModelPath());
 
         // Write Configuration::assumptions
         streamWriter.writeStartElement("assumptions");

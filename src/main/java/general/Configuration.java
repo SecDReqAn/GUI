@@ -4,15 +4,15 @@ import java.util.Set;
 
 public class Configuration {
     private String analysisPath;
-    private String modelName;
+    private String modelPath;
     private Set<Assumption> assumptions;
 
     public Configuration() {
     }
 
-    public Configuration(String analysisPath, String modelName, Set<Assumption> assumptions) {
+    public Configuration(String analysisPath, String modelPath, Set<Assumption> assumptions) {
         this.analysisPath = analysisPath;
-        this.modelName = modelName;
+        this.modelPath = modelPath;
         this.assumptions = assumptions;
     }
 
@@ -20,8 +20,8 @@ public class Configuration {
         this.analysisPath = analysisPath;
     }
 
-    public void setModelName(String modelName) {
-        this.modelName = modelName;
+    public void setModelPath(String modelPath) {
+        this.modelPath = modelPath;
     }
 
     public void setAssumptions(Set<Assumption> assumptions) {
@@ -32,8 +32,8 @@ public class Configuration {
         return analysisPath;
     }
 
-    public String getModelName() {
-        return modelName;
+    public String getModelPath() {
+        return modelPath;
     }
 
     public Set<Assumption> getAssumptions() {

@@ -5,19 +5,17 @@ import general.Configuration;
 import io.ConfigManager;
 import javafx.application.HostServices;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -31,11 +29,16 @@ public class MainScreenController {
     private final String defaultSaveLocation;
     private HostServices hostServices;
     private File saveFile;
-    private String analysisPath = "/home/tbaechle/git/UncertaintyImpactAnalysis\n";
-    private String modelName = "CoronaWarnApp";
+    private String analysisPath;
+    private String modelPath;
 
     @FXML
     private ListView<Assumption> assumptions;
+
+    @FXML
+    private Label analysisPathLabel;
+    @FXML
+    private Label modelNameLabel;
 
     public MainScreenController() {
         this.defaultSaveLocation = System.getProperty("user.home") + System.getProperty("file.separator") + "NewAssumptionSet.xml";
@@ -45,14 +48,9 @@ public class MainScreenController {
         this.hostServices = hostServices;
     }
 
-    private ObservableList<String> getAvailableAnalyses() {
-        // TODO Determine the available analyses.
-        return FXCollections.observableArrayList("Abunai");
-    }
-
     @FXML
     private void handleNewAssumption(ActionEvent actionEvent) {
-        if (this.analysisPath.isEmpty()) {
+        if (this.analysisPath == null || this.analysisPath.isEmpty()) {
             var alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Warning");
             alert.setHeaderText("Unable to create a new assumption!");
@@ -106,7 +104,7 @@ public class MainScreenController {
         var selectedFile = fileChooser.showOpenDialog(stage);
 
         // File selection has been aborted by the user.
-        if(selectedFile == null){
+        if (selectedFile == null) {
             return;
         }
 
@@ -123,11 +121,16 @@ public class MainScreenController {
             Configuration configuration = ConfigManager.readConfig(selectedFile);
 
             this.analysisPath = configuration.getAnalysisPath();
-            this.modelName = configuration.getModelName();
+            this.analysisPathLabel.setText(this.analysisPath);
+
+            this.modelPath = configuration.getModelPath();
+            var folders = this.modelPath.split(System.getProperty("file.separator"));
+            this.modelNameLabel.setText(folders[folders.length - 1]);
+
             this.assumptions.getItems().clear();
             this.assumptions.getItems().addAll(configuration.getAssumptions());
             this.saveFile = selectedFile;
-        } catch (Exception e){
+        } catch (Exception e) {
             // TODO
         }
     }
@@ -159,7 +162,7 @@ public class MainScreenController {
         Set<Assumption> assumptions = new HashSet<>(this.assumptions.getItems());
         try {
             this.saveFile.createNewFile();
-            ConfigManager.writeConfig(this.saveFile, new Configuration(this.analysisPath, this.modelName, assumptions));
+            ConfigManager.writeConfig(this.saveFile, new Configuration(this.analysisPath, this.modelPath, assumptions));
         } catch (Exception e) {
             // TODO
             e.printStackTrace();
@@ -190,30 +193,36 @@ public class MainScreenController {
     }
 
     @FXML
-    private void handleAnalysisSelectionClick(MouseEvent event) {
-        // Determine available analyses in case ComboBox is left-clicked and empty.
-        if (event.getButton().equals(MouseButton.PRIMARY)) {
-            ComboBox<String> comboBox = (ComboBox<String>) event.getSource();
-            if (comboBox.getItems().isEmpty()) {
-                // Set available analyses.
-                comboBox.setItems(this.getAvailableAnalyses());
-            }
+    private void handleAnalysisPathSelection(MouseEvent mouseEvent) {
+        var originatingLabel = (Label) mouseEvent.getSource();
+        var stage = (Stage) originatingLabel.getScene().getWindow();
+
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Select Analysis Folder");
+        directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        var selectedFolder = directoryChooser.showDialog(stage);
+
+        if (selectedFolder != null) {
+            this.analysisPath = selectedFolder.getAbsolutePath();
+            originatingLabel.setText(this.analysisPath);
         }
     }
 
     @FXML
-    private void handleAnalysisSelection(ActionEvent actionEvent) {
-        ComboBox<String> comboBox = (ComboBox<String>) actionEvent.getSource();
-        this.analysisPath = comboBox.getValue();
-    }
+    private void handleModelNameSelection(MouseEvent mouseEvent) {
+        var originatingLabel = (Label) mouseEvent.getSource();
+        var stage = (Stage) originatingLabel.getScene().getWindow();
 
-    @FXML
-    private void handleAnalysisPathSelection(MouseEvent mouseEvent){
-        // TODO
-    }
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Select Model Folder");
+        directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        var selectedFolder = directoryChooser.showDialog(stage);
 
-    @FXML
-    private void handleModelNameSelection(MouseEvent mouseEvent){
-        // TODO
+        if (selectedFolder != null) {
+            this.modelPath = selectedFolder.getAbsolutePath();
+
+            var folders = this.modelPath.split(System.getProperty("file.separator"));
+            originatingLabel.setText(folders[folders.length - 1]);
+        }
     }
 }
