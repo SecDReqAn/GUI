@@ -1,6 +1,9 @@
 package controllers;
 
 import general.Assumption;
+import general.ModelEntity;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -9,11 +12,14 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Map;
+
 public class AssumptionSpecificationScreenController {
     /**
      * The {@link Assumption} that is being specified.
      */
     private Assumption assumption;
+    private Map<String, ModelEntity> modelEntityMap;
 
     @FXML
     private VBox topLevelVBox;
@@ -32,6 +38,8 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private TextArea impactTextArea;
     @FXML
+    private ComboBox<String> affectedComponentComboBox;
+    @FXML
     private Button insertButton;
 
     public void initAssumption(Assumption assumption) {
@@ -39,6 +47,10 @@ public class AssumptionSpecificationScreenController {
 
         // Analyzed is defaulted to false.
         this.assumption.setAnalyzed(false);
+    }
+
+    public void initModelEntities(Map<String, ModelEntity> modelEntityMap){
+        this.modelEntityMap = modelEntityMap;
     }
 
     private void checkForCompletenessOfSpecification(){
@@ -104,6 +116,12 @@ public class AssumptionSpecificationScreenController {
             this.assumption.setImpact(newText.trim());
             this.checkForCompletenessOfSpecification();
         });
+
+
+        // Init ComboBox with available entities read from the selected model.
+        ObservableList<String> affectedComponentsList = FXCollections.observableArrayList();
+        affectedComponentsList.addAll(this.modelEntityMap.keySet());
+        this.affectedComponentComboBox.setItems(affectedComponentsList);
     }
 
     @FXML

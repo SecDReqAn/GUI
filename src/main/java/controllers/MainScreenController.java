@@ -2,7 +2,9 @@ package controllers;
 
 import general.Assumption;
 import general.Configuration;
+import general.ModelEntity;
 import io.ConfigManager;
+import io.ModelReader;
 import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -20,17 +22,23 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class MainScreenController {
+    private static final String COMPONENT_REPOSITORY_FILENAME = "default.repository";
     private final String defaultSaveLocation;
     private HostServices hostServices;
     private File saveFile;
     private String analysisPath;
     private String modelPath;
+
+    private Map<String, ModelEntity> modelEntityMap;
 
     @FXML
     private ListView<Assumption> assumptions;
@@ -50,11 +58,11 @@ public class MainScreenController {
 
     @FXML
     private void handleNewAssumption(ActionEvent actionEvent) {
-        if (this.analysisPath == null || this.analysisPath.isEmpty()) {
+        if (this.modelEntityMap == null || this.modelEntityMap.isEmpty()) {
             var alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Warning");
             alert.setHeaderText("Unable to create a new assumption!");
-            alert.setContentText("The path to an analysis has to be set.");
+            alert.setContentText("A path to a valid model first has to be set.");
 
             alert.showAndWait();
             return;
@@ -69,6 +77,7 @@ public class MainScreenController {
             AssumptionSpecificationScreenController controller = loader.getController();
             Assumption newAssumption = new Assumption();
             controller.initAssumption(newAssumption);
+            controller.initModelEntities(this.modelEntityMap);
 
             var stage = new Stage();
             stage.setScene(new Scene(root));
@@ -130,6 +139,11 @@ public class MainScreenController {
             this.assumptions.getItems().clear();
             this.assumptions.getItems().addAll(configuration.getAssumptions());
             this.saveFile = selectedFile;
+
+            // Init model entities from read model path.
+            this.modelEntityMap = ModelReader.readFromRepositoryFile(new File(this.modelPath
+                    + System.getProperty("file.separator")
+                    + MainScreenController.COMPONENT_REPOSITORY_FILENAME));
         } catch (Exception e) {
             // TODO
         }
@@ -143,6 +157,11 @@ public class MainScreenController {
 
     @FXML
     private void saveToFile() {
+        // No save file necessary if configuration is empty.
+        if (this.assumptions.getItems().isEmpty() && this.analysisPath == null && this.modelPath == null) {
+            return;
+        }
+
         // Use default file if not otherwise set by the user.
         if (this.saveFile == null) {
             this.saveFile = new File(this.defaultSaveLocation);
@@ -218,11 +237,36 @@ public class MainScreenController {
         directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         var selectedFolder = directoryChooser.showDialog(stage);
 
+        // Check whether the user aborted the selection.
         if (selectedFolder != null) {
-            this.modelPath = selectedFolder.getAbsolutePath();
+            var absolutePath = selectedFolder.getAbsolutePath();
 
-            var folders = this.modelPath.split(System.getProperty("file.separator"));
-            originatingLabel.setText(folders[folders.length - 1]);
+            // Check whether the specified folder actually contains a repository file.
+            File repositoryFile = new File(absolutePath + System.getProperty("file.separator") + MainScreenController.COMPONENT_REPOSITORY_FILENAME);
+            if (repositoryFile.exists()) {
+                // Accept valid selection.
+                this.modelPath = absolutePath;
+                var folders = this.modelPath.split(System.getProperty("file.separator"));
+                originatingLabel.setText(folders[folders.length - 1]);
+
+                // Load contents of repository file.
+                try {
+                    this.modelEntityMap = ModelReader.readFromRepositoryFile(repositoryFile);
+                } catch (FileNotFoundException | XMLStreamException e) {
+                    // TODO
+                    throw new RuntimeException(e);
+                }
+            } else {
+                // Invalid selection due to missing repository file.
+                var alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Warning");
+                alert.setHeaderText("Missing repository file!");
+                alert.setContentText("The selected model folder does not contain a repository file ("
+                        + MainScreenController.COMPONENT_REPOSITORY_FILENAME
+                        + "), specifying the available components of the model.");
+
+                alert.showAndWait();
+            }
         }
     }
 }

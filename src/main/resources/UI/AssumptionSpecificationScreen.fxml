@@ -2,37 +2,66 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="400.0" prefWidth="388.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AssumptionSpecificationScreenController">
+<AnchorPane prefHeight="400.0" prefWidth="520.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AssumptionSpecificationScreenController">
    <children>
-      <VBox fx:id="topLevelVBox" layoutX="80.0" layoutY="148.0" prefHeight="400.0" prefWidth="388.0" style="-fx-padding: 10pt;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox fx:id="topLevelVBox" layoutX="80.0" layoutY="148.0" prefHeight="400.0" prefWidth="464.0" style="-fx-padding: 10pt;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <HBox prefHeight="34.0" prefWidth="362.0">
+            <GridPane>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
                <children>
-                  <RadioButton fx:id="resolveUncertaintyToggle" alignment="CENTER_LEFT" mnemonicParsing="false" prefHeight="34.0" prefWidth="170.0" style="-fx-padding: 5pt;" text="Resolve Uncertainty">
+                  <RadioButton fx:id="resolveUncertaintyToggle" mnemonicParsing="false" prefHeight="32.0" prefWidth="257.0" style="-fx-padding: 5pt;" text="Resolve Uncertainty">
                      <toggleGroup>
                         <ToggleGroup fx:id="typeToggleGroup" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton fx:id="introduceUncertaintyToggle" alignment="CENTER_RIGHT" mnemonicParsing="false" prefHeight="65.0" prefWidth="170.0" style="-fx-padding: 5pt;" text="Introduce Uncertainty" toggleGroup="$typeToggleGroup" />
+                  <RadioButton fx:id="introduceUncertaintyToggle" mnemonicParsing="false" prefHeight="32.0" prefWidth="263.0" style="-fx-padding: 5pt;" text="Introduce Uncertainty" toggleGroup="$typeToggleGroup" GridPane.columnIndex="1" />
                </children>
-            </HBox>
+            </GridPane>
             <TextArea fx:id="descriptionTextArea" prefHeight="91.0" prefWidth="362.0" promptText="Description..." />
-            <HBox prefHeight="54.0" prefWidth="362.0" style="-fx-padding: 5pt;">
+            <GridPane style="-fx-padding: 5pt 0pt;">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
                <children>
-                  <TextField fx:id="violationProbabilityTextField" promptText="Violation probability..." style="-fx-padding: 5pt;" />
                   <TextField fx:id="riskTextField" promptText="Risk..." style="-fx-padding: 5pt;" />
+                  <TextField fx:id="violationProbabilityTextField" promptText="Violation probability..." style="-fx-padding: 5pt;" GridPane.columnIndex="1" />
                </children>
-            </HBox>
+            </GridPane>
             <TextArea fx:id="impactTextArea" prefHeight="62.0" prefWidth="362.0" promptText="Impact" />
-            <CheckBox alignment="CENTER" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onAction="#handleAnalyzedToggle" style="-fx-padding: 10pt;" text="Analyzed" />
+            <GridPane style="-fx-padding: 5pt 0pt;">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <CheckBox alignment="BOTTOM_LEFT" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onAction="#handleAnalyzedToggle" style="-fx-padding: 10pt;" text="Analyzed" />
+                  <ComboBox fx:id="affectedComponentComboBox" prefHeight="24.0" prefWidth="245.0" promptText="Affected Component..." GridPane.columnIndex="1" />
+               </children>
+            </GridPane>
             <Button fx:id="insertButton" alignment="CENTER" contentDisplay="CENTER" disable="true" mnemonicParsing="false" onAction="#handleInsertButton" prefHeight="30.0" prefWidth="84.0" style="-fx-padding: 5pt; -fx-background-radius: 5pt; -fx-border-radius: 5pt; -fx-background-color: #99bef7; -fx-border-color: black;" text="Insert" />
          </children>
       </VBox>

@@ -10,8 +10,9 @@ public class Assumption {
     }
 
     private UUID id;
-    private AssumptionType type;
     private Set<UUID> dependencies;
+    private String affectedComponent;
+    private AssumptionType type;
     private String description;
     private Double probabilityOfViolation;
     private Double risk;
@@ -41,7 +42,8 @@ public class Assumption {
     }
 
     public boolean isFullySpecified() {
-        return this.type != null &&
+        return this.affectedComponent != null &&
+                this.type != null &&
                 this.description != null &&
                 this.probabilityOfViolation != null &&
                 this.risk != null &&
@@ -51,12 +53,16 @@ public class Assumption {
                 !this.description.isEmpty();
     }
 
-    public void setType(AssumptionType type) {
-        this.type = type;
+    public void setAffectedComponent(String affectedComponent) {
+        this.affectedComponent = affectedComponent;
     }
 
     public void setDependencies(Set<UUID> dependencies) {
         this.dependencies = dependencies;
+    }
+
+    public void setType(AssumptionType type) {
+        this.type = type;
     }
 
     public void setDescription(String description) {
@@ -83,12 +89,16 @@ public class Assumption {
         return this.id;
     }
 
-    public AssumptionType getType() {
-        return this.type;
+    public String getAffectedComponent() {
+        return this.affectedComponent;
     }
 
     public Set<UUID> getDependencies() {
         return this.dependencies;
+    }
+
+    public AssumptionType getType() {
+        return this.type;
     }
 
     public String getDescription() {
@@ -115,8 +125,9 @@ public class Assumption {
     public String toString() {
         return "Assumption{" +
                 "id=" + id +
-                ", type=" + type +
                 ", dependencies=" + dependencies +
+                ", affectedComponent='" + affectedComponent + '\'' +
+                ", type=" + type +
                 ", description='" + description + '\'' +
                 ", probabilityOfViolation=" + probabilityOfViolation +
                 ", risk=" + risk +
