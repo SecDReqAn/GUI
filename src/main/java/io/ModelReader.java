@@ -42,6 +42,8 @@ public class ModelReader {
             }
         }
 
+        // TODO Clean-up resource.
+
         return readEntities;
     }
 }

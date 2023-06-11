@@ -3,6 +3,7 @@ package controllers;
 import general.Assumption;
 import general.Configuration;
 import general.ModelEntity;
+import general.Utilities;
 import io.ConfigManager;
 import io.ModelReader;
 import javafx.application.HostServices;
@@ -60,12 +61,7 @@ public class MainScreenController {
     private void handleNewAssumption(ActionEvent actionEvent) {
         if (this.analysisPath == null || this.analysisPath.isEmpty() ||
                 this.modelEntityMap == null || this.modelEntityMap.isEmpty()) {
-            var alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning");
-            alert.setHeaderText("Unable to create a new assumption!");
-            alert.setContentText("A path to a valid model and analysis first has to be set.");
-
-            alert.showAndWait();
+            Utilities.showAlertPopUp(Alert.AlertType.WARNING,"Warning", "Unable to create a new assumption!", "A path to a valid model and analysis first has to be set.");
             return;
         }
 
@@ -145,8 +141,11 @@ public class MainScreenController {
             this.modelEntityMap = ModelReader.readFromRepositoryFile(new File(this.modelPath
                     + System.getProperty("file.separator")
                     + MainScreenController.COMPONENT_REPOSITORY_FILENAME));
-        } catch (Exception e) {
+        } catch (XMLStreamException e) {
             // TODO
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            Utilities.showAlertPopUp(Alert.AlertType.ERROR,"Error", "Opening file failed", "The specified file could not be found.");
         }
     }
 
