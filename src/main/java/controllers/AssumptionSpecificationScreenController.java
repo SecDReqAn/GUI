@@ -38,7 +38,7 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private TextArea impactTextArea;
     @FXML
-    private ComboBox<String> affectedComponentComboBox;
+    private ComboBox<String> affectedEntityComboBox;
     @FXML
     private Button insertButton;
 
@@ -51,6 +51,11 @@ public class AssumptionSpecificationScreenController {
 
     public void initModelEntities(Map<String, ModelEntity> modelEntityMap){
         this.modelEntityMap = modelEntityMap;
+
+        // Init ComboBox with available entities read from the selected model.
+        ObservableList<String> affectedComponentsList = FXCollections.observableArrayList();
+        affectedComponentsList.addAll(this.modelEntityMap.keySet());
+        this.affectedEntityComboBox.setItems(affectedComponentsList);
     }
 
     private void checkForCompletenessOfSpecification(){
@@ -58,7 +63,7 @@ public class AssumptionSpecificationScreenController {
     }
 
     @FXML
-    public void initialize() {
+    private void initialize() {
         this.topLevelVBox.setAlignment(Pos.CENTER);
 
         // Init user data for the toggle buttons.
@@ -116,23 +121,26 @@ public class AssumptionSpecificationScreenController {
             this.assumption.setImpact(newText.trim());
             this.checkForCompletenessOfSpecification();
         });
-
-
-        // Init ComboBox with available entities read from the selected model.
-        ObservableList<String> affectedComponentsList = FXCollections.observableArrayList();
-        affectedComponentsList.addAll(this.modelEntityMap.keySet());
-        this.affectedComponentComboBox.setItems(affectedComponentsList);
     }
 
     @FXML
-    public void handleAnalyzedToggle(ActionEvent actionEvent) {
+    private void handleAnalyzedToggle(ActionEvent actionEvent) {
         var checkBox = (CheckBox) actionEvent.getSource();
         this.assumption.setAnalyzed(checkBox.isSelected());
         this.checkForCompletenessOfSpecification();
     }
 
     @FXML
-    public void handleInsertButton(ActionEvent actionEvent) {
+    private void handleAffectedEntitySelection(){
+        var selectedEntity = this.affectedEntityComboBox.getValue();
+        var associatedModelEntity = this.modelEntityMap.get(selectedEntity);
+
+        this.assumption.setAffectedEntity(associatedModelEntity.getId());
+        this.checkForCompletenessOfSpecification();
+    }
+
+    @FXML
+    private void handleInsertButton(ActionEvent actionEvent) {
         var stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         stage.close();
     }

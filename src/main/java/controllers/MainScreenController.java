@@ -58,11 +58,12 @@ public class MainScreenController {
 
     @FXML
     private void handleNewAssumption(ActionEvent actionEvent) {
-        if (this.modelEntityMap == null || this.modelEntityMap.isEmpty()) {
+        if (this.analysisPath == null || this.analysisPath.isEmpty() ||
+                this.modelEntityMap == null || this.modelEntityMap.isEmpty()) {
             var alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Warning");
             alert.setHeaderText("Unable to create a new assumption!");
-            alert.setContentText("A path to a valid model first has to be set.");
+            alert.setContentText("A path to a valid model and analysis first has to be set.");
 
             alert.showAndWait();
             return;

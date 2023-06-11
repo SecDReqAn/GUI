@@ -59,10 +59,10 @@
               </rowConstraints>
                <children>
                   <CheckBox alignment="BOTTOM_LEFT" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onAction="#handleAnalyzedToggle" style="-fx-padding: 10pt;" text="Analyzed" />
-                  <ComboBox fx:id="affectedComponentComboBox" prefHeight="24.0" prefWidth="245.0" promptText="Affected Component..." GridPane.columnIndex="1" />
+                  <ComboBox fx:id="affectedEntityComboBox" onAction="#handleAffectedEntitySelection" prefHeight="24.0" prefWidth="245.0" promptText="Affected Model Entity..." GridPane.columnIndex="1" />
                </children>
             </GridPane>
-            <Button fx:id="insertButton" alignment="CENTER" contentDisplay="CENTER" disable="true" mnemonicParsing="false" onAction="#handleInsertButton" prefHeight="30.0" prefWidth="84.0" style="-fx-padding: 5pt; -fx-background-radius: 5pt; -fx-border-radius: 5pt; -fx-background-color: #99bef7; -fx-border-color: black;" text="Insert" />
+            <Button fx:id="insertButton" alignment="CENTER" contentDisplay="CENTER" disable="true" mnemonicParsing="false" onAction="#handleInsertButton" prefHeight="30.0" prefWidth="84.0" style="-fx-padding: 5pt; -fx-background-radius: 5pt; -fx-border-radius: 5pt; -fx-background-color: #2F8ECA; -fx-border-color: black;" text="Insert" />
          </children>
       </VBox>
    </children>

@@ -6,12 +6,12 @@ import java.util.UUID;
 
 public class Assumption {
     public enum AssumptionType {
-        INTRODUCE_UNCERTAINTY, RESOLVE_UNCERTAINTY;
+        INTRODUCE_UNCERTAINTY, RESOLVE_UNCERTAINTY
     }
 
     private UUID id;
     private Set<UUID> dependencies;
-    private String affectedComponent;
+    private String affectedEntity;
     private AssumptionType type;
     private String description;
     private Double probabilityOfViolation;
@@ -42,7 +42,7 @@ public class Assumption {
     }
 
     public boolean isFullySpecified() {
-        return this.affectedComponent != null &&
+        return this.affectedEntity != null &&
                 this.type != null &&
                 this.description != null &&
                 this.probabilityOfViolation != null &&
@@ -53,8 +53,8 @@ public class Assumption {
                 !this.description.isEmpty();
     }
 
-    public void setAffectedComponent(String affectedComponent) {
-        this.affectedComponent = affectedComponent;
+    public void setAffectedEntity(String affectedEntity) {
+        this.affectedEntity = affectedEntity;
     }
 
     public void setDependencies(Set<UUID> dependencies) {
@@ -89,8 +89,8 @@ public class Assumption {
         return this.id;
     }
 
-    public String getAffectedComponent() {
-        return this.affectedComponent;
+    public String getAffectedEntity() {
+        return this.affectedEntity;
     }
 
     public Set<UUID> getDependencies() {
@@ -125,10 +125,10 @@ public class Assumption {
     public String toString() {
         return "Assumption{" +
                 "id=" + id +
-                ", dependencies=" + dependencies +
-                ", affectedComponent='" + affectedComponent + '\'' +
-                ", type=" + type +
                 ", description='" + description + '\'' +
+                ", affectedComponent='" + affectedEntity + '\'' +
+                ", type=" + type +
+                ", dependencies=" + dependencies +
                 ", probabilityOfViolation=" + probabilityOfViolation +
                 ", risk=" + risk +
                 ", impact='" + impact + '\'' +

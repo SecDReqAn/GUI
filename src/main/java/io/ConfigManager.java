@@ -55,6 +55,12 @@ public class ConfigManager {
                             currentAssumption.setType(Assumption.AssumptionType.valueOf(nextEvent.asCharacters().getData()));
                         }
                     }
+                    case "affectedEntity" -> {
+                        if(currentAssumption != null){
+                            nextEvent = eventReader.nextEvent();
+                            currentAssumption.setAffectedEntity(nextEvent.asCharacters().getData());
+                        }
+                    }
                     case "dependencies" -> {
                         if (currentAssumption != null) {
                             currentAssumption.setDependencies(new HashSet<>());
@@ -137,6 +143,9 @@ public class ConfigManager {
 
             // Write Assumption::type
             ConfigManager.writeIsolatedElement(streamWriter, "type", assumption.getType().toString());
+
+            // Write Assumption::affectedEntity
+            ConfigManager.writeIsolatedElement(streamWriter, "affectedEntity", assumption.getAffectedEntity());
 
             // Write Assumption::dependencies
             streamWriter.writeStartElement("dependencies");
