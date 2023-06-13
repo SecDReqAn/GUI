@@ -20,29 +20,36 @@ public class ModelReader {
         var readEntities = new HashMap<String, ModelEntity>();
 
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-        XMLEventReader eventReader = inputFactory.createXMLEventReader(new FileInputStream(repositoryFile));
+        XMLEventReader eventReader = null;
 
-        while (eventReader.hasNext()) {
-            XMLEvent nextEvent = eventReader.nextEvent();
-            if (nextEvent.isStartElement()) {
-                StartElement startElement = nextEvent.asStartElement();
-                switch (startElement.getName().getLocalPart()) {
-                    case "components__Repository", "interfaces__Repository" -> {
-                        Attribute type = startElement.getAttributeByName(new QName(startElement.getNamespaceContext().getNamespaceURI("xsi"), "type", "xsi"));
-                        Attribute id = startElement.getAttributeByName(new QName("id"));
-                        Attribute name = startElement.getAttributeByName(new QName("entityName"));
+        try {
+            eventReader = inputFactory.createXMLEventReader(new FileInputStream(repositoryFile));
 
-                        if (type != null && id != null && name != null) {
-                            ModelEntity newEntity = new ModelEntity(type.getValue(), id.getValue(), name.getValue());
-                            readEntities.put(newEntity.getName(), newEntity);
+            while (eventReader.hasNext()) {
+                XMLEvent nextEvent = eventReader.nextEvent();
+                if (nextEvent.isStartElement()) {
+                    StartElement startElement = nextEvent.asStartElement();
+                    switch (startElement.getName().getLocalPart()) {
+                        case "components__Repository", "interfaces__Repository" -> {
+                            Attribute type = startElement.getAttributeByName(new QName(startElement.getNamespaceContext().getNamespaceURI("xsi"), "type", "xsi"));
+                            Attribute id = startElement.getAttributeByName(new QName("id"));
+                            Attribute name = startElement.getAttributeByName(new QName("entityName"));
+
+                            if (type != null && id != null && name != null) {
+                                ModelEntity newEntity = new ModelEntity(type.getValue(), id.getValue(), name.getValue());
+                                readEntities.put(newEntity.getName(), newEntity);
+                            }
                         }
                     }
-                }
 
+                }
+            }
+
+        } finally {
+            if(eventReader != null){
+                eventReader.close();
             }
         }
-
-        // TODO Clean-up resource.
 
         return readEntities;
     }

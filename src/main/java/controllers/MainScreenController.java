@@ -36,6 +36,7 @@ public class MainScreenController {
     private final String defaultSaveLocation;
     private HostServices hostServices;
     private File saveFile;
+    private boolean isSaved;
     private String analysisPath;
     private String modelPath;
 
@@ -51,6 +52,7 @@ public class MainScreenController {
 
     public MainScreenController() {
         this.defaultSaveLocation = System.getProperty("user.home") + System.getProperty("file.separator") + "NewAssumptionSet.xml";
+        this.isSaved = true;
     }
 
     public void setHostServices(HostServices hostServices) {
@@ -61,7 +63,7 @@ public class MainScreenController {
     private void handleNewAssumption(ActionEvent actionEvent) {
         if (this.analysisPath == null || this.analysisPath.isEmpty() ||
                 this.modelEntityMap == null || this.modelEntityMap.isEmpty()) {
-            Utilities.showAlertPopUp(Alert.AlertType.WARNING,"Warning", "Unable to create a new assumption!", "A path to a valid model and analysis first has to be set.");
+            Utilities.showAlertPopUp(Alert.AlertType.WARNING, "Warning", "Unable to create a new assumption!", "A path to a valid model and analysis first has to be set.");
             return;
         }
 
@@ -86,6 +88,7 @@ public class MainScreenController {
             // Only add assumption in case it was fully specified by the user.
             if (newAssumption.isFullySpecified()) {
                 this.assumptions.getItems().add(newAssumption);
+                this.isSaved = false;
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -95,7 +98,7 @@ public class MainScreenController {
 
     @FXML
     private void newAnalysis() {
-        // TODO
+        // TODO Leverage isSavedField.
         System.out.println("Not implemented!");
     }
 
@@ -126,6 +129,11 @@ public class MainScreenController {
         try {
             Configuration configuration = ConfigManager.readConfig(selectedFile);
 
+            // Init model entities from read model path.
+            this.modelEntityMap = ModelReader.readFromRepositoryFile(new File(this.modelPath
+                    + System.getProperty("file.separator")
+                    + MainScreenController.COMPONENT_REPOSITORY_FILENAME));
+
             this.analysisPath = configuration.getAnalysisPath();
             this.analysisPathLabel.setText(this.analysisPath);
 
@@ -135,23 +143,21 @@ public class MainScreenController {
 
             this.assumptions.getItems().clear();
             this.assumptions.getItems().addAll(configuration.getAssumptions());
-            this.saveFile = selectedFile;
 
-            // Init model entities from read model path.
-            this.modelEntityMap = ModelReader.readFromRepositoryFile(new File(this.modelPath
-                    + System.getProperty("file.separator")
-                    + MainScreenController.COMPONENT_REPOSITORY_FILENAME));
+            this.saveFile = selectedFile;
+            this.isSaved = true;
         } catch (XMLStreamException e) {
-            // TODO
+            Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file is not a well-formed configuration.");
             e.printStackTrace();
         } catch (FileNotFoundException e) {
-            Utilities.showAlertPopUp(Alert.AlertType.ERROR,"Error", "Opening file failed", "The specified file could not be found.");
+            Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file could not be found.");
+            e.printStackTrace();
         }
     }
 
     @FXML
     private void openRecent() {
-        // TODO
+        // TODO Maybe start with recent files in the current execution. Otherwise some form of persistent config file is required.
         System.out.println("Not implemented!");
     }
 
@@ -182,8 +188,15 @@ public class MainScreenController {
         try {
             this.saveFile.createNewFile();
             ConfigManager.writeConfig(this.saveFile, new Configuration(this.analysisPath, this.modelPath, assumptions));
-        } catch (Exception e) {
-            // TODO
+            this.isSaved = true;
+        } catch (FileNotFoundException e) {
+            Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Saving failed", "The specified save location could not be found!");
+            e.printStackTrace();
+        } catch (IOException e) {
+            Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Saving failed", "Could not write to file!");
+            e.printStackTrace();
+        } catch (XMLStreamException e) {
+            Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Saving failed", "The current configuration is not well formed!");
             e.printStackTrace();
         }
     }
@@ -224,6 +237,7 @@ public class MainScreenController {
         if (selectedFolder != null) {
             this.analysisPath = selectedFolder.getAbsolutePath();
             originatingLabel.setText(this.analysisPath);
+            this.isSaved = true;
         }
     }
 
@@ -244,28 +258,25 @@ public class MainScreenController {
             // Check whether the specified folder actually contains a repository file.
             File repositoryFile = new File(absolutePath + System.getProperty("file.separator") + MainScreenController.COMPONENT_REPOSITORY_FILENAME);
             if (repositoryFile.exists()) {
-                // Accept valid selection.
-                this.modelPath = absolutePath;
-                var folders = this.modelPath.split(System.getProperty("file.separator"));
-                originatingLabel.setText(folders[folders.length - 1]);
-
                 // Load contents of repository file.
                 try {
                     this.modelEntityMap = ModelReader.readFromRepositoryFile(repositoryFile);
-                } catch (FileNotFoundException | XMLStreamException e) {
-                    // TODO
-                    throw new RuntimeException(e);
+
+                    // Accept valid selection.
+                    this.modelPath = absolutePath;
+                    var folders = this.modelPath.split(System.getProperty("file.separator"));
+                    originatingLabel.setText(folders[folders.length - 1]);
+                    this.isSaved = false;
+                } catch (FileNotFoundException e) {
+                    Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Loading model entities failed", "The repository file (default.repository) of the specified model could not be found.");
+                    e.printStackTrace();
+                } catch (XMLStreamException e) {
+                    Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Loading model entities failed", "The repository file (default.repository) of the specified model was not well-formed.");
+                    e.printStackTrace();
                 }
             } else {
                 // Invalid selection due to missing repository file.
-                var alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Warning");
-                alert.setHeaderText("Missing repository file!");
-                alert.setContentText("The selected model folder does not contain a repository file ("
-                        + MainScreenController.COMPONENT_REPOSITORY_FILENAME
-                        + "), specifying the available components of the model.");
-
-                alert.showAndWait();
+                Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Loading model entities failed", "The repository file (default.repository) of the specified model could not be found.");
             }
         }
     }
