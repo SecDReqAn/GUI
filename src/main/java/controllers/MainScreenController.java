@@ -130,7 +130,7 @@ public class MainScreenController {
             Configuration configuration = ConfigManager.readConfig(selectedFile);
 
             // Init model entities from read model path.
-            this.modelEntityMap = ModelReader.readFromRepositoryFile(new File(this.modelPath
+            this.modelEntityMap = ModelReader.readFromRepositoryFile(new File(configuration.getModelPath()
                     + System.getProperty("file.separator")
                     + MainScreenController.COMPONENT_REPOSITORY_FILENAME));
 
