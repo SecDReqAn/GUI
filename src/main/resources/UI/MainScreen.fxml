@@ -99,7 +99,7 @@
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
       </rowConstraints>
       <Label fx:id="analysisPathLabel" onMouseClicked="#handleAnalysisPathSelection" styleClass="ClickableLabel"
-             stylesheets="@MainScreenStyle.css" text="No analysis folder selected" wrapText="true"/>
+             stylesheets="@MainScreenStyle.css" text="No analysis URI specified" wrapText="true"/>
       <Label fx:id="modelNameLabel" onMouseClicked="#handleModelNameSelection" styleClass="ClickableLabel"
              stylesheets="@MainScreenStyle.css" text="No model folder selected" wrapText="true"
              GridPane.columnIndex="1"/>

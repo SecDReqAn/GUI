@@ -12,16 +12,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import network.AnalysisConnector;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
@@ -34,6 +32,7 @@ import java.util.Set;
 public class MainScreenController {
     private static final String COMPONENT_REPOSITORY_FILENAME = "default.repository";
     private final String defaultSaveLocation;
+    private AnalysisConnector analysisConnector;
     private HostServices hostServices;
     private File saveFile;
     private boolean isSaved;
@@ -44,7 +43,6 @@ public class MainScreenController {
 
     @FXML
     private ListView<Assumption> assumptions;
-
     @FXML
     private Label analysisPathLabel;
     @FXML
@@ -227,17 +225,26 @@ public class MainScreenController {
     @FXML
     private void handleAnalysisPathSelection(MouseEvent mouseEvent) {
         var originatingLabel = (Label) mouseEvent.getSource();
-        var stage = (Stage) originatingLabel.getScene().getWindow();
 
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        directoryChooser.setTitle("Select Analysis Folder");
-        directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        var selectedFolder = directoryChooser.showDialog(stage);
+        var textInputDialog = new TextInputDialog();
+        textInputDialog.setTitle("Analysis URI");
+        textInputDialog.setHeaderText("Please provide the web-service URI of the analysis.");
+        textInputDialog.setContentText("URI:");
 
-        if (selectedFolder != null) {
-            this.analysisPath = selectedFolder.getAbsolutePath();
-            originatingLabel.setText(this.analysisPath);
-            this.isSaved = true;
+        var userInput = textInputDialog.showAndWait();
+
+        if (userInput.isPresent()) {
+            this.analysisConnector = new AnalysisConnector(userInput.get());
+
+            // Test connection to analysis.
+            var connectionTestResult = this.analysisConnector.testConnection();
+            if (connectionTestResult.getKey() == 200) {
+                this.analysisPath = userInput.get();
+                this.isSaved = false;
+                originatingLabel.setText(this.analysisPath + " ✓");
+            } else {
+                Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Could not connect to the analysis", connectionTestResult.getValue());
+            }
         }
     }
 
