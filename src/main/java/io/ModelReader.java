@@ -1,7 +1,5 @@
 package io;
 
-import general.ModelEntity;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -16,6 +14,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ModelReader {
+    public record ModelEntity(String type, String id, String name) {
+        @Override
+        public String toString() {
+            return "ModelEntity{" +
+                    "type='" + type + '\'' +
+                    ", id='" + id + '\'' +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
+    }
+
     public static Map<String, ModelEntity> readFromRepositoryFile(File repositoryFile) throws FileNotFoundException, XMLStreamException {
         var readEntities = new HashMap<String, ModelEntity>();
 
@@ -37,7 +46,7 @@ public class ModelReader {
 
                             if (type != null && id != null && name != null) {
                                 ModelEntity newEntity = new ModelEntity(type.getValue(), id.getValue(), name.getValue());
-                                readEntities.put(newEntity.getName(), newEntity);
+                                readEntities.put(newEntity.name(), newEntity);
                             }
                         }
                     }

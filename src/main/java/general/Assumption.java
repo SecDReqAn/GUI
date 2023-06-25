@@ -1,5 +1,7 @@
 package general;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -21,9 +23,7 @@ public class Assumption {
     private Boolean analyzed;
 
     public Assumption() {
-        this.id = UUID.randomUUID();
-        this.dependencies = new HashSet<>();
-        // Implicitly set all other fields to null.
+        this(UUID.randomUUID());
     }
 
     public Assumption(UUID id) {
@@ -33,24 +33,13 @@ public class Assumption {
     }
 
     public Assumption(AssumptionType type, String description, double probabilityOfViolation, double risk, String impact, boolean analyzed) {
+        this();
         this.type = type;
         this.description = description;
         this.probabilityOfViolation = probabilityOfViolation;
         this.risk = risk;
         this.impact = impact;
         this.analyzed = analyzed;
-    }
-
-    public boolean isFullySpecified() {
-        return this.affectedEntity != null &&
-                this.type != null &&
-                this.description != null &&
-                this.probabilityOfViolation != null &&
-                this.risk != null &&
-                this.impact != null &&
-                this.analyzed != null &&
-                !this.impact.isEmpty() &&
-                !this.description.isEmpty();
     }
 
     public void setAffectedEntity(String affectedEntity) {
@@ -119,6 +108,19 @@ public class Assumption {
 
     public boolean isAnalyzed() {
         return this.analyzed;
+    }
+
+    @JsonIgnore
+    public boolean isFullySpecified() {
+        return this.affectedEntity != null &&
+                this.type != null &&
+                this.description != null &&
+                this.probabilityOfViolation != null &&
+                this.risk != null &&
+                this.impact != null &&
+                this.analyzed != null &&
+                !this.impact.isEmpty() &&
+                !this.description.isEmpty();
     }
 
     @Override

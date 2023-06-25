@@ -1,7 +1,7 @@
 package controllers;
 
 import general.Assumption;
-import general.ModelEntity;
+import io.ModelReader;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -19,7 +19,7 @@ public class AssumptionSpecificationScreenController {
      * The {@link Assumption} that is being specified.
      */
     private Assumption assumption;
-    private Map<String, ModelEntity> modelEntityMap;
+    private Map<String, ModelReader.ModelEntity> modelEntityMap;
 
     @FXML
     private VBox topLevelVBox;
@@ -49,7 +49,7 @@ public class AssumptionSpecificationScreenController {
         this.assumption.setAnalyzed(false);
     }
 
-    public void initModelEntities(Map<String, ModelEntity> modelEntityMap){
+    public void initModelEntities(Map<String, ModelReader.ModelEntity> modelEntityMap){
         this.modelEntityMap = modelEntityMap;
 
         // Init ComboBox with available entities read from the selected model.
@@ -135,7 +135,7 @@ public class AssumptionSpecificationScreenController {
         var selectedEntity = this.affectedEntityComboBox.getValue();
         var associatedModelEntity = this.modelEntityMap.get(selectedEntity);
 
-        this.assumption.setAffectedEntity(associatedModelEntity.getId());
+        this.assumption.setAffectedEntity(associatedModelEntity.id());
         this.checkForCompletenessOfSpecification();
     }
 

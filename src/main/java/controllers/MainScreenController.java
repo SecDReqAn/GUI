@@ -2,7 +2,6 @@ package controllers;
 
 import general.Assumption;
 import general.Configuration;
-import general.ModelEntity;
 import general.Utilities;
 import io.ConfigManager;
 import io.ModelReader;
@@ -39,8 +38,10 @@ public class MainScreenController {
     private String analysisPath;
     private String modelPath;
 
-    private Map<String, ModelEntity> modelEntityMap;
+    private Map<String, ModelReader.ModelEntity> modelEntityMap;
 
+    @FXML
+    private Button performAnalysisButton;
     @FXML
     private ListView<Assumption> assumptions;
     @FXML
@@ -55,6 +56,26 @@ public class MainScreenController {
 
     public void setHostServices(HostServices hostServices) {
         this.hostServices = hostServices;
+    }
+
+    private boolean testAnalysisConnection(String uri) {
+        this.analysisConnector = new AnalysisConnector(uri);
+
+        // Test connection to analysis.
+        var connectionTestResult = this.analysisConnector.testConnection();
+        if (connectionTestResult.getKey() == 200) {
+            this.analysisPath = uri;
+            this.isSaved = false;
+            this.analysisPathLabel.setText(this.analysisPath + " ✓");
+            return true;
+        } else {
+            this.analysisPathLabel.setText(uri + " ❌");
+            return false;
+        }
+    }
+
+    private boolean isMissingAnalysisParameters() {
+        return this.analysisPath == null || this.modelPath == null || this.assumptions.getItems().isEmpty();
     }
 
     @FXML
@@ -86,6 +107,7 @@ public class MainScreenController {
             // Only add assumption in case it was fully specified by the user.
             if (newAssumption.isFullySpecified()) {
                 this.assumptions.getItems().add(newAssumption);
+                this.performAnalysisButton.setDisable(this.isMissingAnalysisParameters());
                 this.isSaved = false;
             }
         } catch (IOException e) {
@@ -132,8 +154,9 @@ public class MainScreenController {
                     + System.getProperty("file.separator")
                     + MainScreenController.COMPONENT_REPOSITORY_FILENAME));
 
+            this.testAnalysisConnection(configuration.getAnalysisPath());
             this.analysisPath = configuration.getAnalysisPath();
-            this.analysisPathLabel.setText(this.analysisPath);
+
 
             this.modelPath = configuration.getModelPath();
             var folders = this.modelPath.split(System.getProperty("file.separator"));
@@ -143,6 +166,7 @@ public class MainScreenController {
             this.assumptions.getItems().addAll(configuration.getAssumptions());
 
             this.saveFile = selectedFile;
+            this.performAnalysisButton.setDisable(this.isMissingAnalysisParameters());
             this.isSaved = true;
         } catch (XMLStreamException e) {
             Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file is not a well-formed configuration.");
@@ -223,29 +247,39 @@ public class MainScreenController {
     }
 
     @FXML
-    private void handleAnalysisPathSelection(MouseEvent mouseEvent) {
-        var originatingLabel = (Label) mouseEvent.getSource();
+    private void handleAnalysisExecution() {
+        if (this.modelPath != null && this.assumptions.getItems().size() > 0) {
+            if(this.testAnalysisConnection(this.analysisPath)) {
+                var analysisResponse = this.analysisConnector.performAnalysis(new AnalysisConnector.AnalysisParameter(this.modelPath, new HashSet<>(this.assumptions.getItems())));
 
-        var textInputDialog = new TextInputDialog();
+                if (analysisResponse.getKey() == 200) {
+                    // TODO Show in UI.
+                    System.out.println("Analysis response:" + analysisResponse.getValue());
+                } else {
+                    Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Communication with the analysis failed.", analysisResponse.getValue());
+                }
+            } else {
+                Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Communication with the analysis failed.", "Connection to the analysis could not be established.");
+            }
+        }
+    }
+
+    @FXML
+    private void handleAnalysisPathSelection() {
+        var textInputDialog = new TextInputDialog("http://localhost:2406/");
         textInputDialog.setTitle("Analysis URI");
         textInputDialog.setHeaderText("Please provide the web-service URI of the analysis.");
         textInputDialog.setContentText("URI:");
 
         var userInput = textInputDialog.showAndWait();
 
-        if (userInput.isPresent()) {
-            this.analysisConnector = new AnalysisConnector(userInput.get());
 
-            // Test connection to analysis.
-            var connectionTestResult = this.analysisConnector.testConnection();
-            if (connectionTestResult.getKey() == 200) {
-                this.analysisPath = userInput.get();
-                this.isSaved = false;
-                originatingLabel.setText(this.analysisPath + " ✓");
-            } else {
-                Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Could not connect to the analysis", connectionTestResult.getValue());
-            }
-        }
+        userInput.ifPresent(s -> {
+            var connectionSuccess = this.testAnalysisConnection(s);
+            this.performAnalysisButton.setDisable(!connectionSuccess && this.isMissingAnalysisParameters());
+            // Unsaved changes in case the connection could be established.
+            this.isSaved = !connectionSuccess;
+        });
     }
 
     @FXML
@@ -273,6 +307,8 @@ public class MainScreenController {
                     this.modelPath = absolutePath;
                     var folders = this.modelPath.split(System.getProperty("file.separator"));
                     originatingLabel.setText(folders[folders.length - 1]);
+
+                    this.performAnalysisButton.setDisable(this.isMissingAnalysisParameters());
                     this.isSaved = false;
                 } catch (FileNotFoundException e) {
                     Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Loading model entities failed", "The repository file (default.repository) of the specified model could not be found.");
