@@ -45,6 +45,10 @@ public class MainScreenController {
     @FXML
     private ListView<Assumption> assumptions;
     @FXML
+    private TitledPane analysisOutputTitledPane;
+    @FXML
+    private TextArea analysisOutputTextArea;
+    @FXML
     private Label analysisPathLabel;
     @FXML
     private Label modelNameLabel;
@@ -252,9 +256,9 @@ public class MainScreenController {
             if(this.testAnalysisConnection(this.analysisPath)) {
                 var analysisResponse = this.analysisConnector.performAnalysis(new AnalysisConnector.AnalysisParameter(this.modelPath, new HashSet<>(this.assumptions.getItems())));
 
-                if (analysisResponse.getKey() == 200) {
-                    // TODO Show in UI.
-                    System.out.println("Analysis response:" + analysisResponse.getValue());
+                if (analysisResponse.getKey() != 0) {
+                    this.analysisOutputTextArea.setText(analysisResponse.getValue());
+                    this.analysisOutputTitledPane.setExpanded(true);
                 } else {
                     Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Communication with the analysis failed.", analysisResponse.getValue());
                 }
