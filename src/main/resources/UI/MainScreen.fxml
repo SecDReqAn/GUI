@@ -32,6 +32,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
+<?import java.lang.String?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -49,11 +50,11 @@
 
 <VBox prefHeight="700.0" prefWidth="1000.0" styleClass="MainScreenStyle.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainScreenController">
   <children>
-    <MenuBar style="-fx-padding: 0 0 0 0;" styleClass="BaseBar" stylesheets="@MainScreenStyle.css">
+    <MenuBar style="-fx-padding: 0 0 0 0;" stylesheets="@MainScreenStyle.css">
       <menus>
-        <Menu mnemonicParsing="false" styleClass="CustomMenu" text="Action">
+        <Menu mnemonicParsing="false" text="Action">
           <items>
-            <MenuItem mnemonicParsing="false" onAction="#handleNewAssumption" styleClass="CustomMenuItem" text="New Assumption" />
+            <MenuItem mnemonicParsing="false" onAction="#handleNewAssumption" text="New Assumption" />
                   <MenuItem mnemonicParsing="false" onAction="#newAnalysis" text="New Analysis" />
                   <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" onAction="#openFromFile" text="Open Configuration…" />
@@ -87,6 +88,10 @@
           </items>
         </Menu>
       </menus>
+         <styleClass>
+            <String fx:value="BarBackground" />
+            <String fx:value="LabelBar" />
+         </styleClass>
     </MenuBar>
       <VBox prefHeight="343.0" prefWidth="640.0" VBox.vgrow="ALWAYS">
          <children>
@@ -95,14 +100,14 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-padding: 0;">
                      <children>
-                        <TextArea fx:id="analysisOutputTextArea" editable="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <TextArea fx:id="analysisOutputTextArea" editable="false" styleClass="OutputTextArea" stylesheets="@MainScreenStyle.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
               </content>
             </TitledPane>
          </children>
       </VBox>
-    <GridPane alignment="BASELINE_CENTER" styleClass="BaseBar" stylesheets="@MainScreenStyle.css" VBox.vgrow="NEVER">
+    <GridPane alignment="BASELINE_CENTER" stylesheets="@MainScreenStyle.css" VBox.vgrow="NEVER">
       <columnConstraints>
         <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -114,6 +119,10 @@
       <Label fx:id="analysisPathLabel" onMouseClicked="#handleAnalysisPathSelection" styleClass="ClickableLabel" stylesheets="@MainScreenStyle.css" text="No analysis URI specified" wrapText="true" />
       <Label fx:id="modelNameLabel" onMouseClicked="#handleModelNameSelection" styleClass="ClickableLabel" stylesheets="@MainScreenStyle.css" text="No model folder selected" wrapText="true" GridPane.columnIndex="2" />
          <Button fx:id="performAnalysisButton" disable="true" mnemonicParsing="false" onAction="#handleAnalysisExecution" text="Perform Analysis" GridPane.columnIndex="1" />
+         <styleClass>
+            <String fx:value="BarBackground" />
+            <String fx:value="LabelBar" />
+         </styleClass>
     </GridPane>
   </children>
 </VBox>

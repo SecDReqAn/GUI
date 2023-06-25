@@ -1,12 +1,12 @@
-.BaseBar {
+.BarBackground {
     -fx-background-color: #3C3F41;
 }
 
-.BaseBar .label {
+.LabelBar .label {
     -fx-text-fill: #B8B5B3;
 }
 
-.menu-item .label{
+.menu-item .label {
     -fx-text-fill: black;
 }
 
@@ -16,4 +16,12 @@
 
 .ClickableLabel:hover {
     -fx-background-color: #303234;
+}
+
+.OutputTextArea{
+    -fx-text-fill: #B2AEAD;
+}
+
+.OutputTextArea .content {
+    -fx-background-color: #2B2B2B;
 }

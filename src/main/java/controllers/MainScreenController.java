@@ -28,6 +28,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+// TODO Confirmation pop-up for unsaved changed when closing the application directly.
+
 public class MainScreenController {
     private static final String COMPONENT_REPOSITORY_FILENAME = "default.repository";
     private final String defaultSaveLocation;
@@ -86,7 +88,7 @@ public class MainScreenController {
     private void handleNewAssumption(ActionEvent actionEvent) {
         if (this.analysisPath == null || this.analysisPath.isEmpty() ||
                 this.modelEntityMap == null || this.modelEntityMap.isEmpty()) {
-            Utilities.showAlertPopUp(Alert.AlertType.WARNING, "Warning", "Unable to create a new assumption!", "A path to a valid model and analysis first has to be set.");
+            Utilities.showAlert(Alert.AlertType.WARNING, "Warning", "Unable to create a new assumption!", "A path to a valid model and analysis first has to be set.");
             return;
         }
 
@@ -173,10 +175,10 @@ public class MainScreenController {
             this.performAnalysisButton.setDisable(this.isMissingAnalysisParameters());
             this.isSaved = true;
         } catch (XMLStreamException e) {
-            Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file is not a well-formed configuration.");
+            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file is not a well-formed configuration.");
             e.printStackTrace();
         } catch (FileNotFoundException e) {
-            Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file could not be found.");
+            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file could not be found.");
             e.printStackTrace();
         }
     }
@@ -216,13 +218,13 @@ public class MainScreenController {
             ConfigManager.writeConfig(this.saveFile, new Configuration(this.analysisPath, this.modelPath, assumptions));
             this.isSaved = true;
         } catch (FileNotFoundException e) {
-            Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Saving failed", "The specified save location could not be found!");
+            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Saving failed", "The specified save location could not be found!");
             e.printStackTrace();
         } catch (IOException e) {
-            Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Saving failed", "Could not write to file!");
+            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Saving failed", "Could not write to file!");
             e.printStackTrace();
         } catch (XMLStreamException e) {
-            Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Saving failed", "The current configuration is not well formed!");
+            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Saving failed", "The current configuration is not well formed!");
             e.printStackTrace();
         }
     }
@@ -242,6 +244,17 @@ public class MainScreenController {
 
     @FXML
     private void handleQuit() {
+        if(!this.isSaved){
+            var confirmationResult = Utilities.showAlert(Alert.AlertType.CONFIRMATION,
+                    "Unsaved Changes",
+                    "There exist unsaved changed in the current configuration",
+                    "Quit and discard the changes?");
+
+            if(confirmationResult.isPresent() && confirmationResult.get() == ButtonType.CANCEL){
+                return;
+            }
+        }
+
         Platform.exit();
     }
 
@@ -260,10 +273,10 @@ public class MainScreenController {
                     this.analysisOutputTextArea.setText(analysisResponse.getValue());
                     this.analysisOutputTitledPane.setExpanded(true);
                 } else {
-                    Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Communication with the analysis failed.", analysisResponse.getValue());
+                    Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Communication with the analysis failed.", analysisResponse.getValue());
                 }
             } else {
-                Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Communication with the analysis failed.", "Connection to the analysis could not be established.");
+                Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Communication with the analysis failed.", "Connection to the analysis could not be established.");
             }
         }
     }
@@ -315,15 +328,15 @@ public class MainScreenController {
                     this.performAnalysisButton.setDisable(this.isMissingAnalysisParameters());
                     this.isSaved = false;
                 } catch (FileNotFoundException e) {
-                    Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Loading model entities failed", "The repository file (default.repository) of the specified model could not be found.");
+                    Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Loading model entities failed", "The repository file (default.repository) of the specified model could not be found.");
                     e.printStackTrace();
                 } catch (XMLStreamException e) {
-                    Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Loading model entities failed", "The repository file (default.repository) of the specified model was not well-formed.");
+                    Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Loading model entities failed", "The repository file (default.repository) of the specified model was not well-formed.");
                     e.printStackTrace();
                 }
             } else {
                 // Invalid selection due to missing repository file.
-                Utilities.showAlertPopUp(Alert.AlertType.ERROR, "Error", "Loading model entities failed", "The repository file (default.repository) of the specified model could not be found.");
+                Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Loading model entities failed", "The repository file (default.repository) of the specified model could not be found.");
             }
         }
     }

@@ -13,6 +13,8 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO There are also Actor- and Behavior-Uncertainties. Therefore, it is also necessary being able to parse the appropriate model files.
+
 public class ModelReader {
     public record ModelEntity(String type, String id, String name) {
         @Override

@@ -13,7 +13,7 @@ public class Assumption {
 
     private UUID id;
     private Set<UUID> dependencies;
-    private String affectedEntity;
+    private String affectedEntity; // TODO An assumption is able to affect multiple model-entities.
     private AssumptionType type;
     private String description;
     private Double probabilityOfViolation;

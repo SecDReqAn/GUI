@@ -1,13 +1,16 @@
 package general;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+
+import java.util.Optional;
 
 public class Utilities {
-    public static void showAlertPopUp(Alert.AlertType type, String title, String header, String content){
+    public static Optional<ButtonType> showAlert(Alert.AlertType type, String title, String header, String content){
         var alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(header);
         alert.setContentText(content);
-        alert.showAndWait();
+        return alert.showAndWait();
     }
 }
