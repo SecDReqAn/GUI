@@ -14,10 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.stage.*;
 import network.AnalysisConnector;
 
 import javax.xml.stream.XMLStreamException;
@@ -28,7 +25,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-// TODO Confirmation pop-up for unsaved changed when closing the application directly.
+// TODO Remove * imports.
+// TODO Replace System.getProperty("file.separator") with File.separator and check whether this also works under Windows (System.getProperty("file.separator") returned null under Windows).
 
 public class MainScreenController {
     private static final String COMPONENT_REPOSITORY_FILENAME = "default.repository";
@@ -62,6 +60,19 @@ public class MainScreenController {
 
     public void setHostServices(HostServices hostServices) {
         this.hostServices = hostServices;
+    }
+
+    public void handleExitRequest(WindowEvent windowEvent) {
+        if (!this.isSaved) {
+            var confirmationResult = Utilities.showAlert(Alert.AlertType.CONFIRMATION,
+                    "Unsaved Changes",
+                    "There exist unsaved changed in the current configuration",
+                    "Quit and discard the changes?");
+
+            if (confirmationResult.isPresent() && confirmationResult.get() == ButtonType.CANCEL) {
+                windowEvent.consume();
+            }
+        }
     }
 
     private boolean testAnalysisConnection(String uri) {
@@ -244,13 +255,13 @@ public class MainScreenController {
 
     @FXML
     private void handleQuit() {
-        if(!this.isSaved){
+        if (!this.isSaved) {
             var confirmationResult = Utilities.showAlert(Alert.AlertType.CONFIRMATION,
                     "Unsaved Changes",
                     "There exist unsaved changed in the current configuration",
                     "Quit and discard the changes?");
 
-            if(confirmationResult.isPresent() && confirmationResult.get() == ButtonType.CANCEL){
+            if (confirmationResult.isPresent() && confirmationResult.get() == ButtonType.CANCEL) {
                 return;
             }
         }
@@ -266,7 +277,7 @@ public class MainScreenController {
     @FXML
     private void handleAnalysisExecution() {
         if (this.modelPath != null && this.assumptions.getItems().size() > 0) {
-            if(this.testAnalysisConnection(this.analysisPath)) {
+            if (this.testAnalysisConnection(this.analysisPath)) {
                 var analysisResponse = this.analysisConnector.performAnalysis(new AnalysisConnector.AnalysisParameter(this.modelPath, new HashSet<>(this.assumptions.getItems())));
 
                 if (analysisResponse.getKey() != 0) {
