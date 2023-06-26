@@ -11,10 +11,22 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.TitledPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.*;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import network.AnalysisConnector;
 
 import javax.xml.stream.XMLStreamException;
@@ -25,7 +37,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-// TODO Remove * imports.
 // TODO Replace System.getProperty("file.separator") with File.separator and check whether this also works under Windows (System.getProperty("file.separator") returned null under Windows).
 
 public class MainScreenController {
@@ -143,7 +154,7 @@ public class MainScreenController {
     private void openFromFile(ActionEvent actionEvent) {
         var stage = (Stage) ((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow();
 
-        FileChooser fileChooser = new FileChooser();
+        var fileChooser = new FileChooser();
         fileChooser.setTitle("Select an existing File");
         fileChooser.setInitialFileName("NewAssumptions.xml");
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
@@ -315,7 +326,7 @@ public class MainScreenController {
         var originatingLabel = (Label) mouseEvent.getSource();
         var stage = (Stage) originatingLabel.getScene().getWindow();
 
-        DirectoryChooser directoryChooser = new DirectoryChooser();
+        var directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Select Model Folder");
         directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         var selectedFolder = directoryChooser.showDialog(stage);
