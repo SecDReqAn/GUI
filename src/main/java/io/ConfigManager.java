@@ -2,6 +2,8 @@ package io;
 
 import general.Assumption;
 import general.Configuration;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.*;
@@ -14,13 +16,17 @@ import java.util.HashSet;
 import java.util.UUID;
 
 public class ConfigManager {
-    private static void writeIsolatedElement(XMLStreamWriter streamWriter, String elementName, String value) throws XMLStreamException {
+    private static void writeIsolatedElement(@NotNull XMLStreamWriter streamWriter, @NotNull String elementName, @Nullable String value) throws XMLStreamException {
         streamWriter.writeStartElement(elementName);
-        streamWriter.writeCharacters(value);
+        if(value != null){
+            streamWriter.writeCharacters(value);
+        }
         streamWriter.writeEndElement();
     }
 
-    public static Configuration readConfig(File target) throws FileNotFoundException, XMLStreamException {
+    // TODO Has to support reading incomplete configurations (e.g., missing analysis-path).
+
+    public static Configuration readConfig(@NotNull File target) throws FileNotFoundException, XMLStreamException {
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         XMLEventReader eventReader = null;
 
@@ -128,7 +134,7 @@ public class ConfigManager {
         return readConfiguration;
     }
 
-    public static void writeConfig(File target, Configuration configuration) throws FileNotFoundException, XMLStreamException {
+    public static void writeConfig(@NotNull File target, @NotNull Configuration configuration) throws FileNotFoundException, XMLStreamException {
         XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
         XMLStreamWriter streamWriter = null;
 

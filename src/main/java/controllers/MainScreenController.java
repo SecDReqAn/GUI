@@ -2,6 +2,7 @@ package controllers;
 
 import general.Assumption;
 import general.Configuration;
+import general.Constants;
 import general.Utilities;
 import io.ConfigManager;
 import io.ModelReader;
@@ -37,7 +38,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-// TODO Replace System.getProperty("file.separator") with File.separator and check whether this also works under Windows (System.getProperty("file.separator") returned null under Windows).
+// TODO: Make use of @NotNull and @Nullable annotations to avoid NullPointer-Exceptions.
 
 public class MainScreenController {
     private static final String COMPONENT_REPOSITORY_FILENAME = "default.repository";
@@ -65,7 +66,7 @@ public class MainScreenController {
     private Label modelNameLabel;
 
     public MainScreenController() {
-        this.defaultSaveLocation = System.getProperty("user.home") + System.getProperty("file.separator") + "NewAssumptionSet.xml";
+        this.defaultSaveLocation = Constants.USER_HOME_PATH + Constants.FILE_SYSTEM_SEPARATOR + "NewAssumptionSet.xml";
         this.isSaved = true;
     }
 
@@ -92,7 +93,6 @@ public class MainScreenController {
         // Test connection to analysis.
         var connectionTestResult = this.analysisConnector.testConnection();
         if (connectionTestResult.getKey() == 200) {
-            this.analysisPath = uri;
             this.isSaved = false;
             this.analysisPathLabel.setText(this.analysisPath + " ✓");
             return true;
@@ -157,7 +157,7 @@ public class MainScreenController {
         var fileChooser = new FileChooser();
         fileChooser.setTitle("Select an existing File");
         fileChooser.setInitialFileName("NewAssumptions.xml");
-        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        fileChooser.setInitialDirectory(new File(Constants.USER_HOME_PATH));
         var selectedFile = fileChooser.showOpenDialog(stage);
 
         // File selection has been aborted by the user.
@@ -179,7 +179,7 @@ public class MainScreenController {
 
             // Init model entities from read model path.
             this.modelEntityMap = ModelReader.readFromRepositoryFile(new File(configuration.getModelPath()
-                    + System.getProperty("file.separator")
+                    + Constants.FILE_SYSTEM_SEPARATOR
                     + MainScreenController.COMPONENT_REPOSITORY_FILENAME));
 
             this.testAnalysisConnection(configuration.getAnalysisPath());
@@ -187,7 +187,7 @@ public class MainScreenController {
 
 
             this.modelPath = configuration.getModelPath();
-            var folders = this.modelPath.split(System.getProperty("file.separator"));
+            var folders = this.modelPath.split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
             this.modelNameLabel.setText(folders[folders.length - 1]);
 
             this.assumptions.getItems().clear();
@@ -258,7 +258,7 @@ public class MainScreenController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Save Location");
         fileChooser.setInitialFileName("NewAssumptions.xml");
-        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        fileChooser.setInitialDirectory(new File(Constants.USER_HOME_PATH));
         this.saveFile = fileChooser.showSaveDialog(stage);
 
         this.saveToFile();
@@ -313,11 +313,11 @@ public class MainScreenController {
         var userInput = textInputDialog.showAndWait();
 
 
-        userInput.ifPresent(s -> {
-            var connectionSuccess = this.testAnalysisConnection(s);
-            this.performAnalysisButton.setDisable(!connectionSuccess && this.isMissingAnalysisParameters());
-            // Unsaved changes in case the connection could be established.
-            this.isSaved = !connectionSuccess;
+        userInput.ifPresent(input -> {
+            this.analysisPath = input;
+            this.isSaved = false;
+
+            this.performAnalysisButton.setDisable(!this.testAnalysisConnection(input) && this.isMissingAnalysisParameters());
         });
     }
 
@@ -328,7 +328,7 @@ public class MainScreenController {
 
         var directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Select Model Folder");
-        directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        directoryChooser.setInitialDirectory(new File(Constants.USER_HOME_PATH));
         var selectedFolder = directoryChooser.showDialog(stage);
 
         // Check whether the user aborted the selection.
@@ -336,7 +336,7 @@ public class MainScreenController {
             var absolutePath = selectedFolder.getAbsolutePath();
 
             // Check whether the specified folder actually contains a repository file.
-            File repositoryFile = new File(absolutePath + System.getProperty("file.separator") + MainScreenController.COMPONENT_REPOSITORY_FILENAME);
+            File repositoryFile = new File(absolutePath + Constants.FILE_SYSTEM_SEPARATOR + MainScreenController.COMPONENT_REPOSITORY_FILENAME);
             if (repositoryFile.exists()) {
                 // Load contents of repository file.
                 try {
@@ -344,7 +344,8 @@ public class MainScreenController {
 
                     // Accept valid selection.
                     this.modelPath = absolutePath;
-                    var folders = this.modelPath.split(System.getProperty("file.separator"));
+                    // Only display last subfolder of the path for better readability.
+                    var folders = this.modelPath.split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
                     originatingLabel.setText(folders[folders.length - 1]);
 
                     this.performAnalysisButton.setDisable(this.isMissingAnalysisParameters());
