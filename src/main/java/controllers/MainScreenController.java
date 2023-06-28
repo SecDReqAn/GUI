@@ -57,8 +57,6 @@ public class MainScreenController {
     @FXML
     private ListView<Assumption> assumptions;
     @FXML
-    private TitledPane analysisOutputTitledPane;
-    @FXML
     private TextArea analysisOutputTextArea;
     @FXML
     private Label analysisPathLabel;
@@ -91,15 +89,10 @@ public class MainScreenController {
         this.analysisConnector = new AnalysisConnector(uri);
 
         // Test connection to analysis.
-        var connectionTestResult = this.analysisConnector.testConnection();
-        if (connectionTestResult.getKey() == 200) {
-            this.isSaved = false;
-            this.analysisPathLabel.setText(this.analysisPath + " ✓");
-            return true;
-        } else {
-            this.analysisPathLabel.setText(uri + " ❌");
-            return false;
-        }
+        var connectionSuccess = this.analysisConnector.testConnection().getKey() == 200;
+
+        this.analysisPathLabel.setText(uri + (connectionSuccess ? " ✓" : " ❌"));
+        return connectionSuccess;
     }
 
     private boolean isMissingAnalysisParameters() {
@@ -293,7 +286,6 @@ public class MainScreenController {
 
                 if (analysisResponse.getKey() != 0) {
                     this.analysisOutputTextArea.setText(analysisResponse.getValue());
-                    this.analysisOutputTitledPane.setExpanded(true);
                 } else {
                     Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Communication with the analysis failed.", analysisResponse.getValue());
                 }

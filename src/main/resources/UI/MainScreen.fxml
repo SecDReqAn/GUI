@@ -40,6 +40,7 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -93,20 +94,32 @@
             <String fx:value="LabelBar" />
          </styleClass>
     </MenuBar>
-      <VBox prefHeight="343.0" prefWidth="640.0" VBox.vgrow="ALWAYS">
-         <children>
-            <ListView fx:id="assumptions" prefHeight="620.0" prefWidth="1000.0" style="-fx-background-color: #2B2B2B;" VBox.vgrow="ALWAYS" />
-            <TitledPane fx:id="analysisOutputTitledPane" expanded="false" text="Analysis Output" VBox.vgrow="NEVER">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-padding: 0;">
-                     <children>
-                        <TextArea fx:id="analysisOutputTextArea" editable="false" styleClass="OutputTextArea" stylesheets="@MainScreenStyle.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                     </children>
-                  </AnchorPane>
-              </content>
-            </TitledPane>
-         </children>
-      </VBox>
+      <SplitPane dividerPositions="0.9" orientation="VERTICAL" prefHeight="643.0" prefWidth="1000.0">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+               <children>
+                  <TitledPane collapsible="false" text="Assumptions">
+                     <content>
+                        <ListView fx:id="assumptions" prefHeight="620.0" prefWidth="1000.0" style="-fx-background-color: #2B2B2B;" />
+                     </content>
+                  </TitledPane>
+               </children>
+            </AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+               <children>
+                  <TitledPane collapsible="false" prefHeight="317.0" prefWidth="998.0" text="Analysis Output" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-padding: 0;">
+                           <children>
+                              <TextArea fx:id="analysisOutputTextArea" editable="false" styleClass="OutputTextArea" stylesheets="@MainScreenStyle.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </TitledPane>
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
     <GridPane alignment="BASELINE_CENTER" stylesheets="@MainScreenStyle.css" VBox.vgrow="NEVER">
       <columnConstraints>
         <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
