@@ -98,7 +98,7 @@
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
-                  <TitledPane collapsible="false" text="Assumptions">
+                  <TitledPane collapsible="false" styleClass="CustomTitledPane" stylesheets="@MainScreenStyle.css" text="Assumptions" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <content>
                         <ListView fx:id="assumptions" prefHeight="620.0" prefWidth="1000.0" style="-fx-background-color: #2B2B2B;" />
                      </content>
@@ -107,7 +107,7 @@
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
-                  <TitledPane collapsible="false" prefHeight="317.0" prefWidth="998.0" text="Analysis Output" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <TitledPane collapsible="false" styleClass="CustomTitledPane" stylesheets="@MainScreenStyle.css" text="Analysis Output" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-padding: 0;">
                            <children>

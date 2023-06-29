@@ -15,6 +15,8 @@ import java.io.*;
 import java.util.HashSet;
 import java.util.UUID;
 
+// TODO Consider transitioning from XML to JSON for persisting configurations.
+
 public class ConfigManager {
     private static void writeIsolatedElement(@NotNull XMLStreamWriter streamWriter, @NotNull String elementName, @Nullable String value) throws XMLStreamException {
         streamWriter.writeStartElement(elementName);

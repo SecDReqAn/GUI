@@ -18,10 +18,18 @@
     -fx-background-color: #303234;
 }
 
-.OutputTextArea{
+.OutputTextArea {
     -fx-text-fill: #B2AEAD;
 }
 
 .OutputTextArea .content {
     -fx-background-color: #2B2B2B;
+}
+
+.CustomTitledPane {
+    -fx-text-fill: #B8B5B3;
+}
+
+.CustomTitledPane .title {
+    -fx-background-color: #515658;
 }

@@ -1,5 +1,7 @@
 package io;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -16,7 +18,7 @@ import java.util.Map;
 // TODO There are also Actor- and Behavior-Uncertainties. Therefore, it is also necessary being able to parse the appropriate model files.
 
 public class ModelReader {
-    public record ModelEntity(String type, String id, String name) {
+    public record ModelEntity(@NotNull String type, @NotNull String id, @NotNull String name) {
         @Override
         public String toString() {
             return "ModelEntity{" +
@@ -27,7 +29,7 @@ public class ModelReader {
         }
     }
 
-    public static Map<String, ModelEntity> readFromRepositoryFile(File repositoryFile) throws FileNotFoundException, XMLStreamException {
+    public static @NotNull Map<String, ModelEntity> readFromRepositoryFile(@NotNull File repositoryFile) throws FileNotFoundException, XMLStreamException {
         var readEntities = new HashMap<String, ModelEntity>();
 
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();

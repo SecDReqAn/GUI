@@ -2,6 +2,8 @@ package general;
 
 import java.util.Set;
 
+// TODO Add field for the result of an analysis.
+
 public class Configuration {
     private String analysisPath;
     private String modelPath;

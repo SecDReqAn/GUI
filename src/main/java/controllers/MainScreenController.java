@@ -20,7 +20,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.TitledPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
@@ -275,7 +274,7 @@ public class MainScreenController {
 
     @FXML
     private void openDocumentation() {
-        this.hostServices.showDocument("https://git.scc.kit.edu/i43/stud/praktika/sose2023/timnorbertbaechle");
+        this.hostServices.showDocument(Constants.DOCUMENTATION_URL);
     }
 
     @FXML
@@ -297,13 +296,12 @@ public class MainScreenController {
 
     @FXML
     private void handleAnalysisPathSelection() {
-        var textInputDialog = new TextInputDialog("http://localhost:2406/");
+        var textInputDialog = new TextInputDialog(Constants.DEFAULT_ANALYSIS_PATH);
         textInputDialog.setTitle("Analysis URI");
         textInputDialog.setHeaderText("Please provide the web-service URI of the analysis.");
         textInputDialog.setContentText("URI:");
 
         var userInput = textInputDialog.showAndWait();
-
 
         userInput.ifPresent(input -> {
             this.analysisPath = input;
