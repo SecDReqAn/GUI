@@ -9,19 +9,27 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
 import javafx.util.Pair;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AnalysisConnector {
     public record AnalysisParameter(String modelPath, Set<Assumption> assumptions) {
     }
 
     private final Client client;
+    private final ObjectMapper objectMapper;
     private final String analysisUri;
 
     public AnalysisConnector(String analysisUri) {
         this.client = ClientBuilder.newClient();
         this.analysisUri = analysisUri;
+        this.objectMapper = new ObjectMapper();
     }
 
     public Pair<Integer, String> testConnection() {
@@ -39,10 +47,8 @@ public class AnalysisConnector {
     }
 
     public Pair<Integer, String> performAnalysis(AnalysisParameter analysisParameter) {
-        var objectMapper = new ObjectMapper();
-
         try {
-            var jsonString = objectMapper.writeValueAsString(analysisParameter);
+            var jsonString = this.objectMapper.writeValueAsString(analysisParameter);
 
             try (var response = this.client.target(this.analysisUri).path("run").request().post(Entity.entity(jsonString, MediaType.APPLICATION_JSON))) {
                 return new Pair<>(response.getStatus(), response.readEntity(String.class));
@@ -51,5 +57,39 @@ public class AnalysisConnector {
             e.printStackTrace();
             return new Pair<>(0, "Marshalling failed due to malformed analysis parameters.");
         }
+    }
+
+    public Pair<Integer, String> transferModelFiles(@NotNull File modelPath) {
+        // Determine list of files that are part of the model and must be transferred to the analysis.
+        var filesInModelFolder = modelPath.listFiles();
+
+        // Abort.
+        if (filesInModelFolder == null || filesInModelFolder.length == 0) {
+            return new Pair<>(0, "The model could not be transmitted to the analysis as there are no files contained in the specified model folder.");
+        }
+
+        // Do not consider folders and nested / hidden files.
+        var relevantFiles = Stream.of(filesInModelFolder)
+                .filter(File::isFile)
+                .filter(file -> !file.getName().startsWith("."))
+                .collect(Collectors.toSet());
+
+
+        // TODO Complete transmission of files to analysis.
+        for(var file : relevantFiles){
+            try {
+                byte[] fileData = new byte[(int) file.length()];
+
+                var fileInputStream = new FileInputStream(file);
+                fileInputStream.read(fileData);
+                fileInputStream.close();
+
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return new Pair<>(0, "Not implemented");
     }
 }
