@@ -30,10 +30,8 @@ public class AnalysisConnector {
         try (var response = this.client.target(this.analysisUri).path("test").request(MediaType.TEXT_PLAIN).get()) {
             codeMessagePair = new Pair<>(response.getStatus(), response.readEntity(String.class));
         } catch (IllegalArgumentException | NullPointerException e) {
-            e.printStackTrace();
             codeMessagePair = new Pair<>(0, "The specified URI is invalid.");
         } catch (ProcessingException e) {
-            e.printStackTrace();
             codeMessagePair = new Pair<>(0, "Connection to analysis could not be established.");
         }
 

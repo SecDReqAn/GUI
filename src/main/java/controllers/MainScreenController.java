@@ -1,5 +1,7 @@
 package controllers;
 
+import com.fasterxml.jackson.core.exc.StreamReadException;
+import com.fasterxml.jackson.databind.DatabindException;
 import general.Assumption;
 import general.Configuration;
 import general.Constants;
@@ -167,33 +169,43 @@ public class MainScreenController {
         }
 
         try {
-            Configuration configuration = ConfigManager.readConfig(selectedFile);
+            var readConfiguration = ConfigManager.readConfig(selectedFile);
 
-            // Init model entities from read model path.
-            this.modelEntityMap = ModelReader.readFromRepositoryFile(new File(configuration.getModelPath()
+            // Analysis
+            this.analysisPath = readConfiguration.analysisPath();
+            this.testAnalysisConnection(readConfiguration.analysisPath());
+
+            // Init model entities from read model path if model is already specified.
+            this.modelEntityMap = (readConfiguration.modelPath() != null) ?
+                    ModelReader.readFromRepositoryFile(new File(readConfiguration.modelPath()
                     + Constants.FILE_SYSTEM_SEPARATOR
-                    + MainScreenController.COMPONENT_REPOSITORY_FILENAME));
+                    + MainScreenController.COMPONENT_REPOSITORY_FILENAME)) : null;
 
-            this.testAnalysisConnection(configuration.getAnalysisPath());
-            this.analysisPath = configuration.getAnalysisPath();
-
-
-            this.modelPath = configuration.getModelPath();
+            // Model
+            this.modelPath = readConfiguration.modelPath();
             var folders = this.modelPath.split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
             this.modelNameLabel.setText(folders[folders.length - 1]);
 
+            // Assumptions
             this.assumptions.getItems().clear();
-            this.assumptions.getItems().addAll(configuration.getAssumptions());
+            this.assumptions.getItems().addAll(readConfiguration.assumptions());
+
+            // Analysis result
+            this.analysisOutputTextArea.setText(readConfiguration.analysisResult());
 
             this.saveFile = selectedFile;
             this.performAnalysisButton.setDisable(this.isMissingAnalysisParameters());
             this.isSaved = true;
+        } catch (StreamReadException e) {
+            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file exhibits an invalid structure.");
+        } catch (DatabindException e) {
+            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not map the contents of the specified file to a valid Configuration.");
         } catch (XMLStreamException e) {
-            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file is not a well-formed configuration.");
-            e.printStackTrace();
+            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "An error occurred when reading from the repository file associated with the the specified model.");
         } catch (FileNotFoundException e) {
-            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file could not be found.");
-            e.printStackTrace();
+            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not find the repository file associated with the the specified model.");
+        } catch (IOException e) {
+            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Encountered a low-level I/O problem when trying to read from the file.");
         }
     }
 
@@ -229,16 +241,10 @@ public class MainScreenController {
         Set<Assumption> assumptions = new HashSet<>(this.assumptions.getItems());
         try {
             this.saveFile.createNewFile();
-            ConfigManager.writeConfig(this.saveFile, new Configuration(this.analysisPath, this.modelPath, assumptions));
+            ConfigManager.writeConfig(this.saveFile, new Configuration(this.analysisPath, this.modelPath, assumptions, this.analysisOutputTextArea.getText()));
             this.isSaved = true;
-        } catch (FileNotFoundException e) {
-            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Saving failed", "The specified save location could not be found!");
-            e.printStackTrace();
         } catch (IOException e) {
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Saving failed", "Could not write to file!");
-            e.printStackTrace();
-        } catch (XMLStreamException e) {
-            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Saving failed", "The current configuration is not well formed!");
             e.printStackTrace();
         }
     }
@@ -249,7 +255,7 @@ public class MainScreenController {
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Save Location");
-        fileChooser.setInitialFileName("NewAssumptions.xml");
+        fileChooser.setInitialFileName("NewAssumptions.json");
         fileChooser.setInitialDirectory(new File(Constants.USER_HOME_PATH));
         this.saveFile = fileChooser.showSaveDialog(stage);
 
