@@ -9,10 +9,12 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
 import javafx.util.Pair;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,7 +29,7 @@ public class AnalysisConnector {
     private final String analysisUri;
 
     public AnalysisConnector(String analysisUri) {
-        this.client = ClientBuilder.newClient();
+        this.client = ClientBuilder.newBuilder().register(MultiPartFeature.class).build();
         this.analysisUri = analysisUri;
         this.objectMapper = new ObjectMapper();
     }
@@ -76,18 +78,15 @@ public class AnalysisConnector {
 
 
         // TODO Complete transmission of files to analysis.
-        for(var file : relevantFiles){
-            try {
-                byte[] fileData = new byte[(int) file.length()];
-
-                var fileInputStream = new FileInputStream(file);
-                fileInputStream.read(fileData);
-                fileInputStream.close();
-
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        try (var multiPart = new FormDataMultiPart();) {
+            for (var file : relevantFiles) {
+                multiPart.bodyPart(new FileDataBodyPart(file.getName(), file));
             }
+
+            this.client.target(this.analysisUri).path("set/model").request().post(Entity.entity(multiPart, multiPart.getMediaType()));
+        } catch (IOException e) {
+            // TODO
+            throw new RuntimeException(e);
         }
 
         return new Pair<>(0, "Not implemented");
