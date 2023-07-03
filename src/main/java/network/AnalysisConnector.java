@@ -65,8 +65,8 @@ public class AnalysisConnector {
         // Determine list of files that are part of the model and must be transferred to the analysis.
         var filesInModelFolder = modelPath.listFiles();
 
-        // Abort.
         if (filesInModelFolder == null || filesInModelFolder.length == 0) {
+            // Abort.
             return new Pair<>(0, "The model could not be transmitted to the analysis as there are no files contained in the specified model folder.");
         }
 
@@ -76,19 +76,16 @@ public class AnalysisConnector {
                 .filter(file -> !file.getName().startsWith("."))
                 .collect(Collectors.toSet());
 
-
-        // TODO Complete transmission of files to analysis.
-        try (var multiPart = new FormDataMultiPart();) {
+        try (var multiPart = new FormDataMultiPart()) {
             for (var file : relevantFiles) {
                 multiPart.bodyPart(new FileDataBodyPart(file.getName(), file));
             }
 
-            this.client.target(this.analysisUri).path("set/model").request().post(Entity.entity(multiPart, multiPart.getMediaType()));
+            try(var response = this.client.target(this.analysisUri).path("set/model").request().post(Entity.entity(multiPart, multiPart.getMediaType()))){
+                return new Pair<>(response.getStatus(), response.readEntity(String.class));
+            }
         } catch (IOException e) {
-            // TODO
-            throw new RuntimeException(e);
+            return new Pair<>(0, "Could not create a multi-part object for sending the model to the analysis.");
         }
-
-        return new Pair<>(0, "Not implemented");
     }
 }
