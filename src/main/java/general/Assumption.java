@@ -2,11 +2,18 @@ package general;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class Assumption {
+public class Assumption implements Cloneable{
+    public static class AssumptionComparator implements Comparator<Assumption>{
+        @Override
+        public int compare(Assumption a1, Assumption a2) {
+            return a1.id.compareTo(a2.id);
+        }
+    }
     public enum AssumptionType {
         INTRODUCE_UNCERTAINTY, RESOLVE_UNCERTAINTY
     }
@@ -19,7 +26,6 @@ public class Assumption {
     private Double probabilityOfViolation;
     private Double risk;
     private String impact;
-
     private Boolean analyzed;
 
     public Assumption() {
@@ -136,5 +142,27 @@ public class Assumption {
                 ", impact='" + impact + '\'' +
                 ", analyzed=" + analyzed +
                 '}';
+    }
+
+    @Override
+    public Assumption clone() {
+        try {
+            Assumption clone = (Assumption) super.clone();
+
+            // UUID, String and primitive wrapper instances are immutable.
+            clone.id = this.id;
+            clone.dependencies = new HashSet<>(this.dependencies);
+            clone.affectedEntity = this.affectedEntity;
+            clone.type = this.type;
+            clone.description = this.description;
+            clone.probabilityOfViolation = this.probabilityOfViolation;
+            clone.risk = this.risk;
+            clone.impact = this.impact;
+            clone.analyzed = this.analyzed;
+
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }
