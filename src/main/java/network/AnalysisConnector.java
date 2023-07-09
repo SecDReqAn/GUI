@@ -61,11 +61,13 @@ public class AnalysisConnector {
         }
     }
 
+    // TODO Remove.
     public static void main(String[] args) {
         var testConnector = new AnalysisConnector("http://localhost:2406/abunai");
         testConnector.transferModelFiles(new File("/home/tim/git/UncertaintyImpactAnalysis/tests/dev.abunai.impact.analysis.testmodels/casestudies/CaseStudy-CoronaWarnApp/CoronaWarnApp"));
     }
 
+    // TODO Properly integrate.
     public Pair<Integer, String> transferModelFiles(@NotNull File modelPath) {
         // Determine list of files that are part of the model and must be transferred to the analysis.
         var filesInModelFolder = modelPath.listFiles();
