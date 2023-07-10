@@ -3,7 +3,6 @@ package controllers;
 import general.Assumption;
 import io.ModelReader;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -19,7 +18,7 @@ public class AssumptionSpecificationScreenController {
      * The {@link Assumption} that is being specified.
      */
     private Assumption assumption;
-    private Map<String, ModelReader.ModelEntity> modelEntityMap;
+    private Map<String, Map<String, ModelReader.ModelEntity>> modelEntityMap;
 
     @FXML
     private VBox topLevelVBox;
@@ -38,7 +37,9 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private TextArea impactTextArea;
     @FXML
-    private ComboBox<String> affectedEntityComboBox;
+    private ComboBox<String> modelViewComboBox;
+    @FXML
+    private ComboBox<ModelReader.ModelEntity> modelEntityComboBox;
     @FXML
     private Button insertButton;
 
@@ -49,13 +50,11 @@ public class AssumptionSpecificationScreenController {
         this.assumption.setAnalyzed(false);
     }
 
-    public void initModelEntities(Map<String, ModelReader.ModelEntity> modelEntityMap){
+    public void initModelEntities(Map<String, Map<String, ModelReader.ModelEntity>> modelEntityMap){
         this.modelEntityMap = modelEntityMap;
 
         // Init ComboBox with available entities read from the selected model.
-        ObservableList<String> affectedComponentsList = FXCollections.observableArrayList();
-        affectedComponentsList.addAll(this.modelEntityMap.keySet());
-        this.affectedEntityComboBox.setItems(affectedComponentsList);
+        this.modelViewComboBox.setItems(FXCollections.observableArrayList(this.modelEntityMap.keySet()).sorted());
     }
 
     private void checkForCompletenessOfSpecification(){
@@ -131,12 +130,20 @@ public class AssumptionSpecificationScreenController {
     }
 
     @FXML
+    private void handleModelViewSelection(){
+        var selectedModelView = this.modelViewComboBox.getValue();
+        this.modelEntityComboBox.setItems(FXCollections.observableArrayList(this.modelEntityMap.get(selectedModelView).values()).sorted());
+        this.modelEntityComboBox.setDisable(false);
+    }
+
+    @FXML
     private void handleAffectedEntitySelection(){
-        var selectedEntity = this.affectedEntityComboBox.getValue();
+        // TODO Adjust to new behavior.
+        /*var selectedEntity = this.affectedEntityComboBox.getValue();
         var associatedModelEntity = this.modelEntityMap.get(selectedEntity);
 
         this.assumption.setAffectedEntity(associatedModelEntity.id());
-        this.checkForCompletenessOfSpecification();
+        this.checkForCompletenessOfSpecification();*/
     }
 
     @FXML

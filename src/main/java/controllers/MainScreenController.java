@@ -41,14 +41,13 @@ import java.util.Map;
 // TODO: Make use of @NotNull and @Nullable annotations to avoid NullPointer-Exceptions.
 
 public class MainScreenController {
-    private static final String COMPONENT_REPOSITORY_FILENAME = "default.repository";
     private final String defaultSaveLocation = Constants.USER_HOME_PATH + Constants.FILE_SYSTEM_SEPARATOR + "NewAssumptionSet.xml";
     private Configuration currentConfiguration;
     private Configuration savedConfiguration;
     private AnalysisConnector analysisConnector;
     private HostServices hostServices;
     private File saveFile;
-    private Map<String, ModelReader.ModelEntity> modelEntityMap;
+    private Map<String, Map<String, ModelReader.ModelEntity>> modelEntityMap;
 
     @FXML
     private Button performAnalysisButton;
@@ -176,9 +175,7 @@ public class MainScreenController {
 
             // Init model entities from read model path if model is already specified.
             this.modelEntityMap = (this.currentConfiguration.getModelPath() != null) ?
-                    ModelReader.readFromRepositoryFile(new File(this.currentConfiguration.getModelPath()
-                            + Constants.FILE_SYSTEM_SEPARATOR
-                            + MainScreenController.COMPONENT_REPOSITORY_FILENAME)) : null;
+                    ModelReader.readModel(new File(this.currentConfiguration.getModelPath())) : null;
 
             // Model
             var folders = this.currentConfiguration.getModelPath().split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
@@ -198,8 +195,6 @@ public class MainScreenController {
         } catch (DatabindException e) {
             e.printStackTrace();
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not map the contents of the specified file to a valid Configuration.");
-        } catch (XMLStreamException e) {
-            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "An error occurred when reading from the repository file associated with the the specified model.");
         } catch (FileNotFoundException e) {
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not find the repository file associated with the the specified model.");
         } catch (IOException e) {
@@ -328,29 +323,21 @@ public class MainScreenController {
 
         // Check whether the user aborted the selection.
         if (selectedFolder != null) {
-            var absolutePath = selectedFolder.getAbsolutePath();
+            var absolutePathToSelectedFolder = selectedFolder.getAbsolutePath();
 
             // Check whether the specified folder actually contains a repository file.
-            File repositoryFile = new File(absolutePath + Constants.FILE_SYSTEM_SEPARATOR + MainScreenController.COMPONENT_REPOSITORY_FILENAME);
-            if (repositoryFile.exists()) {
+            File modelFolder = new File(absolutePathToSelectedFolder);
+            if (modelFolder.exists()) {
                 // Load contents of repository file.
-                try {
-                    this.modelEntityMap = ModelReader.readFromRepositoryFile(repositoryFile);
+                this.modelEntityMap = ModelReader.readModel(modelFolder);
 
-                    // Accept valid selection.
-                    this.currentConfiguration.setModelPath(absolutePath);
-                    // Only display last subfolder of the path for better readability.
-                    var folders = this.currentConfiguration.getModelPath().split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
-                    originatingLabel.setText(folders[folders.length - 1]);
+                // Accept valid selection.
+                this.currentConfiguration.setModelPath(absolutePathToSelectedFolder);
+                // Only display last subfolder of the path for better readability.
+                var folders = this.currentConfiguration.getModelPath().split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
+                originatingLabel.setText(folders[folders.length - 1]);
 
-                    this.performAnalysisButton.setDisable(this.currentConfiguration.isMissingAnalysisParameters());
-                } catch (FileNotFoundException e) {
-                    Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Loading model entities failed", "The repository file (default.repository) of the specified model could not be found.");
-                    e.printStackTrace();
-                } catch (XMLStreamException e) {
-                    Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Loading model entities failed", "The repository file (default.repository) of the specified model was not well-formed.");
-                    e.printStackTrace();
-                }
+                this.performAnalysisButton.setDisable(this.currentConfiguration.isMissingAnalysisParameters());
             } else {
                 // Invalid selection due to missing repository file.
                 Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Loading model entities failed", "The repository file (default.repository) of the specified model could not be found.");

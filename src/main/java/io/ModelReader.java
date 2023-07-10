@@ -10,7 +10,6 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,22 +17,34 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ModelReader {
-    public record ModelEntity(@NotNull String id, String elementName, String name, String type) {
+    public record ModelEntity(@NotNull String id, @NotNull String modelView, String elementName, String name, String type) implements Comparable<ModelEntity> {
         @Override
         public String toString() {
-            return "ModelEntity{" +
-                    "id='" + id + '\'' +
-                    ", elementName='" + elementName + '\'' +
-                    ", name='" + name + '\'' +
-                    ", type='" + type + '\'' +
-                    '}';
+            return (this.name == null ? "" : (this.name + " ")) +
+                    (this.type == null ? "" : (this.type + " ")) +
+                    this.id;
         }
-    }
 
-    // TODO Delete.
-    public static void main(String[] args) {
-        var test = ModelReader.readModel(new File("/home/tim/git/UncertaintyImpactAnalysis/tests/dev.abunai.impact.analysis.testmodels/casestudies/CaseStudy-CoronaWarnApp/CoronaWarnApp"));
-        String s = "Hi";
+        @Override
+        public int compareTo(@NotNull ModelReader.ModelEntity otherModelEntity) {
+            if(this.name != null && otherModelEntity.name == null){
+                return -1;
+            } else if (this.name == null && otherModelEntity.name != null) {
+                return 1;
+            } else if(this.name != null && otherModelEntity.name != null){
+                return this.name.compareTo(otherModelEntity.name);
+            } else {
+                if(this.type != null && otherModelEntity.type == null){
+                    return -1;
+                } else if (this.type == null && otherModelEntity.type != null) {
+                    return 1;
+                } else if(this.type != null && otherModelEntity.type != null){
+                    return this.type.compareTo(otherModelEntity.type);
+                } else {
+                    return this.id.compareTo(otherModelEntity.id);
+                }
+            }
+        }
     }
 
     public static @NotNull Map<String, Map<String, ModelEntity>> readModel(@NotNull File modelFolder) {
@@ -44,6 +55,7 @@ public class ModelReader {
             // TODO: Filter out irrelevant files.
             var relevantFiles = Stream.of(modelFiles)
                     .filter(File::isFile)
+                    .filter(file -> !file.getName().startsWith(".")) // Do not consider hidden files.
                     .collect(Collectors.toSet());
 
             for (var relevantFile : relevantFiles) {
@@ -72,6 +84,7 @@ public class ModelReader {
                     if (id != null) {
                         ModelEntity newEntity = new ModelEntity(
                                 id.getValue(),
+                                modelFile.getName(), // Each view is specified by its own file.
                                 startElement.getName().getLocalPart(),
                                 name == null ? null : name.getValue(),
                                 type == null ? null : type.getValue());
@@ -85,10 +98,5 @@ public class ModelReader {
         }
 
         return readEntities;
-    }
-
-    // TODO Remove + change controller to use readModel() + adapt UI.
-    public static @NotNull Map<String, ModelEntity> readFromRepositoryFile(@NotNull File repositoryFile) throws FileNotFoundException, XMLStreamException {
-        return ModelReader.readFromModelFile(repositoryFile);
     }
 }

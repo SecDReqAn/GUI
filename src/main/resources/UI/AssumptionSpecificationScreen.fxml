@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="400.0" prefWidth="520.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AssumptionSpecificationScreenController">
+<AnchorPane prefHeight="400.0" prefWidth="520.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AssumptionSpecificationScreenController">
    <children>
       <VBox fx:id="topLevelVBox" layoutX="80.0" layoutY="148.0" prefHeight="400.0" prefWidth="464.0" style="-fx-padding: 10pt;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -35,7 +35,7 @@
                </children>
             </GridPane>
             <TextArea fx:id="descriptionTextArea" prefHeight="91.0" prefWidth="362.0" promptText="Description..." />
-            <GridPane style="-fx-padding: 5pt 0pt;">
+            <GridPane hgap="10.0" style="-fx-padding: 5pt 0pt;">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -49,9 +49,10 @@
                </children>
             </GridPane>
             <TextArea fx:id="impactTextArea" prefHeight="62.0" prefWidth="362.0" promptText="Impact" />
-            <GridPane style="-fx-padding: 5pt 0pt;">
+            <GridPane hgap="10.0" style="-fx-padding: 5pt 0pt;">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
               <rowConstraints>
@@ -59,7 +60,16 @@
               </rowConstraints>
                <children>
                   <CheckBox alignment="BOTTOM_LEFT" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onAction="#handleAnalyzedToggle" style="-fx-padding: 10pt;" text="Analyzed" />
-                  <ComboBox fx:id="affectedEntityComboBox" onAction="#handleAffectedEntitySelection" prefHeight="24.0" prefWidth="245.0" promptText="Affected Model Entity..." GridPane.columnIndex="1" />
+                  <AnchorPane GridPane.columnIndex="1">
+                     <children>
+                        <ComboBox fx:id="modelViewComboBox" onAction="#handleModelViewSelection" promptText="Model Views" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane GridPane.columnIndex="2">
+                     <children>
+                        <ComboBox fx:id="modelEntityComboBox" disable="true" onAction="#handleAffectedEntitySelection" promptText="View Entities" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                  </AnchorPane>
                </children>
             </GridPane>
             <Button fx:id="insertButton" alignment="CENTER" contentDisplay="CENTER" disable="true" mnemonicParsing="false" onAction="#handleInsertButton" prefHeight="30.0" prefWidth="84.0" style="-fx-padding: 5pt; -fx-background-radius: 5pt; -fx-border-radius: 5pt; -fx-background-color: #2F8ECA; -fx-border-color: black;" text="Insert" />
