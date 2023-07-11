@@ -18,10 +18,12 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
@@ -31,12 +33,12 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import network.AnalysisConnector;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 // TODO: Make use of @NotNull and @Nullable annotations to avoid NullPointer-Exceptions.
 
@@ -52,7 +54,25 @@ public class MainScreenController {
     @FXML
     private Button performAnalysisButton;
     @FXML
-    private ListView<Assumption> assumptions;
+    private TableView<Assumption> assumptionTableView;
+    @FXML
+    private TableColumn<Assumption, UUID> idColumn;
+    @FXML
+    private TableColumn<Assumption, Assumption.AssumptionType> typeColumn;
+    @FXML
+    private TableColumn<Assumption, String> entitiesColumn;
+    @FXML
+    private TableColumn<Assumption, Set<UUID>> dependenciesColumn;
+    @FXML
+    private TableColumn<Assumption, String> descriptionColumn;
+    @FXML
+    private TableColumn<Assumption, Double> violationProbabilityColumn;
+    @FXML
+    private TableColumn<Assumption, Double> riskColumn;
+    @FXML
+    private TableColumn<Assumption, String> impactColumn;
+    @FXML
+    private TableColumn<Assumption, Boolean> analyzedColumn;
     @FXML
     private TextArea analysisOutputTextArea;
     @FXML
@@ -63,6 +83,19 @@ public class MainScreenController {
     public MainScreenController() {
         this.savedConfiguration = new Configuration();
         this.currentConfiguration = new Configuration();
+    }
+
+    @FXML
+    private void initialize(){
+        this.idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        this.typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+        this.entitiesColumn.setCellValueFactory(new PropertyValueFactory<>("affectedEntity"));
+        this.dependenciesColumn.setCellValueFactory(new PropertyValueFactory<>("dependencies"));
+        this.descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+        this.violationProbabilityColumn.setCellValueFactory(new PropertyValueFactory<>("probabilityOfViolation"));
+        this.riskColumn.setCellValueFactory(new PropertyValueFactory<>("risk"));
+        this.impactColumn.setCellValueFactory(new PropertyValueFactory<>("impact"));
+        this.analyzedColumn.setCellValueFactory(new PropertyValueFactory<>("analyzed"));
     }
 
     public void setHostServices(HostServices hostServices) {
@@ -127,7 +160,7 @@ public class MainScreenController {
             // Only add assumption in case it was fully specified by the user.
             if (newAssumption.isFullySpecified()) {
                 this.currentConfiguration.getAssumptions().add(newAssumption);
-                this.assumptions.getItems().add(newAssumption);
+                this.assumptionTableView.getItems().add(newAssumption);
                 this.performAnalysisButton.setDisable(this.currentConfiguration.isMissingAnalysisParameters());
             }
         } catch (IOException e) {
@@ -182,8 +215,8 @@ public class MainScreenController {
             this.modelNameLabel.setText(folders[folders.length - 1]);
 
             // Assumptions
-            this.assumptions.getItems().clear();
-            this.assumptions.getItems().addAll(this.currentConfiguration.getAssumptions());
+            this.assumptionTableView.getItems().clear();
+            this.assumptionTableView.getItems().addAll(this.currentConfiguration.getAssumptions());
 
             // Analysis result
             this.analysisOutputTextArea.setText(this.currentConfiguration.getAnalysisResult());
@@ -280,7 +313,7 @@ public class MainScreenController {
         if (this.currentConfiguration.isMissingAnalysisParameters()) {
             if (this.testAnalysisConnection(this.currentConfiguration.getAnalysisPath())) {
                 var analysisResponse = this.analysisConnector.performAnalysis(
-                        new AnalysisConnector.AnalysisParameter(this.currentConfiguration.getModelPath(), new HashSet<>(this.assumptions.getItems())));
+                        new AnalysisConnector.AnalysisParameter(this.currentConfiguration.getModelPath(), this.currentConfiguration.getAssumptions()));
 
                 if (analysisResponse.getKey() != 0) {
                     this.analysisOutputTextArea.setText(analysisResponse.getValue());

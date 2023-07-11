@@ -15,13 +15,22 @@ public class Assumption implements Cloneable{
         }
     }
     public enum AssumptionType {
-        INTRODUCE_UNCERTAINTY, RESOLVE_UNCERTAINTY
+        INTRODUCE_UNCERTAINTY, RESOLVE_UNCERTAINTY;
+
+        @Override
+        public String toString() {
+            if(this == INTRODUCE_UNCERTAINTY){
+                return "Introduce Uncertainty";
+            } else {
+                return "Resolve Uncertainty";
+            }
+        }
     }
 
     private UUID id;
-    private Set<UUID> dependencies;
-    private String affectedEntity; // TODO An assumption is able to affect multiple model-entities.
     private AssumptionType type;
+    private String affectedEntity; // TODO An assumption is able to affect multiple model-entities.
+    private Set<UUID> dependencies;
     private String description;
     private Double probabilityOfViolation;
     private Double risk;
@@ -131,8 +140,7 @@ public class Assumption implements Cloneable{
 
     @Override
     public String toString() {
-        return "Assumption{" +
-                "id=" + id +
+        return "id=" + id +
                 ", description='" + description + '\'' +
                 ", affectedComponent='" + affectedEntity + '\'' +
                 ", type=" + type +
@@ -140,8 +148,7 @@ public class Assumption implements Cloneable{
                 ", probabilityOfViolation=" + probabilityOfViolation +
                 ", risk=" + risk +
                 ", impact='" + impact + '\'' +
-                ", analyzed=" + analyzed +
-                '}';
+                ", analyzed=" + analyzed;
     }
 
     @Override

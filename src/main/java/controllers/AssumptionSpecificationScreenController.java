@@ -50,14 +50,14 @@ public class AssumptionSpecificationScreenController {
         this.assumption.setAnalyzed(false);
     }
 
-    public void initModelEntities(Map<String, Map<String, ModelReader.ModelEntity>> modelEntityMap){
+    public void initModelEntities(Map<String, Map<String, ModelReader.ModelEntity>> modelEntityMap) {
         this.modelEntityMap = modelEntityMap;
 
         // Init ComboBox with available entities read from the selected model.
         this.modelViewComboBox.setItems(FXCollections.observableArrayList(this.modelEntityMap.keySet()).sorted());
     }
 
-    private void checkForCompletenessOfSpecification(){
+    private void checkForCompletenessOfSpecification() {
         this.insertButton.setDisable(!this.assumption.isFullySpecified());
     }
 
@@ -89,7 +89,7 @@ public class AssumptionSpecificationScreenController {
                 // Clear potential red error border.
                 this.violationProbabilityTextField.setStyle(null);
                 this.violationProbabilityTextField.setStyle("-fx-padding: 5pt");
-            } catch (NullPointerException | NumberFormatException exception){
+            } catch (NullPointerException | NumberFormatException exception) {
                 // Invalidate probability of violation field in assumption.
                 this.assumption.setProbabilityOfViolation(null);
                 this.violationProbabilityTextField.setStyle(this.violationProbabilityTextField.getStyle() + "; -fx-text-box-border: red; -fx-focus-color: red ;");
@@ -106,7 +106,7 @@ public class AssumptionSpecificationScreenController {
                 // Clear potential red error border.
                 this.riskTextField.setStyle(null);
                 this.riskTextField.setStyle("-fx-padding: 5pt");
-            } catch (NullPointerException | NumberFormatException exception){
+            } catch (NullPointerException | NumberFormatException exception) {
                 // Invalidate risk field in assumption.
                 this.assumption.setRisk(null);
                 this.riskTextField.setStyle(this.riskTextField.getStyle() + "; -fx-text-box-border: red; -fx-focus-color: red ;");
@@ -130,20 +130,19 @@ public class AssumptionSpecificationScreenController {
     }
 
     @FXML
-    private void handleModelViewSelection(){
+    private void handleModelViewSelection() {
         var selectedModelView = this.modelViewComboBox.getValue();
-        this.modelEntityComboBox.setItems(FXCollections.observableArrayList(this.modelEntityMap.get(selectedModelView).values()).sorted());
+        this.modelEntityComboBox.setItems(
+                FXCollections.observableArrayList(
+                        this.modelEntityMap.get(selectedModelView).values()).sorted(new ModelReader.EntityComparator()));
         this.modelEntityComboBox.setDisable(false);
     }
 
     @FXML
-    private void handleAffectedEntitySelection(){
-        // TODO Adjust to new behavior.
-        /*var selectedEntity = this.affectedEntityComboBox.getValue();
-        var associatedModelEntity = this.modelEntityMap.get(selectedEntity);
-
+    private void handleAffectedEntitySelection() {
+        ModelReader.ModelEntity associatedModelEntity = this.modelEntityComboBox.getValue();
         this.assumption.setAffectedEntity(associatedModelEntity.id());
-        this.checkForCompletenessOfSpecification();*/
+        this.checkForCompletenessOfSpecification();
     }
 
     @FXML

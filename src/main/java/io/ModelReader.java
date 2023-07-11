@@ -11,40 +11,45 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ModelReader {
-    public record ModelEntity(@NotNull String id, @NotNull String modelView, String elementName, String name, String type) implements Comparable<ModelEntity> {
+    public static class EntityComparator implements Comparator<ModelEntity> {
         @Override
-        public String toString() {
-            return (this.name == null ? "" : (this.name + " ")) +
-                    (this.type == null ? "" : (this.type + " ")) +
-                    this.id;
-        }
-
-        @Override
-        public int compareTo(@NotNull ModelReader.ModelEntity otherModelEntity) {
-            if(this.name != null && otherModelEntity.name == null){
+        public int compare(ModelEntity firstEntity, ModelEntity secondEntity) {
+            if (firstEntity.name() != null && secondEntity.name() == null) {
                 return -1;
-            } else if (this.name == null && otherModelEntity.name != null) {
+            } else if (firstEntity.name() == null && secondEntity.name() != null) {
                 return 1;
-            } else if(this.name != null && otherModelEntity.name != null){
-                return this.name.compareTo(otherModelEntity.name);
+            } else if (firstEntity.name() != null) {
+                return firstEntity.name().compareTo(secondEntity.name());
             } else {
-                if(this.type != null && otherModelEntity.type == null){
+                if (firstEntity.type() != null && secondEntity.type() == null) {
                     return -1;
-                } else if (this.type == null && otherModelEntity.type != null) {
+                } else if (firstEntity.type() == null && secondEntity.type() != null) {
                     return 1;
-                } else if(this.type != null && otherModelEntity.type != null){
-                    return this.type.compareTo(otherModelEntity.type);
+                } else if (firstEntity.type() != null) {
+                    return firstEntity.type().compareTo(secondEntity.type());
                 } else {
-                    return this.id.compareTo(otherModelEntity.id);
+                    return firstEntity.id().compareTo(secondEntity.id());
                 }
             }
         }
+    }
+
+    public record ModelEntity(@NotNull String id, @NotNull String modelView, String elementName, String name,
+                              String type) {
+        @Override
+        public String toString() {
+            return (this.name == null ? "" : ("Name: " + this.name + " ")) +
+                    (this.type == null ? "" : ("Type: " + this.type + " ")) +
+                    "Id: " + this.id;
+        }
+
     }
 
     public static @NotNull Map<String, Map<String, ModelEntity>> readModel(@NotNull File modelFolder) {
