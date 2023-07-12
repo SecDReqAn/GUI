@@ -60,7 +60,7 @@ public class MainScreenController {
     @FXML
     private TableColumn<Assumption, Assumption.AssumptionType> typeColumn;
     @FXML
-    private TableColumn<Assumption, String> entitiesColumn;
+    private TableColumn<Assumption, Set<String>> entitiesColumn;
     @FXML
     private TableColumn<Assumption, Set<UUID>> dependenciesColumn;
     @FXML
@@ -89,7 +89,7 @@ public class MainScreenController {
     private void initialize(){
         this.idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         this.typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
-        this.entitiesColumn.setCellValueFactory(new PropertyValueFactory<>("affectedEntity"));
+        this.entitiesColumn.setCellValueFactory(new PropertyValueFactory<>("affectedEntities"));
         this.dependenciesColumn.setCellValueFactory(new PropertyValueFactory<>("dependencies"));
         this.descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
         this.violationProbabilityColumn.setCellValueFactory(new PropertyValueFactory<>("probabilityOfViolation"));

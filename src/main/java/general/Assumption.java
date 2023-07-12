@@ -29,7 +29,7 @@ public class Assumption implements Cloneable{
 
     private UUID id;
     private AssumptionType type;
-    private String affectedEntity; // TODO An assumption is able to affect multiple model-entities.
+    private Set<String> affectedEntities; // TODO Integrate associated functionality into UI.
     private Set<UUID> dependencies;
     private String description;
     private Double probabilityOfViolation;
@@ -44,21 +44,12 @@ public class Assumption implements Cloneable{
     public Assumption(UUID id) {
         this.id = id;
         this.dependencies = new HashSet<>();
+        this.affectedEntities = new HashSet<>();
         // Implicitly set all other fields to null.
     }
 
-    public Assumption(AssumptionType type, String description, double probabilityOfViolation, double risk, String impact, boolean analyzed) {
-        this();
-        this.type = type;
-        this.description = description;
-        this.probabilityOfViolation = probabilityOfViolation;
-        this.risk = risk;
-        this.impact = impact;
-        this.analyzed = analyzed;
-    }
-
-    public void setAffectedEntity(String affectedEntity) {
-        this.affectedEntity = affectedEntity;
+    public void setAffectedEntities(Set<String> affectedEntities) {
+        this.affectedEntities = affectedEntities;
     }
 
     public void setDependencies(Set<UUID> dependencies) {
@@ -93,8 +84,8 @@ public class Assumption implements Cloneable{
         return this.id;
     }
 
-    public String getAffectedEntity() {
-        return this.affectedEntity;
+    public Set<String> getAffectedEntities() {
+        return this.affectedEntities;
     }
 
     public Set<UUID> getDependencies() {
@@ -127,7 +118,8 @@ public class Assumption implements Cloneable{
 
     @JsonIgnore
     public boolean isFullySpecified() {
-        return this.affectedEntity != null &&
+        return this.affectedEntities != null &&
+                !this.affectedEntities.isEmpty() &&
                 this.type != null &&
                 this.description != null &&
                 this.probabilityOfViolation != null &&
@@ -142,7 +134,7 @@ public class Assumption implements Cloneable{
     public String toString() {
         return "id=" + id +
                 ", description='" + description + '\'' +
-                ", affectedComponent='" + affectedEntity + '\'' +
+                ", affectedComponent='" + affectedEntities + '\'' +
                 ", type=" + type +
                 ", dependencies=" + dependencies +
                 ", probabilityOfViolation=" + probabilityOfViolation +
@@ -159,7 +151,7 @@ public class Assumption implements Cloneable{
             // UUID, String and primitive wrapper instances are immutable.
             clone.id = this.id;
             clone.dependencies = new HashSet<>(this.dependencies);
-            clone.affectedEntity = this.affectedEntity;
+            clone.affectedEntities = new HashSet<>(this.affectedEntities);
             clone.type = this.type;
             clone.description = this.description;
             clone.probabilityOfViolation = this.probabilityOfViolation;

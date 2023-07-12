@@ -141,7 +141,7 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private void handleAffectedEntitySelection() {
         ModelReader.ModelEntity associatedModelEntity = this.modelEntityComboBox.getValue();
-        this.assumption.setAffectedEntity(associatedModelEntity.id());
+        this.assumption.getAffectedEntities().add(associatedModelEntity.id());
         this.checkForCompletenessOfSpecification();
     }
 
