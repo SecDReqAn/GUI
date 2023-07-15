@@ -17,8 +17,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -26,6 +28,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -86,7 +89,7 @@ public class MainScreenController {
     }
 
     @FXML
-    private void initialize(){
+    private void initialize() {
         this.idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         this.typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
         this.entitiesColumn.setCellValueFactory(new PropertyValueFactory<>("affectedEntities"));
@@ -96,6 +99,26 @@ public class MainScreenController {
         this.riskColumn.setCellValueFactory(new PropertyValueFactory<>("risk"));
         this.impactColumn.setCellValueFactory(new PropertyValueFactory<>("impact"));
         this.analyzedColumn.setCellValueFactory(new PropertyValueFactory<>("analyzed"));
+
+        // TODO: Tidy this up.
+        this.descriptionColumn.setCellFactory(tc -> {
+            var cell = new TableCell<Assumption, String>();
+            var text = new Text();
+            cell.setGraphic(text);
+            cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
+            text.wrappingWidthProperty().bind(this.descriptionColumn.widthProperty());
+            text.textProperty().bind(cell.itemProperty());
+            return cell ;
+        });
+        this.impactColumn.setCellFactory(tc -> {
+            var cell = new TableCell<Assumption, String>();
+            var text = new Text();
+            cell.setGraphic(text);
+            cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
+            text.wrappingWidthProperty().bind(this.impactColumn.widthProperty());
+            text.textProperty().bind(cell.itemProperty());
+            return cell ;
+        });
     }
 
     public void setHostServices(HostServices hostServices) {
