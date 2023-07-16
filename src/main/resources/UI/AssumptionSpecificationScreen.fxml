@@ -59,18 +59,18 @@
                <content>
                   <GridPane hgap="10.0">
                     <columnConstraints>
-                      <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
+                      <ColumnConstraints hgrow="ALWAYS" />
+                      <ColumnConstraints percentWidth="35.0" />
                     </columnConstraints>
                     <rowConstraints>
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <TableView>
+                        <TableView fx:id="affectedEntityTableView" prefWidth="400.0">
                           <columns>
-                            <TableColumn prefWidth="75.0" text="Name" />
-                            <TableColumn prefWidth="75.0" text="Type" />
-                              <TableColumn prefWidth="75.0" text="ID" />
+                            <TableColumn fx:id="affectedEntityNameColumn" prefWidth="75.0" text="Name" />
+                            <TableColumn fx:id="affectedEntityTypeColumn" prefWidth="75.0" text="Type" />
+                            <TableColumn fx:id="affectedEntityIdColumn" prefWidth="75.0" text="ID" />
                           </columns>
                            <columnResizePolicy>
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -78,8 +78,8 @@
                         </TableView>
                         <VBox alignment="CENTER" spacing="10.0" GridPane.columnIndex="1">
                            <children>
-                              <ComboBox fx:id="modelViewComboBox" maxWidth="1.7976931348623157E308" onAction="#handleModelViewSelection" promptText="Model Views" />
-                              <ComboBox fx:id="modelEntityComboBox" disable="true" maxWidth="1.7976931348623157E308" onAction="#handleAffectedEntitySelection" promptText="View Entities" />
+                              <ComboBox fx:id="modelViewComboBox" maxWidth="1.7976931348623157E308" onAction="#handleModelViewSelection" promptText="Chose Model View" />
+                              <ComboBox fx:id="modelEntityComboBox" disable="true" maxWidth="1.7976931348623157E308" onAction="#handleAffectedEntitySelection" promptText="Choose View Entity" />
                            </children>
                         </VBox>
                      </children>

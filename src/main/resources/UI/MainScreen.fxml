@@ -50,7 +50,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="700.0" prefWidth="1200.0" styleClass="MainScreenStyle.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainScreenController">
+<VBox prefHeight="700.0" prefWidth="1200.0" styleClass="MainScreenStyle.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.MainScreenController">
     <children>
         <MenuBar style="-fx-padding: 0 0 0 0;" stylesheets="@MainScreenStyle.css">
             <menus>

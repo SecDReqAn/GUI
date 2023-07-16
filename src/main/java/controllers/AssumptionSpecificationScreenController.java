@@ -2,6 +2,7 @@ package controllers;
 
 import general.Assumption;
 import io.ModelReader;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -36,6 +37,14 @@ public class AssumptionSpecificationScreenController {
     private TextField riskTextField;
     @FXML
     private TextArea impactTextArea;
+    @FXML
+    private TableView<ModelReader.ModelEntity> affectedEntityTableView;
+    @FXML
+    private TableColumn<ModelReader.ModelEntity, String> affectedEntityNameColumn;
+    @FXML
+    private TableColumn<ModelReader.ModelEntity, String> affectedEntityTypeColumn;
+    @FXML
+    private TableColumn<ModelReader.ModelEntity, String> affectedEntityIdColumn;
     @FXML
     private ComboBox<String> modelViewComboBox;
     @FXML
@@ -120,6 +129,10 @@ public class AssumptionSpecificationScreenController {
             this.assumption.setImpact(newText.trim());
             this.checkForCompletenessOfSpecification();
         });
+
+        this.affectedEntityNameColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().name()));
+        this.affectedEntityTypeColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().type()));
+        this.affectedEntityIdColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().id()));
     }
 
     @FXML
@@ -140,9 +153,14 @@ public class AssumptionSpecificationScreenController {
 
     @FXML
     private void handleAffectedEntitySelection() {
-        ModelReader.ModelEntity associatedModelEntity = this.modelEntityComboBox.getValue();
-        this.assumption.getAffectedEntities().add(associatedModelEntity.id());
-        this.checkForCompletenessOfSpecification();
+        // Is also called when items property is changed via other ComboBox.
+        if (this.modelEntityComboBox.getValue() != null) {
+            ModelReader.ModelEntity selectedModelEntity = this.modelEntityComboBox.getValue();
+            if (this.assumption.getAffectedEntities().add(selectedModelEntity.id())) {
+                this.affectedEntityTableView.getItems().add(selectedModelEntity);
+            }
+            this.checkForCompletenessOfSpecification();
+        }
     }
 
     @FXML
