@@ -57,10 +57,10 @@
             <TextArea fx:id="impactTextArea" prefHeight="60.0" promptText="Impact" wrapText="true" VBox.vgrow="ALWAYS" />
             <TitledPane collapsible="false" prefHeight="150.0" text="Affected Model Entities" VBox.vgrow="ALWAYS">
                <content>
-                  <GridPane hgap="5.0">
+                  <GridPane hgap="10.0">
                     <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints minWidth="10.0" percentWidth="35.0" prefWidth="100.0" />
+                      <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                      <ColumnConstraints minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
                     </columnConstraints>
                     <rowConstraints>
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -76,7 +76,7 @@
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
                         </TableView>
-                        <VBox spacing="10.0" GridPane.columnIndex="1" GridPane.valignment="CENTER">
+                        <VBox alignment="CENTER" spacing="10.0" GridPane.columnIndex="1">
                            <children>
                               <ComboBox fx:id="modelViewComboBox" maxWidth="1.7976931348623157E308" onAction="#handleModelViewSelection" promptText="Model Views" />
                               <ComboBox fx:id="modelEntityComboBox" disable="true" maxWidth="1.7976931348623157E308" onAction="#handleAffectedEntitySelection" promptText="View Entities" />

@@ -95,7 +95,7 @@
                 <String fx:value="LabelBar" />
             </styleClass>
         </MenuBar>
-        <SplitPane dividerPositions="0.9" orientation="VERTICAL" prefHeight="643.0" prefWidth="1000.0">
+        <SplitPane dividerPositions="0.9" orientation="VERTICAL" prefHeight="643.0" prefWidth="1000.0" VBox.vgrow="ALWAYS">
             <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                     <children>
