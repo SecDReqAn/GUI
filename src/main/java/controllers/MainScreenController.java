@@ -333,13 +333,14 @@ public class MainScreenController {
     @FXML
     private void handleAnalysisExecution() {
         // Check whether forwarding the request to the analysis makes sense.
-        if (this.currentConfiguration.isMissingAnalysisParameters()) {
+        if (!this.currentConfiguration.isMissingAnalysisParameters()) {
             if (this.testAnalysisConnection(this.currentConfiguration.getAnalysisPath())) {
                 var analysisResponse = this.analysisConnector.performAnalysis(
                         new AnalysisConnector.AnalysisParameter(this.currentConfiguration.getModelPath(), this.currentConfiguration.getAssumptions()));
 
                 if (analysisResponse.getKey() != 0) {
                     this.analysisOutputTextArea.setText(analysisResponse.getValue());
+                    this.currentConfiguration.setAnalysisResult(analysisResponse.getValue());
                 } else {
                     Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Communication with the analysis failed.", analysisResponse.getValue());
                 }
@@ -348,6 +349,7 @@ public class MainScreenController {
             }
         } else {
             // TODO Error
+            System.out.println("Error (Not implemented)");
         }
     }
 
