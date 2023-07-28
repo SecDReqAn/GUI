@@ -11,6 +11,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -22,9 +23,14 @@
    <children>
       <VBox fx:id="topLevelVBox" layoutX="80.0" layoutY="148.0" style="-fx-padding: 5pt;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <BorderPane style="-fx-padding: 0pt 0pt 5pt 0pt;">
+            <TextField fx:id="nameTextField" promptText="Assumption Name ...">
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin>
+            </TextField>
+            <BorderPane>
                <left>
-                  <RadioButton fx:id="resolveUncertaintyToggle" mnemonicParsing="false" style="-fx-padding: 0pt;" text="Resolve Uncertainty" BorderPane.alignment="CENTER">
+                  <RadioButton fx:id="resolveUncertaintyToggle" mnemonicParsing="false" text="Resolve Uncertainty" BorderPane.alignment="CENTER">
                      <toggleGroup>
                         <ToggleGroup fx:id="typeToggleGroup" />
                      </toggleGroup>
@@ -34,8 +40,11 @@
                   <RadioButton fx:id="introduceUncertaintyToggle" mnemonicParsing="false" text="Introduce Uncertainty" toggleGroup="$typeToggleGroup" BorderPane.alignment="CENTER" />
                </center>
                <right>
-                  <CheckBox alignment="BOTTOM_LEFT" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onAction="#handleAnalyzedToggle" text="Analyzed" BorderPane.alignment="CENTER" />
+                  <CheckBox fx:id="analyzedCheckBox" alignment="BOTTOM_LEFT" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onAction="#handleAnalyzedToggle" text="Analyzed" BorderPane.alignment="CENTER" />
                </right>
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin>
             </BorderPane>
             <TextArea fx:id="descriptionTextArea" prefHeight="100.0" promptText="Description..." wrapText="true" VBox.vgrow="ALWAYS" />
             <GridPane hgap="10.0">
@@ -68,9 +77,9 @@
                      <children>
                         <TableView fx:id="affectedEntityTableView" prefWidth="400.0">
                           <columns>
+                            <TableColumn fx:id="affectedEntityIdColumn" prefWidth="75.0" text="ID" />
                             <TableColumn fx:id="affectedEntityNameColumn" prefWidth="75.0" text="Name" />
                             <TableColumn fx:id="affectedEntityTypeColumn" prefWidth="75.0" text="Type" />
-                            <TableColumn fx:id="affectedEntityIdColumn" prefWidth="75.0" text="ID" />
                           </columns>
                            <columnResizePolicy>
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -78,7 +87,7 @@
                         </TableView>
                         <VBox alignment="CENTER" spacing="10.0" GridPane.columnIndex="1">
                            <children>
-                              <ComboBox fx:id="modelViewComboBox" maxWidth="1.7976931348623157E308" onAction="#handleModelViewSelection" promptText="Chose Model View" />
+                              <ComboBox fx:id="modelViewComboBox" maxWidth="1.7976931348623157E308" onAction="#handleModelViewSelection" promptText="Choose Model View" />
                               <ComboBox fx:id="modelEntityComboBox" disable="true" maxWidth="1.7976931348623157E308" onAction="#handleAffectedEntitySelection" promptText="Choose View Entity" />
                            </children>
                         </VBox>
@@ -89,6 +98,7 @@
                   <Insets bottom="10.0" top="10.0" />
                </VBox.margin>
             </TitledPane>
+            <TreeView />
             <Button fx:id="insertButton" alignment="CENTER" contentDisplay="CENTER" disable="true" mnemonicParsing="false" onAction="#handleInsertButton" prefHeight="30.0" prefWidth="84.0" style="-fx-padding: 5pt; -fx-background-radius: 5pt; -fx-border-radius: 5pt; -fx-background-color: #2F8ECA; -fx-border-color: black;" text="Insert" />
          </children>
       </VBox>

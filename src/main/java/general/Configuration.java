@@ -84,10 +84,16 @@ public class Configuration implements Cloneable {
             if (this.assumptions == null || otherConfiguration.assumptions == null) {
                 assumptionsEqual = this.assumptions == otherConfiguration.assumptions;
             } else {
-                var idThis = this.assumptions.stream().map(Assumption::getId).toList();
-                var idOther = otherConfiguration.assumptions.stream().map(Assumption::getId).toList();
+                assumptionsEqual = this.assumptions.size() == otherConfiguration.assumptions.size();
 
-                assumptionsEqual = idThis.equals(idOther);
+                if (assumptionsEqual) {
+                    var assumptionIteratorThis = this.assumptions.iterator();
+                    var assumptionIteratorOther = otherConfiguration.assumptions.iterator();
+                    while (assumptionIteratorThis.hasNext() && assumptionIteratorOther.hasNext())
+                        if (!assumptionIteratorThis.next().semanticallyEqualTo(assumptionIteratorOther.next())) {
+                            return false;
+                        }
+                }
             }
 
             return Objects.equals(this.analysisPath, otherConfiguration.analysisPath)

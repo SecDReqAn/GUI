@@ -50,7 +50,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="700.0" prefWidth="1200.0" styleClass="MainScreenStyle.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.MainScreenController">
+<VBox prefHeight="700.0" prefWidth="1200.0" styleClass="MainScreenStyle.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainScreenController">
     <children>
         <MenuBar style="-fx-padding: 0 0 0 0;" stylesheets="@MainScreenStyle.css">
             <menus>
@@ -106,11 +106,12 @@
                                         <Label text="No Assumptions specified" />
                                     </placeholder>
                                     <columns>
-                                        <TableColumn fx:id="idColumn" editable="false" prefWidth="100.0" text="ID" />
+                                        <TableColumn fx:id="idColumn" editable="false" prefWidth="75.0" text="ID" />
+                              <TableColumn fx:id="nameColumn" prefWidth="100.0" text="Name" />
                                         <TableColumn fx:id="typeColumn" editable="false" prefWidth="100.0" text="Type" />
+                                        <TableColumn fx:id="descriptionColumn" editable="false" prefWidth="150.0" text="Description" />
                                         <TableColumn fx:id="entitiesColumn" editable="false" prefWidth="100.0" text="Entities" />
                                         <TableColumn fx:id="dependenciesColumn" editable="false" prefWidth="125.0" text="Dependencies" />
-                                        <TableColumn fx:id="descriptionColumn" editable="false" prefWidth="150.0" text="Description" />
                                         <TableColumn fx:id="violationProbabilityColumn" editable="false" prefWidth="75.0" text="Violation Probability" />
                                         <TableColumn fx:id="riskColumn" editable="false" prefWidth="75.0" text="Risk" />
                                         <TableColumn fx:id="impactColumn" editable="false" prefWidth="100.0" text="Impact" />

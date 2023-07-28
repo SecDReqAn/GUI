@@ -1,6 +1,7 @@
 package controllers;
 
 import general.Assumption;
+import general.ModelEntity;
 import io.ModelReader;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -19,16 +20,20 @@ public class AssumptionSpecificationScreenController {
      * The {@link Assumption} that is being specified.
      */
     private Assumption assumption;
-    private Map<String, Map<String, ModelReader.ModelEntity>> modelEntityMap;
+    private Map<String, Map<String, ModelEntity>> modelEntityMap;
 
     @FXML
     private VBox topLevelVBox;
+    @FXML
+    private TextField nameTextField;
     @FXML
     private ToggleGroup typeToggleGroup;
     @FXML
     private ToggleButton resolveUncertaintyToggle;
     @FXML
     private ToggleButton introduceUncertaintyToggle;
+    @FXML
+    private CheckBox analyzedCheckBox;
     @FXML
     private TextArea descriptionTextArea;
     @FXML
@@ -38,28 +43,33 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private TextArea impactTextArea;
     @FXML
-    private TableView<ModelReader.ModelEntity> affectedEntityTableView;
+    private TableView<ModelEntity> affectedEntityTableView;
     @FXML
-    private TableColumn<ModelReader.ModelEntity, String> affectedEntityNameColumn;
+    private TableColumn<ModelEntity, String> affectedEntityNameColumn;
     @FXML
-    private TableColumn<ModelReader.ModelEntity, String> affectedEntityTypeColumn;
+    private TableColumn<ModelEntity, String> affectedEntityTypeColumn;
     @FXML
-    private TableColumn<ModelReader.ModelEntity, String> affectedEntityIdColumn;
+    private TableColumn<ModelEntity, String> affectedEntityIdColumn;
     @FXML
     private ComboBox<String> modelViewComboBox;
     @FXML
-    private ComboBox<ModelReader.ModelEntity> modelEntityComboBox;
+    private ComboBox<ModelEntity> modelEntityComboBox;
     @FXML
     private Button insertButton;
 
     public void initAssumption(Assumption assumption) {
         this.assumption = assumption;
 
-        // Analyzed is defaulted to false.
-        this.assumption.setAnalyzed(false);
+        // Set analyzed to false (default) if not already set.
+        if(this.assumption.isAnalyzed() == null){
+            this.assumption.setAnalyzed(false);
+        }
+
+        // Initialize UI with possibly pre-existing data.
+        this.initUI();
     }
 
-    public void initModelEntities(Map<String, Map<String, ModelReader.ModelEntity>> modelEntityMap) {
+    public void initModelEntities(Map<String, Map<String, ModelEntity>> modelEntityMap) {
         this.modelEntityMap = modelEntityMap;
 
         // Init ComboBox with available entities read from the selected model.
@@ -67,7 +77,30 @@ public class AssumptionSpecificationScreenController {
     }
 
     private void checkForCompletenessOfSpecification() {
-        this.insertButton.setDisable(!this.assumption.isFullySpecified());
+        this.insertButton.setDisable(!this.assumption.isSufficientlySpecified());
+    }
+
+    private void initUI(){
+        this.nameTextField.setText(this.assumption.getName() != null ? this.assumption.getName() : "");
+        this.descriptionTextArea.setText(this.assumption.getDescription() != null ? this.assumption.getDescription() : "");
+        this.riskTextField.setText(this.assumption.getRisk() != null ? String.valueOf(this.assumption.getRisk()) : "");
+        this.violationProbabilityTextField.setText(this.assumption.getProbabilityOfViolation() != null ? String.valueOf(this.assumption.getProbabilityOfViolation()) : "");
+        this.impactTextArea.setText(this.assumption.getImpact() != null ? this.assumption.getImpact() : "");
+        this.riskTextField.setText(this.assumption.getRisk() != null ? String.valueOf(this.assumption.getRisk()) : "");
+
+        if(this.assumption.getType() != null){
+            if(this.assumption.getType() == Assumption.AssumptionType.INTRODUCE_UNCERTAINTY){
+                this.introduceUncertaintyToggle.setSelected(true);
+            } else {
+                this.resolveUncertaintyToggle.setSelected(true);
+            }
+        }
+
+        if(this.assumption.isAnalyzed() != null){
+            this.analyzedCheckBox.setSelected(this.assumption.isAnalyzed());
+        }
+
+        this.affectedEntityTableView.setItems(FXCollections.observableArrayList(this.assumption.getAffectedEntities()));
     }
 
     @FXML
@@ -77,6 +110,12 @@ public class AssumptionSpecificationScreenController {
         // Init user data for the toggle buttons.
         resolveUncertaintyToggle.setUserData(Assumption.AssumptionType.RESOLVE_UNCERTAINTY);
         introduceUncertaintyToggle.setUserData(Assumption.AssumptionType.INTRODUCE_UNCERTAINTY);
+
+        // Listen for changes of the text in the name TextField.
+        this.nameTextField.textProperty().addListener((observable, oldText, newText) -> {
+            this.assumption.setName(newText.trim());
+            this.checkForCompletenessOfSpecification();
+        });
 
         // Listen for changes with regard to the toggle-group.
         this.typeToggleGroup.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
@@ -155,8 +194,8 @@ public class AssumptionSpecificationScreenController {
     private void handleAffectedEntitySelection() {
         // Is also called when items property is changed via other ComboBox.
         if (this.modelEntityComboBox.getValue() != null) {
-            ModelReader.ModelEntity selectedModelEntity = this.modelEntityComboBox.getValue();
-            if (this.assumption.getAffectedEntities().add(selectedModelEntity.id())) {
+            ModelEntity selectedModelEntity = this.modelEntityComboBox.getValue();
+            if (this.assumption.getAffectedEntities().add(selectedModelEntity)) {
                 this.affectedEntityTableView.getItems().add(selectedModelEntity);
             }
             this.checkForCompletenessOfSpecification();

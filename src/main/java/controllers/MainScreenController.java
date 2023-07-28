@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DatabindException;
 import general.Assumption;
 import general.Configuration;
 import general.Constants;
+import general.ModelEntity;
 import general.Utilities;
 import io.ConfigManager;
 import io.ModelReader;
@@ -17,6 +18,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -33,6 +35,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import network.AnalysisConnector;
 
@@ -52,7 +55,7 @@ public class MainScreenController {
     private AnalysisConnector analysisConnector;
     private HostServices hostServices;
     private File saveFile;
-    private Map<String, Map<String, ModelReader.ModelEntity>> modelEntityMap;
+    private Map<String, Map<String, ModelEntity>> modelEntityMap;
 
     @FXML
     private Button performAnalysisButton;
@@ -61,13 +64,15 @@ public class MainScreenController {
     @FXML
     private TableColumn<Assumption, UUID> idColumn;
     @FXML
+    private TableColumn<Assumption, String> nameColumn;
+    @FXML
     private TableColumn<Assumption, Assumption.AssumptionType> typeColumn;
+    @FXML
+    private TableColumn<Assumption, String> descriptionColumn;
     @FXML
     private TableColumn<Assumption, Set<String>> entitiesColumn;
     @FXML
     private TableColumn<Assumption, Set<UUID>> dependenciesColumn;
-    @FXML
-    private TableColumn<Assumption, String> descriptionColumn;
     @FXML
     private TableColumn<Assumption, Double> violationProbabilityColumn;
     @FXML
@@ -91,10 +96,11 @@ public class MainScreenController {
     @FXML
     private void initialize() {
         this.idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        this.nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         this.typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+        this.descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
         this.entitiesColumn.setCellValueFactory(new PropertyValueFactory<>("affectedEntities"));
         this.dependenciesColumn.setCellValueFactory(new PropertyValueFactory<>("dependencies"));
-        this.descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
         this.violationProbabilityColumn.setCellValueFactory(new PropertyValueFactory<>("probabilityOfViolation"));
         this.riskColumn.setCellValueFactory(new PropertyValueFactory<>("risk"));
         this.impactColumn.setCellValueFactory(new PropertyValueFactory<>("impact"));
@@ -108,7 +114,7 @@ public class MainScreenController {
             cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
             text.wrappingWidthProperty().bind(this.descriptionColumn.widthProperty());
             text.textProperty().bind(cell.itemProperty());
-            return cell ;
+            return cell;
         });
         this.impactColumn.setCellFactory(tc -> {
             var cell = new TableCell<Assumption, String>();
@@ -117,8 +123,20 @@ public class MainScreenController {
             cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
             text.wrappingWidthProperty().bind(this.impactColumn.widthProperty());
             text.textProperty().bind(cell.itemProperty());
-            return cell ;
+            return cell;
         });
+
+        // Context menu for editing assumptions within the table view.
+        var tableEditAssumptionMenuItem = new MenuItem("Edit Assumption");
+        tableEditAssumptionMenuItem.setOnAction((ActionEvent actionEvent) -> {
+            Assumption selectedAssumption = this.assumptionTableView.getSelectionModel().getSelectedItem();
+            this.showAssumptionSpecificationScreen(selectedAssumption, ((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow());
+            this.assumptionTableView.refresh();
+        });
+
+        var tableEditAssumptionMenu = new ContextMenu();
+        tableEditAssumptionMenu.getItems().add(tableEditAssumptionMenuItem);
+        this.assumptionTableView.setContextMenu(tableEditAssumptionMenu);
     }
 
     public void setHostServices(HostServices hostServices) {
@@ -148,6 +166,30 @@ public class MainScreenController {
         return connectionSuccess;
     }
 
+    private void showAssumptionSpecificationScreen(Assumption assumption, Window owner) {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("../UI/AssumptionSpecificationScreen.fxml"));
+            AnchorPane root = loader.load();
+
+            AssumptionSpecificationScreenController controller = loader.getController();
+            controller.initAssumption(assumption);
+            controller.initModelEntities(this.modelEntityMap);
+
+            var stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Assumption Specification");
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(owner);
+            stage.showAndWait();
+
+        } catch (IOException e) {
+            // TODO Proper handling of this case.
+            throw new RuntimeException(e);
+
+        }
+    }
+
     private boolean hasUnsavedChanges() {
         return !this.currentConfiguration.equals(this.savedConfiguration);
     }
@@ -163,33 +205,15 @@ public class MainScreenController {
         }
 
         // Create new modal window for entry of assumption parameters.
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("../UI/AssumptionSpecificationScreen.fxml"));
-            AnchorPane root = loader.load();
+        Assumption newAssumption = new Assumption();
+        this.showAssumptionSpecificationScreen(newAssumption, ((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow());
 
-            AssumptionSpecificationScreenController controller = loader.getController();
-            Assumption newAssumption = new Assumption();
-            controller.initAssumption(newAssumption);
-            controller.initModelEntities(this.modelEntityMap);
-
-            var stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Assumption Specification");
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow().getScene().getWindow());
-            stage.showAndWait();
-
-            // Only add assumption in case it was fully specified by the user.
-            if (newAssumption.isFullySpecified()) {
-                this.currentConfiguration.getAssumptions().add(newAssumption);
-                this.assumptionTableView.getItems().add(newAssumption);
-                this.performAnalysisButton.setDisable(this.currentConfiguration.isMissingAnalysisParameters());
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        // Only add assumption in case it was fully specified by the user.
+        if (newAssumption.isSufficientlySpecified()) {
+            this.currentConfiguration.getAssumptions().add(newAssumption);
+            this.assumptionTableView.getItems().add(newAssumption);
+            this.performAnalysisButton.setDisable(this.currentConfiguration.isMissingAnalysisParameters());
         }
-
     }
 
     @FXML
@@ -249,7 +273,6 @@ public class MainScreenController {
         } catch (StreamReadException e) {
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file exhibits an invalid structure.");
         } catch (DatabindException e) {
-            e.printStackTrace();
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not map the contents of the specified file to a valid Configuration.");
         } catch (FileNotFoundException e) {
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not find the repository file associated with the the specified model.");

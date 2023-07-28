@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,8 +29,9 @@ public class Assumption implements Cloneable{
     }
 
     private UUID id;
+    private String name;
     private AssumptionType type;
-    private Set<String> affectedEntities; // TODO Integrate associated functionality into UI.
+    private Set<ModelEntity> affectedEntities; // TODO Integrate associated functionality into UI.
     private Set<UUID> dependencies;
     private String description;
     private Double probabilityOfViolation;
@@ -48,7 +50,15 @@ public class Assumption implements Cloneable{
         // Implicitly set all other fields to null.
     }
 
-    public void setAffectedEntities(Set<String> affectedEntities) {
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAffectedEntities(Set<ModelEntity> affectedEntities) {
         this.affectedEntities = affectedEntities;
     }
 
@@ -84,7 +94,7 @@ public class Assumption implements Cloneable{
         return this.id;
     }
 
-    public Set<String> getAffectedEntities() {
+    public Set<ModelEntity> getAffectedEntities() {
         return this.affectedEntities;
     }
 
@@ -100,11 +110,11 @@ public class Assumption implements Cloneable{
         return this.description;
     }
 
-    public double getProbabilityOfViolation() {
+    public Double getProbabilityOfViolation() {
         return this.probabilityOfViolation;
     }
 
-    public double getRisk() {
+    public Double getRisk() {
         return this.risk;
     }
 
@@ -112,22 +122,30 @@ public class Assumption implements Cloneable{
         return this.impact;
     }
 
-    public boolean isAnalyzed() {
+    public Boolean isAnalyzed() {
         return this.analyzed;
     }
 
     @JsonIgnore
-    public boolean isFullySpecified() {
-        return this.affectedEntities != null &&
-                !this.affectedEntities.isEmpty() &&
-                this.type != null &&
+    public boolean isSufficientlySpecified() {
+        return this.type != null &&
+                this.name != null &&
                 this.description != null &&
-                this.probabilityOfViolation != null &&
-                this.risk != null &&
-                this.impact != null &&
-                this.analyzed != null &&
-                !this.impact.isEmpty() &&
+                !this.name.isEmpty() &&
                 !this.description.isEmpty();
+    }
+
+    public boolean semanticallyEqualTo(Assumption otherAssumption){
+        return Objects.equals(this.id, otherAssumption.id) &&
+                Objects.equals(this.name, otherAssumption.name) &&
+                Objects.equals(this.type, otherAssumption.type) &&
+                Objects.equals(this.affectedEntities, otherAssumption.affectedEntities) &&
+                Objects.equals(this.dependencies, otherAssumption.dependencies) &&
+                Objects.equals(this.description, otherAssumption.description)&&
+                Objects.equals(this.probabilityOfViolation, otherAssumption.probabilityOfViolation) &&
+                Objects.equals(this.risk, otherAssumption.risk) &&
+                Objects.equals(this.impact, otherAssumption.impact) &&
+                Objects.equals(this.analyzed, otherAssumption.analyzed);
     }
 
     @Override
