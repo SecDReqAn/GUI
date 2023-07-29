@@ -20,7 +20,7 @@ public class AssumptionSpecificationScreenController {
      * The {@link Assumption} that is being specified.
      */
     private Assumption assumption;
-    private Map<String, Map<String, ModelEntity>> modelEntityMap;
+    private Map<String, TreeItem<ModelEntity>> modelEntityMap;
 
     @FXML
     private VBox topLevelVBox;
@@ -56,6 +56,8 @@ public class AssumptionSpecificationScreenController {
     private ComboBox<ModelEntity> modelEntityComboBox;
     @FXML
     private Button insertButton;
+    @FXML
+    private TreeView<ModelEntity> modelEntityTreeView;
 
     public void initAssumption(Assumption assumption) {
         this.assumption = assumption;
@@ -69,7 +71,7 @@ public class AssumptionSpecificationScreenController {
         this.initUI();
     }
 
-    public void initModelEntities(Map<String, Map<String, ModelEntity>> modelEntityMap) {
+    public void initModelEntities(Map<String, TreeItem<ModelEntity>> modelEntityMap) {
         this.modelEntityMap = modelEntityMap;
 
         // Init ComboBox with available entities read from the selected model.
@@ -172,6 +174,21 @@ public class AssumptionSpecificationScreenController {
         this.affectedEntityNameColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().name()));
         this.affectedEntityTypeColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().type()));
         this.affectedEntityIdColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().id()));
+
+        // Context menu for editing assumptions within the table view.
+        var tableEditAssumptionMenuItem = new MenuItem("Add Model Entity");
+        tableEditAssumptionMenuItem.setOnAction((ActionEvent actionEvent) -> {
+            ModelEntity selectedModelEntity = this.modelEntityTreeView.getSelectionModel().getSelectedItem().getValue();
+
+            if (this.assumption.getAffectedEntities().add(selectedModelEntity)) {
+                this.affectedEntityTableView.getItems().add(selectedModelEntity);
+            }
+            this.checkForCompletenessOfSpecification();
+        });
+
+        var tableEditAssumptionMenu = new ContextMenu();
+        tableEditAssumptionMenu.getItems().add(tableEditAssumptionMenuItem);
+        this.modelEntityTreeView.setContextMenu(tableEditAssumptionMenu);
     }
 
     @FXML
@@ -184,10 +201,17 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private void handleModelViewSelection() {
         var selectedModelView = this.modelViewComboBox.getValue();
-        this.modelEntityComboBox.setItems(
-                FXCollections.observableArrayList(
-                        this.modelEntityMap.get(selectedModelView).values()).sorted(new ModelReader.EntityComparator()));
+
+        // TODO Remove
+        //this.modelEntityComboBox.setItems(
+        //        FXCollections.observableArrayList(
+        //                this.modelEntityMap.get(selectedModelView).values()).sorted(new ModelReader.EntityComparator()));
+
+        this.modelEntityTreeView.setRoot(this.modelEntityMap.get(selectedModelView));
+        this.modelEntityTreeView.refresh();
+
         this.modelEntityComboBox.setDisable(false);
+
     }
 
     @FXML

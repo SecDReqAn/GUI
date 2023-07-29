@@ -1,7 +1,9 @@
 package io;
 
 import general.ModelEntity;
+import javafx.scene.control.TreeItem;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
@@ -19,9 +21,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ModelReader {
-    public static class EntityComparator implements Comparator<ModelEntity> {
+    public static class EntityComparator implements Comparator<TreeItem<ModelEntity>> {
         @Override
-        public int compare(ModelEntity firstEntity, ModelEntity secondEntity) {
+        public int compare(TreeItem<ModelEntity> first, TreeItem<ModelEntity> second) {
+            ModelEntity firstEntity = first.getValue();
+            ModelEntity secondEntity = second.getValue();
             if (firstEntity.name() != null && secondEntity.name() == null) {
                 return -1;
             } else if (firstEntity.name() == null && secondEntity.name() != null) {
@@ -42,8 +46,11 @@ public class ModelReader {
         }
     }
 
-    public static @NotNull Map<String, Map<String, ModelEntity>> readModel(@NotNull File modelFolder) {
-        var readEntitiesByView = new HashMap<String, Map<String, ModelEntity>>();
+    public static record ModelEntityNode(ModelEntity entity, ModelEntity parent) {
+    }
+
+    public static @NotNull Map<String, TreeItem<ModelEntity>> readModel(@NotNull File modelFolder) {
+        var readEntitiesByView = new HashMap<String, TreeItem<ModelEntity>>();
 
         var modelFiles = modelFolder.listFiles();
         if (modelFiles != null && modelFiles.length != 0) {
@@ -61,12 +68,16 @@ public class ModelReader {
         return readEntitiesByView;
     }
 
-    private static @NotNull Map<String, ModelEntity> readFromModelFile(@NotNull File modelFile) {
-        var readEntities = new HashMap<String, ModelEntity>();
+    // TODO Overhaul to be memory efficient (see https://docs.oracle.com/javafx/2/api/javafx/scene/control/TreeItem.html)
+    private static @Nullable TreeItem<ModelEntity> readFromModelFile(@NotNull File modelFile) {
 
+        TreeItem<ModelEntity> currentItem = null;
         try (var fileInputStream = new FileInputStream(modelFile)) {
             var inputFactory = XMLInputFactory.newInstance();
             var eventReader = inputFactory.createXMLEventReader(fileInputStream);
+
+            // TODO Build hierarchy from XML
+            currentItem = null;
 
             while (eventReader.hasNext()) {
                 XMLEvent nextEvent = eventReader.nextEvent();
@@ -77,14 +88,24 @@ public class ModelReader {
                     Attribute name = startElement.getAttributeByName(new QName("entityName"));
 
                     if (id != null) {
-                        ModelEntity newEntity = new ModelEntity(
-                                id.getValue(),
-                                modelFile.getName(), // Each view is specified by its own file.
-                                startElement.getName().getLocalPart(),
-                                name == null ? null : name.getValue(),
-                                type == null ? null : type.getValue());
+                        var newTreeItem = new TreeItem<>(
+                                new ModelEntity(
+                                        id.getValue(),
+                                        modelFile.getName(), // Each view is specified by its own file.
+                                        startElement.getName().getLocalPart(),
+                                        name == null ? null : name.getValue(),
+                                        type == null ? null : type.getValue()));
 
-                        readEntities.put(newEntity.id(), newEntity);
+                        if (currentItem != null) {
+                            currentItem.getChildren().add(newTreeItem);
+                        }
+                        currentItem = newTreeItem;
+                    }
+                } else if (nextEvent.isEndElement() && currentItem != null) {
+                    currentItem.getChildren().sort(new ModelReader.EntityComparator());
+
+                    if(currentItem.getParent() != null){
+                        currentItem = currentItem.getParent(); // Traverse up.
                     }
                 }
             }
@@ -92,6 +113,6 @@ public class ModelReader {
         } catch (XMLStreamException | IOException ignored) {
         }
 
-        return readEntities;
+        return currentItem;
     }
 }

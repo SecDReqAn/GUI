@@ -98,7 +98,7 @@
                   <Insets bottom="10.0" top="10.0" />
                </VBox.margin>
             </TitledPane>
-            <TreeView />
+            <TreeView fx:id="modelEntityTreeView" />
             <Button fx:id="insertButton" alignment="CENTER" contentDisplay="CENTER" disable="true" mnemonicParsing="false" onAction="#handleInsertButton" prefHeight="30.0" prefWidth="84.0" style="-fx-padding: 5pt; -fx-background-radius: 5pt; -fx-border-radius: 5pt; -fx-background-color: #2F8ECA; -fx-border-color: black;" text="Insert" />
          </children>
       </VBox>
