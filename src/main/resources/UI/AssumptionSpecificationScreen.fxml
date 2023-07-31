@@ -5,6 +5,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
@@ -64,41 +65,59 @@
                </VBox.margin>
             </GridPane>
             <TextArea fx:id="impactTextArea" prefHeight="60.0" promptText="Impact" wrapText="true" VBox.vgrow="ALWAYS" />
-            <TitledPane collapsible="false" prefHeight="150.0" text="Affected Model Entities" VBox.vgrow="ALWAYS">
-               <content>
-                  <GridPane hgap="10.0">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="ALWAYS" />
-                      <ColumnConstraints percentWidth="35.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <TableView fx:id="affectedEntityTableView" prefWidth="400.0">
-                          <columns>
-                            <TableColumn fx:id="affectedEntityIdColumn" prefWidth="75.0" text="ID" />
-                            <TableColumn fx:id="affectedEntityNameColumn" prefWidth="75.0" text="Name" />
-                            <TableColumn fx:id="affectedEntityTypeColumn" prefWidth="75.0" text="Type" />
-                          </columns>
-                           <columnResizePolicy>
-                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                           </columnResizePolicy>
-                        </TableView>
-                        <VBox alignment="CENTER" spacing="10.0" GridPane.columnIndex="1">
-                           <children>
-                              <ComboBox fx:id="modelViewComboBox" maxWidth="1.7976931348623157E308" onAction="#handleModelViewSelection" promptText="Choose Model View" />
-                              <ComboBox fx:id="modelEntityComboBox" disable="true" maxWidth="1.7976931348623157E308" onAction="#handleAffectedEntitySelection" promptText="Choose View Entity" />
-                           </children>
-                        </VBox>
-                     </children>
-                  </GridPane>
-               </content>
+            <TitledPane collapsible="false" prefHeight="400.0" text="Affected Model Entities" VBox.vgrow="ALWAYS">
                <VBox.margin>
                   <Insets bottom="10.0" top="10.0" />
                </VBox.margin>
+               <content>
+                  <SplitPane dividerPositions="0.5" orientation="VERTICAL" style="-fx-background-insets: 0,0;">
+                    <items>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                           <children>
+                              <GridPane hgap="10.0" prefHeight="86.0" prefWidth="523.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="ALWAYS" />
+                                  <ColumnConstraints percentWidth="25.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <TableView fx:id="affectedEntityTableView" prefWidth="400.0">
+                                      <columns>
+                                        <TableColumn fx:id="affectedEntityIdColumn" prefWidth="75.0" text="ID" />
+                                        <TableColumn fx:id="affectedEntityNameColumn" prefWidth="75.0" text="Name" />
+                                        <TableColumn fx:id="affectedEntityTypeColumn" prefWidth="75.0" text="Type" />
+                                      </columns>
+                                       <columnResizePolicy>
+                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                       </columnResizePolicy>
+                                    </TableView>
+                                    <VBox alignment="CENTER" GridPane.columnIndex="1">
+                                       <children>
+                                          <ComboBox fx:id="modelViewComboBox" maxWidth="1.7976931348623157E308" onAction="#handleModelViewSelection" promptText="Choose Model View">
+                                             <VBox.margin>
+                                                <Insets />
+                                             </VBox.margin>
+                                          </ComboBox>
+                                       </children>
+                                       <padding>
+                                          <Insets right="10.0" />
+                                       </padding>
+                                    </VBox>
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </AnchorPane>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                           <children>
+                              <TreeView fx:id="modelEntityTreeView" prefHeight="86.0" prefWidth="523.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </children>
+                        </AnchorPane>
+                    </items>
+                  </SplitPane>
+               </content>
             </TitledPane>
-            <TreeView fx:id="modelEntityTreeView" />
             <Button fx:id="insertButton" alignment="CENTER" contentDisplay="CENTER" disable="true" mnemonicParsing="false" onAction="#handleInsertButton" prefHeight="30.0" prefWidth="84.0" style="-fx-padding: 5pt; -fx-background-radius: 5pt; -fx-border-radius: 5pt; -fx-background-color: #2F8ECA; -fx-border-color: black;" text="Insert" />
          </children>
       </VBox>

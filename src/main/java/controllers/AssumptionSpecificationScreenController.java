@@ -2,7 +2,7 @@ package controllers;
 
 import general.Assumption;
 import general.ModelEntity;
-import io.ModelReader;
+import general.Utilities;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -53,8 +53,6 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private ComboBox<String> modelViewComboBox;
     @FXML
-    private ComboBox<ModelEntity> modelEntityComboBox;
-    @FXML
     private Button insertButton;
     @FXML
     private TreeView<ModelEntity> modelEntityTreeView;
@@ -63,12 +61,12 @@ public class AssumptionSpecificationScreenController {
         this.assumption = assumption;
 
         // Set analyzed to false (default) if not already set.
-        if(this.assumption.isAnalyzed() == null){
+        if (this.assumption.isAnalyzed() == null) {
             this.assumption.setAnalyzed(false);
         }
 
         // Initialize UI with possibly pre-existing data.
-        this.initUI();
+        this.initializeUIElements();
     }
 
     public void initModelEntities(Map<String, TreeItem<ModelEntity>> modelEntityMap) {
@@ -82,7 +80,7 @@ public class AssumptionSpecificationScreenController {
         this.insertButton.setDisable(!this.assumption.isSufficientlySpecified());
     }
 
-    private void initUI(){
+    private void initializeUIElements() {
         this.nameTextField.setText(this.assumption.getName() != null ? this.assumption.getName() : "");
         this.descriptionTextArea.setText(this.assumption.getDescription() != null ? this.assumption.getDescription() : "");
         this.riskTextField.setText(this.assumption.getRisk() != null ? String.valueOf(this.assumption.getRisk()) : "");
@@ -90,19 +88,40 @@ public class AssumptionSpecificationScreenController {
         this.impactTextArea.setText(this.assumption.getImpact() != null ? this.assumption.getImpact() : "");
         this.riskTextField.setText(this.assumption.getRisk() != null ? String.valueOf(this.assumption.getRisk()) : "");
 
-        if(this.assumption.getType() != null){
-            if(this.assumption.getType() == Assumption.AssumptionType.INTRODUCE_UNCERTAINTY){
+        if (this.assumption.getType() != null) {
+            if (this.assumption.getType() == Assumption.AssumptionType.INTRODUCE_UNCERTAINTY) {
                 this.introduceUncertaintyToggle.setSelected(true);
             } else {
                 this.resolveUncertaintyToggle.setSelected(true);
             }
         }
 
-        if(this.assumption.isAnalyzed() != null){
+        if (this.assumption.isAnalyzed() != null) {
             this.analyzedCheckBox.setSelected(this.assumption.isAnalyzed());
         }
 
         this.affectedEntityTableView.setItems(FXCollections.observableArrayList(this.assumption.getAffectedEntities()));
+    }
+
+    private void addContextMenus() {
+        // Context menu for adding model entities from the TreeView.
+        this.modelEntityTreeView.setContextMenu(Utilities.createSingleContextMenu("Add to Affected Model Entities", (ActionEvent actionEvent) -> {
+            ModelEntity selectedModelEntity = this.modelEntityTreeView.getSelectionModel().getSelectedItem().getValue();
+
+            if (selectedModelEntity != null && this.assumption.getAffectedEntities().add(selectedModelEntity)) {
+                this.affectedEntityTableView.getItems().add(selectedModelEntity);
+                this.checkForCompletenessOfSpecification();
+            }
+        }));
+
+        // Context menu for removing affected model entity within the table view.
+        this.affectedEntityTableView.setContextMenu(Utilities.createSingleContextMenu("Remove Model Entity", (ActionEvent actionEvent) -> {
+            ModelEntity selectedModelEntity = this.affectedEntityTableView.getSelectionModel().getSelectedItem();
+
+            if (selectedModelEntity != null && this.assumption.getAffectedEntities().remove(selectedModelEntity)) {
+                this.affectedEntityTableView.getItems().remove(selectedModelEntity);
+            }
+        }));
     }
 
     @FXML
@@ -175,20 +194,7 @@ public class AssumptionSpecificationScreenController {
         this.affectedEntityTypeColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().type()));
         this.affectedEntityIdColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().id()));
 
-        // Context menu for editing assumptions within the table view.
-        var tableEditAssumptionMenuItem = new MenuItem("Add Model Entity");
-        tableEditAssumptionMenuItem.setOnAction((ActionEvent actionEvent) -> {
-            ModelEntity selectedModelEntity = this.modelEntityTreeView.getSelectionModel().getSelectedItem().getValue();
-
-            if (this.assumption.getAffectedEntities().add(selectedModelEntity)) {
-                this.affectedEntityTableView.getItems().add(selectedModelEntity);
-            }
-            this.checkForCompletenessOfSpecification();
-        });
-
-        var tableEditAssumptionMenu = new ContextMenu();
-        tableEditAssumptionMenu.getItems().add(tableEditAssumptionMenuItem);
-        this.modelEntityTreeView.setContextMenu(tableEditAssumptionMenu);
+        this.addContextMenus();
     }
 
     @FXML
@@ -201,29 +207,8 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private void handleModelViewSelection() {
         var selectedModelView = this.modelViewComboBox.getValue();
-
-        // TODO Remove
-        //this.modelEntityComboBox.setItems(
-        //        FXCollections.observableArrayList(
-        //                this.modelEntityMap.get(selectedModelView).values()).sorted(new ModelReader.EntityComparator()));
-
         this.modelEntityTreeView.setRoot(this.modelEntityMap.get(selectedModelView));
         this.modelEntityTreeView.refresh();
-
-        this.modelEntityComboBox.setDisable(false);
-
-    }
-
-    @FXML
-    private void handleAffectedEntitySelection() {
-        // Is also called when items property is changed via other ComboBox.
-        if (this.modelEntityComboBox.getValue() != null) {
-            ModelEntity selectedModelEntity = this.modelEntityComboBox.getValue();
-            if (this.assumption.getAffectedEntities().add(selectedModelEntity)) {
-                this.affectedEntityTableView.getItems().add(selectedModelEntity);
-            }
-            this.checkForCompletenessOfSpecification();
-        }
     }
 
     @FXML

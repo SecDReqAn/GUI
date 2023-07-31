@@ -94,52 +94,6 @@ public class MainScreenController {
         this.currentConfiguration = new Configuration();
     }
 
-    @FXML
-    private void initialize() {
-        this.idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        this.nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        this.typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
-        this.descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
-        this.entitiesColumn.setCellValueFactory(new PropertyValueFactory<>("affectedEntities"));
-        this.dependenciesColumn.setCellValueFactory(new PropertyValueFactory<>("dependencies"));
-        this.violationProbabilityColumn.setCellValueFactory(new PropertyValueFactory<>("probabilityOfViolation"));
-        this.riskColumn.setCellValueFactory(new PropertyValueFactory<>("risk"));
-        this.impactColumn.setCellValueFactory(new PropertyValueFactory<>("impact"));
-        this.analyzedColumn.setCellValueFactory(new PropertyValueFactory<>("analyzed"));
-
-        // TODO: Tidy this up.
-        this.descriptionColumn.setCellFactory(tc -> {
-            var cell = new TableCell<Assumption, String>();
-            var text = new Text();
-            cell.setGraphic(text);
-            cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
-            text.wrappingWidthProperty().bind(this.descriptionColumn.widthProperty());
-            text.textProperty().bind(cell.itemProperty());
-            return cell;
-        });
-        this.impactColumn.setCellFactory(tc -> {
-            var cell = new TableCell<Assumption, String>();
-            var text = new Text();
-            cell.setGraphic(text);
-            cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
-            text.wrappingWidthProperty().bind(this.impactColumn.widthProperty());
-            text.textProperty().bind(cell.itemProperty());
-            return cell;
-        });
-
-        // Context menu for editing assumptions within the table view.
-        var tableEditAssumptionMenuItem = new MenuItem("Edit Assumption");
-        tableEditAssumptionMenuItem.setOnAction((ActionEvent actionEvent) -> {
-            Assumption selectedAssumption = this.assumptionTableView.getSelectionModel().getSelectedItem();
-            this.showAssumptionSpecificationScreen(selectedAssumption, ((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow());
-            this.assumptionTableView.refresh();
-        });
-
-        var tableEditAssumptionMenu = new ContextMenu();
-        tableEditAssumptionMenu.getItems().add(tableEditAssumptionMenuItem);
-        this.assumptionTableView.setContextMenu(tableEditAssumptionMenu);
-    }
-
     public void setHostServices(HostServices hostServices) {
         this.hostServices = hostServices;
     }
@@ -193,6 +147,35 @@ public class MainScreenController {
 
     private boolean hasUnsavedChanges() {
         return !this.currentConfiguration.equals(this.savedConfiguration);
+    }
+
+    @FXML
+    private void initialize() {
+        // Extract fields of an assumption into their appropriate column of the TableView.
+        this.idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        this.nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        this.typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+        this.descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+        this.entitiesColumn.setCellValueFactory(new PropertyValueFactory<>("affectedEntities"));
+        this.dependenciesColumn.setCellValueFactory(new PropertyValueFactory<>("dependencies"));
+        this.violationProbabilityColumn.setCellValueFactory(new PropertyValueFactory<>("probabilityOfViolation"));
+        this.riskColumn.setCellValueFactory(new PropertyValueFactory<>("risk"));
+        this.impactColumn.setCellValueFactory(new PropertyValueFactory<>("impact"));
+        this.analyzedColumn.setCellValueFactory(new PropertyValueFactory<>("analyzed"));
+
+        // Enable text-warp in text-centric columns.
+        Utilities.enableTextWrapForTableColumn(this.descriptionColumn);
+        Utilities.enableTextWrapForTableColumn(this.impactColumn);
+
+        // Context menu for editing assumptions within the table view.
+        this.assumptionTableView.setContextMenu(Utilities.createSingleContextMenu("Edit Assumption", (ActionEvent actionEvent) -> {
+            Assumption selectedAssumption = this.assumptionTableView.getSelectionModel().getSelectedItem();
+
+            if(selectedAssumption != null){
+                this.showAssumptionSpecificationScreen(selectedAssumption, ((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow());
+                this.assumptionTableView.refresh();
+            }
+        }));
     }
 
     @FXML
