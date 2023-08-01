@@ -21,6 +21,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AnalysisConnector {
+    private static final String PATH_CONNECTION_TEST = "test";
+    private static final String PATH_ANALYSIS_EXECUTION = "run";
+    private static final String PATH_MODEL_TRANSMISSION = "set/model";
+
     public record AnalysisParameter(String modelPath, Set<Assumption> assumptions) {
     }
 
@@ -37,7 +41,7 @@ public class AnalysisConnector {
     public Pair<Integer, String> testConnection() {
         Pair<Integer, String> codeMessagePair;
 
-        try (var response = this.client.target(this.analysisUri).path("test").request(MediaType.TEXT_PLAIN).get()) {
+        try (var response = this.client.target(this.analysisUri).path(AnalysisConnector.PATH_CONNECTION_TEST).request(MediaType.TEXT_PLAIN).get()) {
             codeMessagePair = new Pair<>(response.getStatus(), response.readEntity(String.class));
         } catch (IllegalArgumentException | NullPointerException e) {
             codeMessagePair = new Pair<>(0, "The specified URI is invalid.");
@@ -52,7 +56,7 @@ public class AnalysisConnector {
         try {
             var jsonString = this.objectMapper.writeValueAsString(analysisParameter);
 
-            try (var response = this.client.target(this.analysisUri).path("run").request().post(Entity.entity(jsonString, MediaType.APPLICATION_JSON))) {
+            try (var response = this.client.target(this.analysisUri).path(AnalysisConnector.PATH_ANALYSIS_EXECUTION).request().post(Entity.entity(jsonString, MediaType.APPLICATION_JSON))) {
                 return new Pair<>(response.getStatus(), response.readEntity(String.class));
             }
         } catch (JsonProcessingException e) {
@@ -61,13 +65,6 @@ public class AnalysisConnector {
         }
     }
 
-    // TODO Remove.
-    public static void main(String[] args) {
-        var testConnector = new AnalysisConnector("http://localhost:2406/abunai");
-        testConnector.transferModelFiles(new File("/home/tim/git/UncertaintyImpactAnalysis/tests/dev.abunai.impact.analysis.testmodels/casestudies/CaseStudy-CoronaWarnApp/CoronaWarnApp"));
-    }
-
-    // TODO Properly integrate.
     public Pair<Integer, String> transferModelFiles(@NotNull File modelPath) {
         // Determine list of files that are part of the model and must be transferred to the analysis.
         var filesInModelFolder = modelPath.listFiles();
@@ -88,7 +85,7 @@ public class AnalysisConnector {
                 multiPart.bodyPart(new FileDataBodyPart(file.getName(), file));
             }
 
-            try(var response = this.client.target(this.analysisUri).path("set/model").request().post(Entity.entity(multiPart, multiPart.getMediaType()))){
+            try (var response = this.client.target(this.analysisUri).path(AnalysisConnector.PATH_MODEL_TRANSMISSION).request().post(Entity.entity(multiPart, multiPart.getMediaType()))) {
                 return new Pair<>(response.getStatus(), response.readEntity(String.class));
             }
         } catch (IOException e) {

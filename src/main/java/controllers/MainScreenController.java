@@ -18,11 +18,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -31,7 +28,6 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -88,6 +84,8 @@ public class MainScreenController {
     private Label analysisPathLabel;
     @FXML
     private Label modelNameLabel;
+    @FXML
+    private Label statusLabel;
 
     public MainScreenController() {
         this.savedConfiguration = new Configuration();
@@ -168,14 +166,23 @@ public class MainScreenController {
         Utilities.enableTextWrapForTableColumn(this.impactColumn);
 
         // Context menu for editing assumptions within the table view.
-        this.assumptionTableView.setContextMenu(Utilities.createSingleContextMenu("Edit Assumption", (ActionEvent actionEvent) -> {
+        Utilities.addFunctionalityToContextMenu(this.assumptionTableView, "Edit Assumption", (ActionEvent actionEvent) -> {
             Assumption selectedAssumption = this.assumptionTableView.getSelectionModel().getSelectedItem();
 
-            if(selectedAssumption != null){
+            if (selectedAssumption != null) {
                 this.showAssumptionSpecificationScreen(selectedAssumption, ((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow());
                 this.assumptionTableView.refresh();
             }
-        }));
+        });
+        // Context menu for removing an assumptions from the table view.
+        Utilities.addFunctionalityToContextMenu(this.assumptionTableView, "Remove Assumption", (ActionEvent actionEvent) -> {
+            Assumption selectedAssumption = this.assumptionTableView.getSelectionModel().getSelectedItem();
+
+            if (selectedAssumption != null && this.currentConfiguration.getAssumptions().remove(selectedAssumption)) {
+                this.assumptionTableView.getItems().remove(selectedAssumption);
+                this.assumptionTableView.refresh();
+            }
+        });
     }
 
     @FXML
@@ -341,17 +348,30 @@ public class MainScreenController {
     private void handleAnalysisExecution() {
         // Check whether forwarding the request to the analysis makes sense.
         if (!this.currentConfiguration.isMissingAnalysisParameters()) {
+            this.statusLabel.setText("Trying to connect to analysis...");
             if (this.testAnalysisConnection(this.currentConfiguration.getAnalysisPath())) {
-                var analysisResponse = this.analysisConnector.performAnalysis(
+                this.statusLabel.setText("Transmit selected model to the analysis...");
+                var analysisResponse = this.analysisConnector.transferModelFiles(new File(this.currentConfiguration.getModelPath()));
+                if (analysisResponse.getKey() != 200) {
+                    this.statusLabel.setText("Analysis aborted.");
+                    Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Transmission of the selected model to the analysis failed.", analysisResponse.getValue());
+                    return;
+                }
+
+                this.statusLabel.setText("Starting analysis...");
+                analysisResponse = this.analysisConnector.performAnalysis(
                         new AnalysisConnector.AnalysisParameter(this.currentConfiguration.getModelPath(), this.currentConfiguration.getAssumptions()));
 
                 if (analysisResponse.getKey() != 0) {
+                    this.statusLabel.setText("Analysis successfully executed.");
                     this.analysisOutputTextArea.setText(analysisResponse.getValue());
                     this.currentConfiguration.setAnalysisResult(analysisResponse.getValue());
                 } else {
+                    this.statusLabel.setText("Received invalid response from the analysis.");
                     Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Communication with the analysis failed.", analysisResponse.getValue());
                 }
             } else {
+                this.statusLabel.setText("Analysis aborted.");
                 Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Communication with the analysis failed.", "Connection to the analysis could not be established.");
             }
         } else {

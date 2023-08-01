@@ -26,14 +26,18 @@ public class Utilities {
         return alert.showAndWait();
     }
 
-    public static ContextMenu createSingleContextMenu(String prompt, Consumer<ActionEvent> actionHandling){
+    public static void addFunctionalityToContextMenu(Control controlElement, String prompt, Consumer<ActionEvent> actionHandling){
         var menuItem = new MenuItem(prompt);
         menuItem.setOnAction(actionHandling::accept);
 
-        var contextMenu = new ContextMenu();
-        contextMenu.getItems().add(menuItem);
+        if(controlElement.getContextMenu() == null){
+            var contextMenu = new ContextMenu();
+            contextMenu.getItems().add(menuItem);
+            controlElement.setContextMenu(contextMenu);
+        } else {
+            controlElement.getContextMenu().getItems().add(menuItem);
+        }
 
-        return contextMenu;
     }
 
     public static void enableTextWrapForTableColumn(TableColumn<Assumption, String> column){

@@ -105,23 +105,23 @@ public class AssumptionSpecificationScreenController {
 
     private void addContextMenus() {
         // Context menu for adding model entities from the TreeView.
-        this.modelEntityTreeView.setContextMenu(Utilities.createSingleContextMenu("Add to Affected Model Entities", (ActionEvent actionEvent) -> {
+        Utilities.addFunctionalityToContextMenu(this.modelEntityTreeView, "Add to Affected Model Entities", (ActionEvent actionEvent) -> {
             ModelEntity selectedModelEntity = this.modelEntityTreeView.getSelectionModel().getSelectedItem().getValue();
 
             if (selectedModelEntity != null && this.assumption.getAffectedEntities().add(selectedModelEntity)) {
                 this.affectedEntityTableView.getItems().add(selectedModelEntity);
                 this.checkForCompletenessOfSpecification();
             }
-        }));
+        });
 
         // Context menu for removing affected model entity within the table view.
-        this.affectedEntityTableView.setContextMenu(Utilities.createSingleContextMenu("Remove Model Entity", (ActionEvent actionEvent) -> {
+        Utilities.addFunctionalityToContextMenu(this.affectedEntityTableView, "Remove Model Entity", (ActionEvent actionEvent) -> {
             ModelEntity selectedModelEntity = this.affectedEntityTableView.getSelectionModel().getSelectedItem();
 
             if (selectedModelEntity != null && this.assumption.getAffectedEntities().remove(selectedModelEntity)) {
                 this.affectedEntityTableView.getItems().remove(selectedModelEntity);
             }
-        }));
+        });
     }
 
     @FXML
