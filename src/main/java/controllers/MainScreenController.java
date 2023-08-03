@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.DatabindException;
 import general.Assumption;
 import general.Configuration;
 import general.Constants;
-import general.ModelEntity;
 import general.Utilities;
 import io.ConfigManager;
 import io.ModelReader;
@@ -24,7 +23,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.TreeItem;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -39,7 +37,7 @@ import network.AnalysisConnector;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Map;
+import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
@@ -52,7 +50,7 @@ public class MainScreenController {
     private AnalysisConnector analysisConnector;
     private HostServices hostServices;
     private File saveFile;
-    private Map<String, TreeItem<ModelEntity>> modelEntityMap;
+    private Collection<File> modelViewFiles;
 
     @FXML
     private Button performAnalysisButton;
@@ -127,7 +125,7 @@ public class MainScreenController {
 
             AssumptionSpecificationScreenController controller = loader.getController();
             controller.initAssumption(assumption);
-            controller.initModelEntities(this.modelEntityMap);
+            controller.initModelViewFiles(this.modelViewFiles);
 
             var stage = new Stage();
             stage.setScene(new Scene(root));
@@ -187,7 +185,7 @@ public class MainScreenController {
 
     @FXML
     private void handleNewAssumption(ActionEvent actionEvent) {
-        if (this.modelEntityMap == null || this.modelEntityMap.isEmpty()) {
+        if (this.modelViewFiles == null || this.modelViewFiles.isEmpty()) {
             Utilities.showAlert(Alert.AlertType.WARNING,
                     "Warning",
                     "Unable to create a new assumption!",
@@ -245,8 +243,8 @@ public class MainScreenController {
             this.testAnalysisConnection(this.currentConfiguration.getAnalysisPath());
 
             // Init model entities from read model path if model is already specified.
-            this.modelEntityMap = (this.currentConfiguration.getModelPath() != null) ?
-                    ModelReader.readModel(new File(this.currentConfiguration.getModelPath())) : null;
+            this.modelViewFiles = (this.currentConfiguration.getModelPath() != null) ?
+                    ModelReader.getModelViewFiles(new File(this.currentConfiguration.getModelPath())) : null;
 
             // Model
             var folders = this.currentConfiguration.getModelPath().split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
@@ -414,7 +412,7 @@ public class MainScreenController {
             File modelFolder = new File(absolutePathToSelectedFolder);
             if (modelFolder.exists()) {
                 // Load contents of repository file.
-                this.modelEntityMap = ModelReader.readModel(modelFolder);
+                this.modelViewFiles = ModelReader.getModelViewFiles(modelFolder);
 
                 // Accept valid selection.
                 this.currentConfiguration.setModelPath(absolutePathToSelectedFolder);

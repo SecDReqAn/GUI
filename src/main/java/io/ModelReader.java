@@ -14,9 +14,9 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -46,38 +46,26 @@ public class ModelReader {
         }
     }
 
-    public static record ModelEntityNode(ModelEntity entity, ModelEntity parent) {
-    }
-
-    public static @NotNull Map<String, TreeItem<ModelEntity>> readModel(@NotNull File modelFolder) {
-        var readEntitiesByView = new HashMap<String, TreeItem<ModelEntity>>();
-
+    public static @NotNull Collection<File> getModelViewFiles(@NotNull File modelFolder) {
         var modelFiles = modelFolder.listFiles();
         if (modelFiles != null && modelFiles.length != 0) {
-            // TODO: Filter out irrelevant files.
-            var relevantFiles = Stream.of(modelFiles)
+            return Stream.of(modelFiles)
                     .filter(File::isFile)
                     .filter(file -> !file.getName().startsWith(".")) // Do not consider hidden files.
                     .collect(Collectors.toSet());
 
-            for (var relevantFile : relevantFiles) {
-                readEntitiesByView.put(relevantFile.getName(), ModelReader.readFromModelFile(relevantFile));
-            }
+        } else {
+            return Collections.emptySet();
         }
-
-        return readEntitiesByView;
     }
 
-    // TODO Overhaul to be memory efficient (see https://docs.oracle.com/javafx/2/api/javafx/scene/control/TreeItem.html)
-    private static @Nullable TreeItem<ModelEntity> readFromModelFile(@NotNull File modelFile) {
+    // Requires more memory this way (loading all entities) but is faster than trying to reparse specific parts of the XML-file on-demand.
+    public static @Nullable TreeItem<ModelEntity> readFromModelFile(@NotNull File modelFile) {
 
         TreeItem<ModelEntity> currentItem = null;
         try (var fileInputStream = new FileInputStream(modelFile)) {
             var inputFactory = XMLInputFactory.newInstance();
             var eventReader = inputFactory.createXMLEventReader(fileInputStream);
-
-            // TODO Build hierarchy from XML
-            currentItem = null;
 
             while (eventReader.hasNext()) {
                 XMLEvent nextEvent = eventReader.nextEvent();
@@ -86,6 +74,9 @@ public class ModelReader {
                     Attribute type = startElement.getAttributeByName(new QName(startElement.getNamespaceContext().getNamespaceURI("xsi"), "type", "xsi"));
                     Attribute id = startElement.getAttributeByName(new QName("id"));
                     Attribute name = startElement.getAttributeByName(new QName("entityName"));
+
+                    // TODO When encountering an element without a name but with hrefs, look up the element specified in the href and build a name.
+                    // TODO Consider caching model files here for more efficient cross-lookup (consider file.lastModified())
 
                     if (id != null) {
                         var newTreeItem = new TreeItem<>(
@@ -104,7 +95,7 @@ public class ModelReader {
                 } else if (nextEvent.isEndElement() && currentItem != null) {
                     currentItem.getChildren().sort(new ModelReader.EntityComparator());
 
-                    if(currentItem.getParent() != null){
+                    if (currentItem.getParent() != null) {
                         currentItem = currentItem.getParent(); // Traverse up.
                     }
                 }

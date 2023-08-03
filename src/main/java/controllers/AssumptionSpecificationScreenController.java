@@ -3,24 +3,40 @@ package controllers;
 import general.Assumption;
 import general.ModelEntity;
 import general.Utilities;
+import io.ModelReader;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class AssumptionSpecificationScreenController {
     /**
      * The {@link Assumption} that is being specified.
      */
     private Assumption assumption;
-    private Map<String, TreeItem<ModelEntity>> modelEntityMap;
+    private Collection<File> modelViewFiles;
+    private final Map<String, TreeItem<ModelEntity>> readFilePool;
 
     @FXML
     private VBox topLevelVBox;
@@ -57,6 +73,10 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private TreeView<ModelEntity> modelEntityTreeView;
 
+    public AssumptionSpecificationScreenController() {
+        this.readFilePool = new HashMap<>();
+    }
+
     public void initAssumption(Assumption assumption) {
         this.assumption = assumption;
 
@@ -69,11 +89,11 @@ public class AssumptionSpecificationScreenController {
         this.initializeUIElements();
     }
 
-    public void initModelEntities(Map<String, TreeItem<ModelEntity>> modelEntityMap) {
-        this.modelEntityMap = modelEntityMap;
+    public void initModelViewFiles(Collection<File> modelViewFiles) {
+        this.modelViewFiles = modelViewFiles;
 
         // Init ComboBox with available entities read from the selected model.
-        this.modelViewComboBox.setItems(FXCollections.observableArrayList(this.modelEntityMap.keySet()).sorted());
+        this.modelViewComboBox.setItems(FXCollections.observableArrayList(this.modelViewFiles.stream().map(File::getName).sorted().toList()));
     }
 
     private void checkForCompletenessOfSpecification() {
@@ -206,9 +226,23 @@ public class AssumptionSpecificationScreenController {
 
     @FXML
     private void handleModelViewSelection() {
-        var selectedModelView = this.modelViewComboBox.getValue();
-        this.modelEntityTreeView.setRoot(this.modelEntityMap.get(selectedModelView));
-        this.modelEntityTreeView.refresh();
+        String selectedModelViewName = this.modelViewComboBox.getValue();
+
+        // Use pooled results, if possible.
+        if (this.readFilePool.containsKey(selectedModelViewName)) {
+            TreeItem<ModelEntity> pooledTreeItem = this.readFilePool.get(selectedModelViewName);
+            this.modelEntityTreeView.setRoot(pooledTreeItem);
+            this.modelEntityTreeView.refresh();
+        } else {
+            Optional<File> selectedModelViewFile = this.modelViewFiles.stream().filter(file -> file.getName().equals(selectedModelViewName)).findAny();
+
+            if (selectedModelViewFile.isPresent()) {
+                TreeItem<ModelEntity> readTreeItem = ModelReader.readFromModelFile(selectedModelViewFile.get());
+                this.readFilePool.put(selectedModelViewName, readTreeItem);
+                this.modelEntityTreeView.setRoot(readTreeItem);
+                this.modelEntityTreeView.refresh();
+            }
+        }
     }
 
     @FXML
