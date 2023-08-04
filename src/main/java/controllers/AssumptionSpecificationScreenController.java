@@ -35,8 +35,7 @@ public class AssumptionSpecificationScreenController {
      * The {@link Assumption} that is being specified.
      */
     private Assumption assumption;
-    private Collection<File> modelViewFiles;
-    private final Map<String, TreeItem<ModelEntity>> readFilePool;
+    private ModelReader modelReader;
 
     @FXML
     private VBox topLevelVBox;
@@ -73,10 +72,6 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private TreeView<ModelEntity> modelEntityTreeView;
 
-    public AssumptionSpecificationScreenController() {
-        this.readFilePool = new HashMap<>();
-    }
-
     public void initAssumption(Assumption assumption) {
         this.assumption = assumption;
 
@@ -89,11 +84,11 @@ public class AssumptionSpecificationScreenController {
         this.initializeUIElements();
     }
 
-    public void initModelViewFiles(Collection<File> modelViewFiles) {
-        this.modelViewFiles = modelViewFiles;
+    public void initModelFolder(String modelPath) {
+        this.modelReader = new ModelReader(new File(modelPath));
 
         // Init ComboBox with available entities read from the selected model.
-        this.modelViewComboBox.setItems(FXCollections.observableArrayList(this.modelViewFiles.stream().map(File::getName).sorted().toList()));
+        this.modelViewComboBox.setItems(FXCollections.observableArrayList(this.modelReader.getModelFiles().stream().map(File::getName).sorted().toList()));
     }
 
     private void checkForCompletenessOfSpecification() {
@@ -227,21 +222,12 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private void handleModelViewSelection() {
         String selectedModelViewName = this.modelViewComboBox.getValue();
+        Optional<File> selectedModelViewFile = this.modelReader.getModelFiles().stream().filter(file -> file.getName().equals(selectedModelViewName)).findAny();
 
-        // Use pooled results, if possible.
-        if (this.readFilePool.containsKey(selectedModelViewName)) {
-            TreeItem<ModelEntity> pooledTreeItem = this.readFilePool.get(selectedModelViewName);
-            this.modelEntityTreeView.setRoot(pooledTreeItem);
+        if (selectedModelViewFile.isPresent()) {
+            TreeItem<ModelEntity> readTreeItem = this.modelReader.readFromModelFile(selectedModelViewFile.get());
+            this.modelEntityTreeView.setRoot(readTreeItem);
             this.modelEntityTreeView.refresh();
-        } else {
-            Optional<File> selectedModelViewFile = this.modelViewFiles.stream().filter(file -> file.getName().equals(selectedModelViewName)).findAny();
-
-            if (selectedModelViewFile.isPresent()) {
-                TreeItem<ModelEntity> readTreeItem = ModelReader.readFromModelFile(selectedModelViewFile.get());
-                this.readFilePool.put(selectedModelViewName, readTreeItem);
-                this.modelEntityTreeView.setRoot(readTreeItem);
-                this.modelEntityTreeView.refresh();
-            }
         }
     }
 

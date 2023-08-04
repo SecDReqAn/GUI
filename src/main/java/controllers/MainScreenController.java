@@ -7,7 +7,6 @@ import general.Configuration;
 import general.Constants;
 import general.Utilities;
 import io.ConfigManager;
-import io.ModelReader;
 import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -37,7 +36,6 @@ import network.AnalysisConnector;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
@@ -50,7 +48,6 @@ public class MainScreenController {
     private AnalysisConnector analysisConnector;
     private HostServices hostServices;
     private File saveFile;
-    private Collection<File> modelViewFiles;
 
     @FXML
     private Button performAnalysisButton;
@@ -125,7 +122,7 @@ public class MainScreenController {
 
             AssumptionSpecificationScreenController controller = loader.getController();
             controller.initAssumption(assumption);
-            controller.initModelViewFiles(this.modelViewFiles);
+            controller.initModelFolder(this.currentConfiguration.getModelPath());
 
             var stage = new Stage();
             stage.setScene(new Scene(root));
@@ -185,7 +182,7 @@ public class MainScreenController {
 
     @FXML
     private void handleNewAssumption(ActionEvent actionEvent) {
-        if (this.modelViewFiles == null || this.modelViewFiles.isEmpty()) {
+        if (this.currentConfiguration.getModelPath() == null || !(new File(this.currentConfiguration.getModelPath()).exists())) {
             Utilities.showAlert(Alert.AlertType.WARNING,
                     "Warning",
                     "Unable to create a new assumption!",
@@ -241,10 +238,6 @@ public class MainScreenController {
 
             // Analysis
             this.testAnalysisConnection(this.currentConfiguration.getAnalysisPath());
-
-            // Init model entities from read model path if model is already specified.
-            this.modelViewFiles = (this.currentConfiguration.getModelPath() != null) ?
-                    ModelReader.getModelViewFiles(new File(this.currentConfiguration.getModelPath())) : null;
 
             // Model
             var folders = this.currentConfiguration.getModelPath().split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
@@ -411,9 +404,6 @@ public class MainScreenController {
             // Check whether the specified folder actually contains a repository file.
             File modelFolder = new File(absolutePathToSelectedFolder);
             if (modelFolder.exists()) {
-                // Load contents of repository file.
-                this.modelViewFiles = ModelReader.getModelViewFiles(modelFolder);
-
                 // Accept valid selection.
                 this.currentConfiguration.setModelPath(absolutePathToSelectedFolder);
                 // Only display last subfolder of the path for better readability.

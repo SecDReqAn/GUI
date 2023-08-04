@@ -15,9 +15,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public class ModelReader {
@@ -46,21 +46,35 @@ public class ModelReader {
         }
     }
 
-    public static @NotNull Collection<File> getModelViewFiles(@NotNull File modelFolder) {
+    private final Map<File, TreeItem<ModelEntity>> modelFileParsedItemMap;
+
+    public ModelReader(@NotNull File modelFolder) {
+        this.modelFileParsedItemMap = new HashMap<>();
+
         var modelFiles = modelFolder.listFiles();
         if (modelFiles != null && modelFiles.length != 0) {
-            return Stream.of(modelFiles)
+            Stream.of(modelFiles)
                     .filter(File::isFile)
                     .filter(file -> !file.getName().startsWith(".")) // Do not consider hidden files.
-                    .collect(Collectors.toSet());
-
-        } else {
-            return Collections.emptySet();
+                    .forEach(file -> this.modelFileParsedItemMap.put(file, null));
         }
     }
 
+    public @NotNull Collection<File> getModelFiles() {
+        return this.modelFileParsedItemMap.keySet();
+    }
+
     // Requires more memory this way (loading all entities) but is faster than trying to reparse specific parts of the XML-file on-demand.
-    public static @Nullable TreeItem<ModelEntity> readFromModelFile(@NotNull File modelFile) {
+    public @Nullable TreeItem<ModelEntity> readFromModelFile(@NotNull File modelFile) {
+        // Only allow reading from a file within the specified model folder.
+        if(!this.modelFileParsedItemMap.containsKey(modelFile)){
+            return null;
+        }
+
+        // Check whether input file has already been read.
+        if (this.modelFileParsedItemMap.get(modelFile) != null) {
+            return this.modelFileParsedItemMap.get(modelFile);
+        }
 
         TreeItem<ModelEntity> currentItem = null;
         try (var fileInputStream = new FileInputStream(modelFile)) {
@@ -76,7 +90,20 @@ public class ModelReader {
                     Attribute name = startElement.getAttributeByName(new QName("entityName"));
 
                     // TODO When encountering an element without a name but with hrefs, look up the element specified in the href and build a name.
-                    // TODO Consider caching model files here for more efficient cross-lookup (consider file.lastModified())
+                    Attribute href = startElement.getAttributeByName(new QName("href"));
+                    if(href != null){
+                        String[] hrefComponents = href.getValue().split("#");
+                        if(hrefComponents.length == 2){
+                            String hrefFile = hrefComponents[0];
+                            String hrefId = hrefComponents[1];
+
+                            System.out.println("Href within " + currentItem.getValue().id() + ": " + startElement.getName().getLocalPart() + " --> " + hrefComponents[0] + "::" + hrefComponents[1]);
+
+
+                            // Check whether file specified one of the model files.
+                            // TODO
+                        }
+                    }
 
                     if (id != null) {
                         var newTreeItem = new TreeItem<>(
@@ -104,6 +131,7 @@ public class ModelReader {
         } catch (XMLStreamException | IOException ignored) {
         }
 
+        this.modelFileParsedItemMap.put(modelFile, currentItem);
         return currentItem;
     }
 }
