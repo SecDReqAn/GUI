@@ -42,7 +42,7 @@ import java.util.UUID;
 // TODO: Make use of @NotNull and @Nullable annotations to avoid NullPointer-Exceptions.
 
 public class MainScreenController {
-    private final String defaultSaveLocation = Constants.USER_HOME_PATH + Constants.FILE_SYSTEM_SEPARATOR + "NewAssumptionSet.xml";
+    private final String defaultSaveLocation = Constants.USER_HOME_PATH + Constants.FILE_SYSTEM_SEPARATOR + "NewAssumptionSet.json";
     private Configuration currentConfiguration;
     private Configuration savedConfiguration;
     private AnalysisConnector analysisConnector;
@@ -256,6 +256,7 @@ public class MainScreenController {
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file exhibits an invalid structure.");
         } catch (DatabindException e) {
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not map the contents of the specified file to a valid Configuration.");
+            e.printStackTrace();
         } catch (FileNotFoundException e) {
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not find the repository file associated with the the specified model.");
         } catch (IOException e) {

@@ -25,9 +25,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 public class AssumptionSpecificationScreenController {
@@ -205,9 +202,9 @@ public class AssumptionSpecificationScreenController {
             this.checkForCompletenessOfSpecification();
         });
 
-        this.affectedEntityNameColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().name()));
-        this.affectedEntityTypeColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().type()));
-        this.affectedEntityIdColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().id()));
+        this.affectedEntityNameColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getName()));
+        this.affectedEntityTypeColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getType()));
+        this.affectedEntityIdColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getId()));
 
         this.addContextMenus();
     }
@@ -225,9 +222,12 @@ public class AssumptionSpecificationScreenController {
         Optional<File> selectedModelViewFile = this.modelReader.getModelFiles().stream().filter(file -> file.getName().equals(selectedModelViewName)).findAny();
 
         if (selectedModelViewFile.isPresent()) {
-            TreeItem<ModelEntity> readTreeItem = this.modelReader.readFromModelFile(selectedModelViewFile.get());
-            this.modelEntityTreeView.setRoot(readTreeItem);
-            this.modelEntityTreeView.refresh();
+            Optional<TreeItem<ModelEntity>> readTreeItem = this.modelReader.readFromModelFile(selectedModelViewFile.get());
+
+            if(readTreeItem.isPresent()){
+                this.modelEntityTreeView.setRoot(readTreeItem.get());
+                this.modelEntityTreeView.refresh();
+            }
         }
     }
 
