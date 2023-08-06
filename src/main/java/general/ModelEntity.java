@@ -59,8 +59,8 @@ public class ModelEntity {
 
     @Override
     public String toString() {
-        return "Type: " + (this.type == null ? "N/A" : this.type) + " " +
-                "Name: " + (this.name == null ? "N/A" : this.name) + " " +
+        return "Type: " + (this.type == null ? "N/A" : this.type) + "    " +
+                "Name: " + (this.name == null ? "N/A" : this.name) + "    " +
                 "Id: " + this.id;
     }
 

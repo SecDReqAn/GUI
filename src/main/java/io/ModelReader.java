@@ -33,7 +33,7 @@ public class ModelReader {
             } else if (firstEntity.getType() != null) {
                 return firstEntity.getType().compareTo(secondEntity.getType());
             } else {
-                if (firstEntity.getName() != null && secondEntity.getElementName() == null) {
+                if (firstEntity.getName() != null && secondEntity.getName() == null) {
                     return -1;
                 } else if (firstEntity.getName() == null && secondEntity.getName() != null) {
                     return 1;
@@ -138,10 +138,8 @@ public class ModelReader {
                     Attribute id = startElement.getAttributeByName(new QName("id"));
                     Attribute name = startElement.getAttributeByName(new QName("entityName"));
 
-                    // TODO When encountering an element without a name but with hrefs, look up the element specified in the href and build a name.
+                    // TODO: Due to href resolving being very limited, incorporate all XML elements into the tree (even those without an ID) but make only the proper one 'addable' (+ add visual clue like greying out the others)
                     Attribute href = startElement.getAttributeByName(new QName("href"));
-
-
                     if (href != null && currentlySurroundingItem != null && !currentlySurroundingItem.getValue().hasOwnName()) {
                         this.tryToResolveHref(startElement, href, currentlySurroundingItem);
                     }
