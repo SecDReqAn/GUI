@@ -40,7 +40,7 @@ public class ModelReader {
                 } else if (firstEntity.getName() != null) {
                     return firstEntity.getName().compareTo(secondEntity.getName());
                 } else {
-                    return firstEntity.getId().compareTo(secondEntity.getId());
+                    return firstEntity.getElementName().compareTo(secondEntity.getElementName());
                 }
             }
         }
@@ -61,7 +61,8 @@ public class ModelReader {
     }
 
     private @NotNull Optional<TreeItem<ModelEntity>> searchTreeItemByElementId(@NotNull TreeItem<ModelEntity> root, @NotNull String id) {
-        if (root.getValue().getId().equals(id)) {
+        String rootId = root.getValue().getId();
+        if (rootId != null && rootId.equals(id)) {
             return Optional.of(root);
         }
 
@@ -74,7 +75,7 @@ public class ModelReader {
         return Optional.empty();
     }
 
-    private void tryToResolveHref(StartElement currentStartElement, Attribute href, TreeItem<ModelEntity> currentlySurroundingItem){
+    private void tryToResolveHref(StartElement currentStartElement, Attribute href, TreeItem<ModelEntity> encompassingTreeItem) {
         String[] hrefComponents = href.getValue().split("#");
         if (hrefComponents.length == 2) {
             String hrefFile = hrefComponents[0];
@@ -88,19 +89,19 @@ public class ModelReader {
                     var referencedTreeItem = this.searchTreeItemByElementId(rootOfReferencedModelFile.get(), hrefId);
 
                     if (referencedTreeItem.isPresent() && referencedTreeItem.get().getValue().hasOwnName()) {
-                        StringBuilder newNameOfSurroundingEntity = new StringBuilder(currentlySurroundingItem.getValue().getName());
+                        StringBuilder newNameOfEntity = (encompassingTreeItem.getValue().getName() == null) ? new StringBuilder() : new StringBuilder(encompassingTreeItem.getValue().getName());
 
-                        if (newNameOfSurroundingEntity.isEmpty()) {
-                            newNameOfSurroundingEntity = new StringBuilder("Entity with hrefs: ");
+                        if (newNameOfEntity.isEmpty()) {
+                            newNameOfEntity = new StringBuilder("Entity with hrefs to: ");
                         }
 
-                        String nameHrefContainingEntity = currentStartElement.getName().getLocalPart();
                         String nameOfReferencedEntity = referencedTreeItem.get().getValue().getName();
-                        newNameOfSurroundingEntity.append(nameHrefContainingEntity).
-                                append(" → ").
-                                append(nameOfReferencedEntity);
+                        newNameOfEntity.append(hrefFile).
+                                append("→").
+                                append(nameOfReferencedEntity)
+                                .append(" ");
 
-                        currentlySurroundingItem.getValue().setName(newNameOfSurroundingEntity.toString());
+                        encompassingTreeItem.getValue().setName(newNameOfEntity.toString().trim());
                     }
                 }
             }
@@ -113,7 +114,7 @@ public class ModelReader {
         return this.modelFileParsedItemMap.keySet();
     }
 
-    // Requires more memory this way (loading all entities) but is faster than trying to reparse specific parts of the XML-file on-demand.
+    // Requires more memory this way (loading all entities) but is faster (and less complex) than trying to reparse specific parts of the XML-file on-demand.
     public @NotNull Optional<TreeItem<ModelEntity>> readFromModelFile(@NotNull File modelFile) {
         // Only allow reading from a file within the specified model folder.
         if (!this.modelFileParsedItemMap.containsKey(modelFile)) {
@@ -138,26 +139,24 @@ public class ModelReader {
                     Attribute id = startElement.getAttributeByName(new QName("id"));
                     Attribute name = startElement.getAttributeByName(new QName("entityName"));
 
+                    var newTreeItem = new TreeItem<>(
+                            new ModelEntity(
+                                    id == null ? null : id.getValue(),
+                                    modelFile.getName(), // Each view is specified by its own file.
+                                    startElement.getName().getLocalPart(),
+                                    name == null ? null : name.getValue(),
+                                    type == null ? null : type.getValue()));
+
                     // TODO: Due to href resolving being very limited, incorporate all XML elements into the tree (even those without an ID) but make only the proper one 'addable' (+ add visual clue like greying out the others)
                     Attribute href = startElement.getAttributeByName(new QName("href"));
-                    if (href != null && currentlySurroundingItem != null && !currentlySurroundingItem.getValue().hasOwnName()) {
-                        this.tryToResolveHref(startElement, href, currentlySurroundingItem);
+                    if (href != null && !newTreeItem.getValue().hasOwnName()) {
+                        this.tryToResolveHref(startElement, href, newTreeItem);
                     }
 
-                    if (id != null) {
-                        var newTreeItem = new TreeItem<>(
-                                new ModelEntity(
-                                        id.getValue(),
-                                        modelFile.getName(), // Each view is specified by its own file.
-                                        startElement.getName().getLocalPart(),
-                                        name == null ? null : name.getValue(),
-                                        type == null ? null : type.getValue()));
-
-                        if (currentlySurroundingItem != null) {
-                            currentlySurroundingItem.getChildren().add(newTreeItem);
-                        }
-                        currentlySurroundingItem = newTreeItem;
+                    if (currentlySurroundingItem != null) {
+                        currentlySurroundingItem.getChildren().add(newTreeItem);
                     }
+                    currentlySurroundingItem = newTreeItem;
                 } else if (nextEvent.isEndElement() && currentlySurroundingItem != null) {
                     currentlySurroundingItem.getChildren().sort(new ModelReader.EntityComparator());
 

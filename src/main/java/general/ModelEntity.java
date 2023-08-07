@@ -20,7 +20,7 @@ public class ModelEntity {
 
     }
 
-    public ModelEntity(@NotNull String id, @NotNull String modelView, @NotNull String elementName, @Nullable String name, @Nullable String type) {
+    public ModelEntity(String id, @NotNull String modelView, @NotNull String elementName, @Nullable String name, @Nullable String type) {
         this.id = id;
         this.modelView = modelView;
         this.elementName = elementName;
@@ -59,9 +59,11 @@ public class ModelEntity {
 
     @Override
     public String toString() {
-        return "Type: " + (this.type == null ? "N/A" : this.type) + "    " +
-                "Name: " + (this.name == null ? "N/A" : this.name) + "    " +
-                "Id: " + this.id;
+
+        return this.elementName.substring(0, 1).toUpperCase() + this.elementName.substring(1) + "    "
+                +  "Type: " + (this.type == null ? "N/A" : this.type) + "    "
+                + "Name: " + (this.name == null ? "N/A" : this.name) + "    "
+                + "Id: " + (this.id == null ? "N/A" : this.id);
     }
 
 }

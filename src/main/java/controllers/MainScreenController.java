@@ -31,7 +31,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
-import network.AnalysisConnector;
+import io.AnalysisConnector;
 
 import java.io.File;
 import java.io.FileNotFoundException;
