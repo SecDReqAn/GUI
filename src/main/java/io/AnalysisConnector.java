@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 public class AnalysisConnector {
     private static final String PATH_CONNECTION_TEST = "test";
     private static final String PATH_ANALYSIS_EXECUTION = "run";
-    private static final String PATH_MODEL_TRANSMISSION = "set/model";
+    private static final String PATH_MODEL_TRANSMISSION = "set/model/";
 
     public record AnalysisParameter(String modelPath, Set<Assumption> assumptions) {
     }
@@ -85,7 +85,7 @@ public class AnalysisConnector {
                 multiPart.bodyPart(new FileDataBodyPart(file.getName(), file));
             }
 
-            try (var response = this.client.target(this.analysisUri).path(AnalysisConnector.PATH_MODEL_TRANSMISSION).request().post(Entity.entity(multiPart, multiPart.getMediaType()))) {
+            try (var response = this.client.target(this.analysisUri).path(AnalysisConnector.PATH_MODEL_TRANSMISSION + modelPath.getName()).request().post(Entity.entity(multiPart, multiPart.getMediaType()))) {
                 return new Pair<>(response.getStatus(), response.readEntity(String.class));
             }
         } catch (IOException e) {
