@@ -126,6 +126,18 @@ public class AssumptionSpecificationScreenController {
             }
         });
 
+        // Show context menu for the TreeView only for the ModelEntities that are associated with an id.
+        // Maybe try approach proposed here: https://stackoverflow.com/questions/25368365/javafx-contextmenu-not-hiding
+        this.modelEntityTreeView.setOnContextMenuRequested(event -> {
+            TreeItem<ModelEntity> selectedModelEntity = this.modelEntityTreeView.getSelectionModel().getSelectedItem();
+
+            if (selectedModelEntity != null && selectedModelEntity.getValue().getId() != null) {
+                this.modelEntityTreeView.getContextMenu().show(this.modelEntityTreeView, event.getScreenX(), event.getScreenY());
+            }
+
+            event.consume();
+        });
+
         // Context menu for removing affected model entity within the table view.
         Utilities.addFunctionalityToContextMenu(this.affectedEntityTableView, "Remove Model Entity", (ActionEvent actionEvent) -> {
             ModelEntity selectedModelEntity = this.affectedEntityTableView.getSelectionModel().getSelectedItem();
