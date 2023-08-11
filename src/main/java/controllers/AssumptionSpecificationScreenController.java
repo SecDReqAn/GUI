@@ -27,11 +27,17 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.Optional;
 
+/**
+ * The dedicated controller managing the assumption-specification screen that is initiated by {@link MainScreenController}.
+ */
 public class AssumptionSpecificationScreenController {
     /**
      * The {@link Assumption} that is being specified.
      */
     private Assumption assumption;
+    /**
+     * The {@link ModelReader} that is used for accessing model entities.
+     */
     private ModelReader modelReader;
 
     @FXML
@@ -69,6 +75,11 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private TreeView<ModelEntity> modelEntityTreeView;
 
+    /**
+     * Initializes the assumption instance that should be specified through the specification screen.
+     *
+     * @param assumption The {@link Assumption} instance that should be filled with data by the user.
+     */
     public void initAssumption(Assumption assumption) {
         this.assumption = assumption;
 
@@ -81,6 +92,11 @@ public class AssumptionSpecificationScreenController {
         this.initializeUIElements();
     }
 
+    /**
+     * Initializes the path to the model folder whose contents are then read by the {@link ModelReader} instance to determine the available model entities.
+     *
+     * @param modelPath The absolute path to the folder of the PCM model.
+     */
     public void initModelFolder(String modelPath) {
         this.modelReader = new ModelReader(new File(modelPath));
 
@@ -88,10 +104,16 @@ public class AssumptionSpecificationScreenController {
         this.modelViewComboBox.setItems(FXCollections.observableArrayList(this.modelReader.getModelFiles().stream().map(File::getName).sorted().toList()));
     }
 
+    /**
+     * Checks whether the mandatory fields of the {@link Assumption} instance have been filled and enables a button to exit the pop-up window.
+     */
     private void checkForCompletenessOfSpecification() {
         this.insertButton.setDisable(!this.assumption.isSufficientlySpecified());
     }
 
+    /**
+     * Populates the GUI control elements with existing values in case {@link AssumptionSpecificationScreenController#assumption} already contains data. This is the case if the user decided to edit an already existing {@link Assumption}.
+     */
     private void initializeUIElements() {
         this.nameTextField.setText(this.assumption.getName() != null ? this.assumption.getName() : "");
         this.descriptionTextArea.setText(this.assumption.getDescription() != null ? this.assumption.getDescription() : "");
@@ -115,27 +137,32 @@ public class AssumptionSpecificationScreenController {
         this.affectedEntityTableView.setItems(FXCollections.observableArrayList(this.assumption.getAffectedEntities()));
     }
 
+    /**
+     * Convenience method that adds appropriate context menus to {@link AssumptionSpecificationScreenController#modelEntityTreeView} and {@link AssumptionSpecificationScreenController#affectedEntityTableView}.
+     */
     private void addContextMenus() {
-        // Context menu for adding model entities from the TreeView.
-        Utilities.addFunctionalityToContextMenu(this.modelEntityTreeView, "Add to Affected Model Entities", (ActionEvent actionEvent) -> {
-            ModelEntity selectedModelEntity = this.modelEntityTreeView.getSelectionModel().getSelectedItem().getValue();
-
-            if (selectedModelEntity != null && this.assumption.getAffectedEntities().add(selectedModelEntity)) {
-                this.affectedEntityTableView.getItems().add(selectedModelEntity);
-                this.checkForCompletenessOfSpecification();
-            }
-        });
-
         // Show context menu for the TreeView only for the ModelEntities that are associated with an id.
-        // Maybe try approach proposed here: https://stackoverflow.com/questions/25368365/javafx-contextmenu-not-hiding
-        this.modelEntityTreeView.setOnContextMenuRequested(event -> {
-            TreeItem<ModelEntity> selectedModelEntity = this.modelEntityTreeView.getSelectionModel().getSelectedItem();
+        this.modelEntityTreeView.getSelectionModel().selectedItemProperty().addListener(event -> {
+            TreeItem<ModelEntity> selectedItem = this.modelEntityTreeView.getSelectionModel().getSelectedItem();
 
-            if (selectedModelEntity != null && selectedModelEntity.getValue().getId() != null) {
-                this.modelEntityTreeView.getContextMenu().show(this.modelEntityTreeView, event.getScreenX(), event.getScreenY());
+            if (selectedItem != null && selectedItem.getValue().getId() != null) {
+                // Nothing to do if ContextMenu is already set.
+                if (this.modelEntityTreeView.getContextMenu() != null) {
+                    return;
+                }
+
+                Utilities.addFunctionalityToContextMenu(this.modelEntityTreeView, "Add to Affected Model Entities", (ActionEvent actionEvent) -> {
+                    TreeItem<ModelEntity> selectedItemDuringContextInitiation = this.modelEntityTreeView.getSelectionModel().getSelectedItem();
+
+                    if (selectedItemDuringContextInitiation != null && this.assumption.getAffectedEntities().add(selectedItemDuringContextInitiation.getValue())) {
+                        this.affectedEntityTableView.getItems().add(selectedItemDuringContextInitiation.getValue());
+                        this.checkForCompletenessOfSpecification();
+                    }
+                });
+            } else {
+                // Do not show the context menu for invalid items.
+                this.modelEntityTreeView.setContextMenu(null);
             }
-
-            event.consume();
         });
 
         // Context menu for removing affected model entity within the table view.
@@ -148,6 +175,9 @@ public class AssumptionSpecificationScreenController {
         });
     }
 
+    /**
+     * Initializes various GUI control elements on creation of the scene.
+     */
     @FXML
     private void initialize() {
         this.topLevelVBox.setAlignment(Pos.CENTER);
@@ -221,6 +251,11 @@ public class AssumptionSpecificationScreenController {
         this.addContextMenus();
     }
 
+    /**
+     * Handles a press on the "Analyzed" check box.
+     *
+     * @param actionEvent The {@link ActionEvent} triggered through the press.
+     */
     @FXML
     private void handleAnalyzedToggle(ActionEvent actionEvent) {
         var checkBox = (CheckBox) actionEvent.getSource();
@@ -228,6 +263,9 @@ public class AssumptionSpecificationScreenController {
         this.checkForCompletenessOfSpecification();
     }
 
+    /**
+     * Handles selection of one of the PCM model's views via the dedicated drop-down.
+     */
     @FXML
     private void handleModelViewSelection() {
         String selectedModelViewName = this.modelViewComboBox.getValue();
@@ -236,13 +274,18 @@ public class AssumptionSpecificationScreenController {
         if (selectedModelViewFile.isPresent()) {
             Optional<TreeItem<ModelEntity>> readTreeItem = this.modelReader.readFromModelFile(selectedModelViewFile.get());
 
-            if(readTreeItem.isPresent()){
+            if (readTreeItem.isPresent()) {
                 this.modelEntityTreeView.setRoot(readTreeItem.get());
                 this.modelEntityTreeView.refresh();
             }
         }
     }
 
+    /**
+     * Handles a press on the "Insert" button at the bottom of the scene.
+     *
+     * @param actionEvent The triggered {@link ActionEvent} through the press.
+     */
     @FXML
     private void handleInsertButton(ActionEvent actionEvent) {
         var stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
