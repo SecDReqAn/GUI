@@ -1,0 +1,13 @@
+.root{
+    -fx-background-color: #2B2B2B;
+    -fx-foreground-color: #3C3F41;
+    -fx-view-background-color: #343436;
+
+    -fx-accent-color: #0096C9;
+    -fx-accent-pale-color: #5a656c;
+
+    -fx-focus-border-color: #E3E3E3;
+
+    -fx-main-font-color: #D4D4D4;
+    -fx-subtle-font-color: #989898;
+}

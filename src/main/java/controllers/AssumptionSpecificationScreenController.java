@@ -210,12 +210,9 @@ public class AssumptionSpecificationScreenController {
                 this.assumption.setProbabilityOfViolation(Double.parseDouble(newText));
 
                 // Clear potential red error border.
-                this.violationProbabilityTextField.setStyle(null);
-                this.violationProbabilityTextField.setStyle("-fx-padding: 5pt");
+                this.violationProbabilityTextField.getStyleClass().removeIf(style -> style.equals("text-input-error"));
             } catch (NullPointerException | NumberFormatException exception) {
-                // Invalidate probability of violation field in assumption.
-                this.assumption.setProbabilityOfViolation(null);
-                this.violationProbabilityTextField.setStyle(this.violationProbabilityTextField.getStyle() + "; -fx-text-box-border: red; -fx-focus-color: red ;");
+                this.violationProbabilityTextField.getStyleClass().add("text-input-error");
             }
 
             this.checkForCompletenessOfSpecification();
@@ -227,12 +224,9 @@ public class AssumptionSpecificationScreenController {
                 this.assumption.setRisk(Double.parseDouble(newText));
 
                 // Clear potential red error border.
-                this.riskTextField.setStyle(null);
-                this.riskTextField.setStyle("-fx-padding: 5pt");
+                this.riskTextField.getStyleClass().removeIf(style -> style.equals("text-input-error"));
             } catch (NullPointerException | NumberFormatException exception) {
-                // Invalidate risk field in assumption.
-                this.assumption.setRisk(null);
-                this.riskTextField.setStyle(this.riskTextField.getStyle() + "; -fx-text-box-border: red; -fx-focus-color: red ;");
+                this.riskTextField.getStyleClass().add("text-input-error");
             }
 
             this.checkForCompletenessOfSpecification();

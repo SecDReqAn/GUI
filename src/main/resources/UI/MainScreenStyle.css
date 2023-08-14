@@ -1,20 +1,20 @@
-.BarBackground {
-    -fx-background-color: #3C3F41;
-}
+@import "CommonStyle.css";
 
-.LabelBar .label {
-    -fx-text-fill: #B8B5B3;
+.menu-bar, .menu-bar .label{
+    -fx-background-color: -fx-foreground-color;
+    -fx-text-fill: -fx-main-font-color;
 }
 
 .menu-item .label {
     -fx-text-fill: black;
 }
 
-.ClickableLabel {
+.label{
+    -fx-text-fill: -fx-main-font-color;
     -fx-padding: 5pt 5pt 5pt 5pt;
 }
 
-.ClickableLabel:hover {
+.clickable-label:hover {
     -fx-background-color: #303234;
 }
 
@@ -32,4 +32,11 @@
 
 .CustomTitledPane .title {
     -fx-background-color: #515658;
+}
+
+.button {
+    -fx-background-radius: 5pt;
+    -fx-border-radius: 5pt;
+    -fx-background-color: -fx-accent-color;
+    -fx-border-color: black;
 }

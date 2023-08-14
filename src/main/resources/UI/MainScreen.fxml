@@ -52,9 +52,9 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="700.0" prefWidth="1200.0" styleClass="MainScreenStyle.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainScreenController">
+<VBox prefHeight="700.0" prefWidth="1200.0" stylesheets="@MainScreenStyle.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainScreenController">
     <children>
-        <MenuBar style="-fx-padding: 0 0 0 0;" stylesheets="@MainScreenStyle.css">
+        <MenuBar style="-fx-padding: 0 0 0 0;">
             <menus>
                 <Menu mnemonicParsing="false" text="Action">
                     <items>
@@ -92,10 +92,6 @@
                     </items>
                 </Menu>
             </menus>
-            <styleClass>
-                <String fx:value="BarBackground" />
-                <String fx:value="LabelBar" />
-            </styleClass>
         </MenuBar>
         <SplitPane dividerPositions="0.9" orientation="VERTICAL" prefHeight="643.0" prefWidth="1000.0" VBox.vgrow="ALWAYS">
             <items>
@@ -142,7 +138,7 @@
                 </AnchorPane>
             </items>
         </SplitPane>
-        <GridPane alignment="BASELINE_CENTER" minHeight="30.0" stylesheets="@MainScreenStyle.css" VBox.vgrow="NEVER">
+        <GridPane alignment="BASELINE_CENTER" minHeight="30.0" VBox.vgrow="NEVER">
             <columnConstraints>
                 <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -153,8 +149,8 @@
             </rowConstraints>
          <HBox prefHeight="100.0" prefWidth="200.0">
             <children>
-                  <Label fx:id="modelNameLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#handleModelNameSelection" styleClass="ClickableLabel" stylesheets="@MainScreenStyle.css" text="No model folder selected" wrapText="true" />
-                  <Label fx:id="analysisPathLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#handleAnalysisPathSelection" styleClass="ClickableLabel" stylesheets="@MainScreenStyle.css" text="No analysis URI specified" wrapText="true" />
+                  <Label fx:id="modelNameLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#handleModelNameSelection" styleClass="clickable-label" text="No model folder selected" wrapText="true" />
+                  <Label fx:id="analysisPathLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#handleAnalysisPathSelection" styleClass="clickable-label" text="No analysis URI specified" wrapText="true" />
             </children>
          </HBox>
             <Button fx:id="performAnalysisButton" disable="true" mnemonicParsing="false" onAction="#handleAnalysisExecution" text="Perform Analysis" GridPane.columnIndex="1" />
