@@ -53,7 +53,7 @@
                   <Insets bottom="5.0" />
                </VBox.margin>
             </BorderPane>
-            <TextArea fx:id="descriptionTextArea" prefHeight="100.0" promptText="Description..." styleClass="text" wrapText="true" VBox.vgrow="ALWAYS" />
+            <TextArea fx:id="descriptionTextArea" prefHeight="100.0" promptText="Description..." wrapText="true" VBox.vgrow="ALWAYS" />
             <GridPane hgap="10.0">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -79,7 +79,7 @@
                </VBox.margin>
             </GridPane>
             <TextArea fx:id="impactTextArea" prefHeight="60.0" promptText="Impact..." styleClass="text" wrapText="true" VBox.vgrow="ALWAYS" />
-            <TitledPane alignment="CENTER" collapsible="false" prefHeight="400.0" text="Affected Model Entities" VBox.vgrow="ALWAYS">
+            <TitledPane alignment="CENTER" prefHeight="400.0" text="Affected Model Entities" VBox.vgrow="ALWAYS">
                <VBox.margin>
                   <Insets bottom="10.0" top="10.0" />
                </VBox.margin>
