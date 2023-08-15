@@ -1,12 +1,70 @@
 @import "CommonStyle.css";
 
-.menu-bar, .menu-bar .label{
+
+.menu-bar {
+    -fx-padding: 0 0 0 0;
+}
+
+.menu-bar, .menu-item{
     -fx-background-color: -fx-foreground-color;
     -fx-text-fill: -fx-main-font-color;
 }
 
-.menu-item .label {
-    -fx-text-fill: black;
+.menu-item:hover {
+    -fx-background-color: -fx-accent-color;
+}
+
+.context-menu {
+    -fx-background-color: -fx-accent-pale-color;
+}
+
+.context-menu .separator:horizontal .line {
+    -fx-border-color: #2B2B2B;
+    -fx-border-insets: 1 0 0 0;
+}
+
+.split-pane {
+    -fx-background-color: -fx-foreground-color;
+}
+
+.table-view {
+    -fx-background-color: -fx-view-background-color;
+}
+
+.table-view .column-header {
+    -fx-background-color: -fx-foreground-color;
+    -fx-border-color: -fx-accent-pale-color;
+    -fx-border-width: 1pt 1pt 1pt 1pt;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: -fx-main-font-color;
+}
+
+.text-area, .text-area:focused {
+    -fx-text-fill: -fx-main-font-color;
+    -fx-border-color: -fx-foreground-color;
+
+}
+
+.text-area, .text-area .content {
+    -fx-background-color: -fx-foreground-color;
+}
+
+.text-area .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.text-area .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.text-area:focused {
+    -fx-background-color: -fx-focus-border-color;
+}
+
+.grid-pane {
+    -fx-background-color: -fx-foreground-color;
 }
 
 .label{
@@ -18,25 +76,18 @@
     -fx-background-color: #303234;
 }
 
-.OutputTextArea {
+.text-area {
     -fx-text-fill: #B2AEAD;
 }
 
-.OutputTextArea .content {
+.text-area .content {
     -fx-background-color: #2B2B2B;
 }
 
-.CustomTitledPane {
-    -fx-text-fill: #B8B5B3;
+.split-pane {
+    -fx-border-color: -fx-background-color;
 }
 
-.CustomTitledPane .title {
-    -fx-background-color: #515658;
-}
-
-.button {
-    -fx-background-radius: 5pt;
-    -fx-border-radius: 5pt;
-    -fx-background-color: -fx-accent-color;
-    -fx-border-color: black;
+.split-pane > .split-pane-divider {
+    -fx-background-color: transparent;
 }

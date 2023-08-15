@@ -33,22 +33,6 @@
     -fx-text-box-border: red
 }
 
-.titled-pane {
-    -fx-text-fill: -fx-main-font-color;
-}
-
-.titled-pane .title {
-    -fx-background-color: -fx-foreground-color;
-}
-
-.titled-pane > *.content {
-    -fx-border-color: -fx-foreground-color;
-}
-
-.split-pane > .split-pane-divider {
-    -fx-background-color: -fx-foreground-color;
-}
-
 .table-view {
     -fx-background-color: -fx-view-background-color;
 }
@@ -89,6 +73,10 @@
     -fx-background-color: -fx-accent-color;
 }
 
+.split-pane > .split-pane-divider {
+    -fx-background-color: -fx-foreground-color;
+}
+
 .tree-view {
     -fx-background-color: -fx-view-background-color;
 }
@@ -106,10 +94,3 @@
     -fx-background-color: -fx-main-font-color;
 }
 
-
-.button {
-    -fx-background-radius: 5pt;
-    -fx-border-radius: 5pt;
-    -fx-background-color: -fx-accent-color;
-    -fx-border-color: black;
-}

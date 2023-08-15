@@ -11,3 +11,22 @@
     -fx-main-font-color: #D4D4D4;
     -fx-subtle-font-color: #989898;
 }
+
+.titled-pane {
+    -fx-text-fill: -fx-main-font-color;
+}
+
+.titled-pane .title {
+    -fx-background-color: -fx-foreground-color;
+}
+
+.titled-pane > *.content {
+    -fx-border-color: -fx-foreground-color;
+}
+
+.button {
+    -fx-background-radius: 5pt;
+    -fx-border-radius: 5pt;
+    -fx-background-color: -fx-accent-color;
+    -fx-border-color: black;
+}

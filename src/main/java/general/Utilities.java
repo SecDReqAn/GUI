@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class Utilities {
+    // TODO Add Alert with custom Buttons functionality.
     public static Optional<ButtonType> showAlert(@NotNull Alert.AlertType type,
                                                  @NotNull String title,
                                                  @NotNull String header,

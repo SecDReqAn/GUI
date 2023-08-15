@@ -89,7 +89,7 @@
                   <Insets bottom="10.0" top="10.0" />
                </VBox.margin>
                <content>
-                  <SplitPane dividerPositions="0.5" orientation="VERTICAL">
+                  <SplitPane dividerPositions="0.75" orientation="VERTICAL">
                     <items>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" styleClass="root">
                            <children>
