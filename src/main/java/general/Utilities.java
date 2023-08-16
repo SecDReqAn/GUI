@@ -12,6 +12,7 @@ import javafx.scene.text.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class Utilities {
@@ -49,6 +50,8 @@ public class Utilities {
             tableCell.setPrefHeight(Control.USE_COMPUTED_SIZE);
             text.wrappingWidthProperty().bind(column.widthProperty());
             text.textProperty().bind(tableCell.itemProperty());
+            text.getStyleClass().add("text-node");
+
             return tableCell;
         });
     }

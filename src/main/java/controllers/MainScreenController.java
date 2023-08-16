@@ -9,6 +9,7 @@ import general.Utilities;
 import io.ConfigManager;
 import javafx.application.HostServices;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -62,7 +63,7 @@ public class MainScreenController {
     @FXML
     private TableColumn<Assumption, String> descriptionColumn;
     @FXML
-    private TableColumn<Assumption, Set<String>> entitiesColumn;
+    private TableColumn<Assumption, String> entitiesColumn;
     @FXML
     private TableColumn<Assumption, Set<UUID>> dependenciesColumn;
     @FXML
@@ -149,7 +150,17 @@ public class MainScreenController {
         this.nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         this.typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
         this.descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
-        this.entitiesColumn.setCellValueFactory(new PropertyValueFactory<>("affectedEntities"));
+        this.entitiesColumn.setCellValueFactory(cellData -> {
+            Assumption assumption = cellData.getValue();
+            StringBuilder stringBuilder = new StringBuilder();
+            assumption.getAffectedEntities().forEach(affectedEntity -> {
+                stringBuilder.append(affectedEntity.getId());
+                stringBuilder.append(", ");
+            });
+            String cellValue = stringBuilder.isEmpty() ? "" : stringBuilder.substring(0, stringBuilder.length() - 2);
+
+            return new ReadOnlyStringWrapper( cellValue);
+        });
         this.dependenciesColumn.setCellValueFactory(new PropertyValueFactory<>("dependencies"));
         this.violationProbabilityColumn.setCellValueFactory(new PropertyValueFactory<>("probabilityOfViolation"));
         this.riskColumn.setCellValueFactory(new PropertyValueFactory<>("risk"));
@@ -159,6 +170,8 @@ public class MainScreenController {
         // Enable text-warp in text-centric columns.
         Utilities.enableTextWrapForTableColumn(this.descriptionColumn);
         Utilities.enableTextWrapForTableColumn(this.impactColumn);
+        Utilities.enableTextWrapForTableColumn(this.entitiesColumn);
+
 
         // Context menu for editing assumptions within the table view.
         Utilities.addFunctionalityToContextMenu(this.assumptionTableView, "Edit Assumption", (ActionEvent actionEvent) -> {
