@@ -165,7 +165,7 @@ public class MainScreenController {
             });
             String cellValue = stringBuilder.isEmpty() ? "" : stringBuilder.substring(0, stringBuilder.length() - 2);
 
-            return new ReadOnlyStringWrapper( cellValue);
+            return new ReadOnlyStringWrapper(cellValue);
         });
 
         // Enable text-warp in text-centric columns.

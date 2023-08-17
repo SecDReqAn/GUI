@@ -4,6 +4,7 @@ import general.Assumption;
 import general.ModelEntity;
 import general.Utilities;
 import io.ModelReader;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -12,7 +13,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -69,7 +69,9 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private TableColumn<ModelEntity, String> affectedEntityIdColumn;
     @FXML
-    private ComboBox<String> modelViewComboBox;
+    private TableView<File> modelViewTableView;
+    @FXML
+    private TableColumn<File, String> modelViewTableColumn;
     @FXML
     private Button insertButton;
     @FXML
@@ -100,8 +102,8 @@ public class AssumptionSpecificationScreenController {
     public void initModelFolder(String modelPath) {
         this.modelReader = new ModelReader(new File(modelPath));
 
-        // Init ComboBox with available entities read from the selected model.
-        this.modelViewComboBox.setItems(FXCollections.observableArrayList(this.modelReader.getModelFiles().stream().map(File::getName).sorted().toList()));
+        // Init TableView with available entities read from the selected model.
+        this.modelViewTableView.setItems(FXCollections.observableArrayList(this.modelReader.getModelFiles()));
     }
 
     /**
@@ -156,6 +158,7 @@ public class AssumptionSpecificationScreenController {
 
                     if (selectedItemDuringContextInitiation != null && this.assumption.getAffectedEntities().add(selectedItemDuringContextInitiation.getValue())) {
                         this.affectedEntityTableView.getItems().add(selectedItemDuringContextInitiation.getValue());
+                        this.affectedEntityTableView.scrollTo(this.affectedEntityTableView.getItems().size() - 1);
                         this.checkForCompletenessOfSpecification();
                     }
                 });
@@ -242,6 +245,19 @@ public class AssumptionSpecificationScreenController {
         this.affectedEntityTypeColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getType()));
         this.affectedEntityIdColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getId()));
 
+        this.modelViewTableColumn.setCellValueFactory(cellData -> {
+            File file = cellData.getValue();
+            return new ReadOnlyStringWrapper(file == null ? "" : file.getName());
+        });
+
+        // Handle selection of one of the PCM model's views.
+        this.modelViewTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldFile, newFile) -> {
+            Optional<TreeItem<ModelEntity>> readTreeItem = this.modelReader.readFromModelFile(newFile);
+
+            this.modelEntityTreeView.setRoot(readTreeItem.orElse(null));
+            this.modelEntityTreeView.refresh();
+        });
+
         this.addContextMenus();
     }
 
@@ -255,24 +271,6 @@ public class AssumptionSpecificationScreenController {
         var checkBox = (CheckBox) actionEvent.getSource();
         this.assumption.setAnalyzed(checkBox.isSelected());
         this.checkForCompletenessOfSpecification();
-    }
-
-    /**
-     * Handles selection of one of the PCM model's views via the dedicated drop-down.
-     */
-    @FXML
-    private void handleModelViewSelection() {
-        String selectedModelViewName = this.modelViewComboBox.getValue();
-        Optional<File> selectedModelViewFile = this.modelReader.getModelFiles().stream().filter(file -> file.getName().equals(selectedModelViewName)).findAny();
-
-        if (selectedModelViewFile.isPresent()) {
-            Optional<TreeItem<ModelEntity>> readTreeItem = this.modelReader.readFromModelFile(selectedModelViewFile.get());
-
-            if (readTreeItem.isPresent()) {
-                this.modelEntityTreeView.setRoot(readTreeItem.get());
-                this.modelEntityTreeView.refresh();
-            }
-        }
     }
 
     /**

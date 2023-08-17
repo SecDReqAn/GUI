@@ -1,5 +1,7 @@
 @import "CommonStyle.css";
 
+/* TODO: Refactor */
+
 .text-field:focused {
     -fx-border-color: -fx-focus-border-color;
 }
@@ -53,7 +55,9 @@
     -fx-background-color: -fx-foreground-color;
 }
 
-.table-view .column-header-background .filler {
+.table-view .column-header-background .filler,
+.table-view .virtual-flow .corner,
+.tree-view .virtual-flow .corner {
     -fx-background-color: -fx-foreground-color;
 }
 
@@ -100,6 +104,14 @@
 .tree-view .virtual-flow .scroll-bar .decrement-button:hover,
 .text-area .scroll-bar .increment-button:hover,
 .text-area .scroll-bar .decrement-button:hover {
+    -fx-background-color: -fx-accent-color;
+}
+
+#modelViewTableView .table-row-cell {
+    -fx-background-color: -fx-view-background-color;
+}
+
+#modelViewTableView .table-row-cell:focused {
     -fx-background-color: -fx-accent-color;
 }
 
