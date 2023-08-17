@@ -12,27 +12,25 @@ import javafx.scene.text.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
 
 public class Utilities {
-    // TODO Add Alert with custom Buttons functionality.
-    public static Optional<ButtonType> showAlert(@NotNull Alert.AlertType type,
-                                                 @NotNull String title,
-                                                 @NotNull String header,
-                                                 @NotNull String content) {
-        var alert = new Alert(type);
+    public static @NotNull Optional<ButtonType> showAlert(@NotNull Alert.AlertType type,
+                                                          @NotNull String title,
+                                                          @NotNull String header,
+                                                          @NotNull String content,
+                                                          @NotNull ButtonType... buttonTypes) {
+        var alert = new Alert(type, content, buttonTypes);
         alert.setTitle(title);
         alert.setHeaderText(header);
-        alert.setContentText(content);
         return alert.showAndWait();
     }
 
-    public static void addFunctionalityToContextMenu(Control controlElement, String prompt, Consumer<ActionEvent> actionHandling){
+    public static void addFunctionalityToContextMenu(@NotNull Control controlElement, @NotNull String prompt, @NotNull Consumer<ActionEvent> actionHandling) {
         var menuItem = new MenuItem(prompt);
         menuItem.setOnAction(actionHandling::accept);
 
-        if(controlElement.getContextMenu() == null){
+        if (controlElement.getContextMenu() == null) {
             var contextMenu = new ContextMenu();
             contextMenu.getItems().add(menuItem);
             controlElement.setContextMenu(contextMenu);
@@ -42,7 +40,7 @@ public class Utilities {
 
     }
 
-    public static void enableTextWrapForTableColumn(TableColumn<Assumption, String> column){
+    public static void enableTextWrapForTableColumn(@NotNull TableColumn<Assumption, String> column) {
         column.setCellFactory(tc -> {
             var tableCell = new TableCell<Assumption, String>();
             var text = new Text();

@@ -35,8 +35,7 @@
 }
 
 .text-input-error {
-    -fx-border-color: red;
-    -fx-text-box-border: red
+    -fx-text-fill: red;
 }
 
 .table-view {

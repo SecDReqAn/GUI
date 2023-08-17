@@ -16,6 +16,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -97,10 +98,12 @@ public class MainScreenController {
             var confirmationResult = Utilities.showAlert(Alert.AlertType.CONFIRMATION,
                     "Unsaved Changes",
                     "There exist unsaved changed in the current configuration",
-                    "Quit and discard the changes?");
+                    "Save changes before exiting?",
+                    new ButtonType("Save Changes", ButtonBar.ButtonData.YES),
+                    new ButtonType("Discard Changes", ButtonBar.ButtonData.NO));
 
-            if (confirmationResult.isPresent() && confirmationResult.get() == ButtonType.CANCEL) {
-                windowEvent.consume();
+            if (confirmationResult.isPresent() && confirmationResult.get().getButtonData() == ButtonBar.ButtonData.YES) {
+               this.saveToFile();
             }
         }
     }

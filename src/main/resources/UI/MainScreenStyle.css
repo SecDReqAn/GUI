@@ -161,10 +161,6 @@
     -fx-background-color: #2B2B2B;
 }
 
-.split-pane {
-    -fx-border-color: -fx-background-color;
-}
-
 .split-pane > .split-pane-divider {
     -fx-background-color: transparent;
 }

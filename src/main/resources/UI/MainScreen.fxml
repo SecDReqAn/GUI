@@ -105,12 +105,12 @@
                         <TableColumn fx:id="nameColumn" prefWidth="100.0" text="Name" />
                                   <TableColumn fx:id="typeColumn" editable="false" prefWidth="100.0" text="Type" />
                                   <TableColumn fx:id="descriptionColumn" editable="false" prefWidth="150.0" text="Description" />
-                                  <TableColumn fx:id="entitiesColumn" editable="false" prefWidth="100.0" text="Entities" />
+                                  <TableColumn fx:id="entitiesColumn" editable="false" prefWidth="125.0" text="Entities" />
                                   <TableColumn fx:id="dependenciesColumn" editable="false" prefWidth="125.0" text="Dependencies" />
-                                  <TableColumn fx:id="violationProbabilityColumn" editable="false" prefWidth="75.0" text="Violation Probability" />
-                                  <TableColumn fx:id="riskColumn" editable="false" prefWidth="75.0" text="Risk" />
+                                  <TableColumn fx:id="violationProbabilityColumn" editable="false" prefWidth="60.0" text="Violation Probability" />
+                                  <TableColumn fx:id="riskColumn" editable="false" prefWidth="25.0" text="Risk" />
                                   <TableColumn fx:id="impactColumn" editable="false" prefWidth="100.0" text="Impact" />
-                                  <TableColumn fx:id="analyzedColumn" editable="false" prefWidth="75.0" text="Analyzed" />
+                                  <TableColumn fx:id="analyzedColumn" editable="false" prefWidth="50.0" text="Analyzed" />
                               </columns>
                      <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
