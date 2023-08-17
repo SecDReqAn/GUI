@@ -1,5 +1,9 @@
 @import "CommonStyle.css";
 
+.text-field:focused {
+    -fx-border-color: -fx-focus-border-color;
+}
+
 .radio-button, .check-box {
     -fx-text-fill: -fx-main-font-color;
 }
@@ -28,7 +32,7 @@
     -fx-background-color: -fx-focus-border-color;
 }
 
-.text-input-error{
+.text-input-error {
     -fx-border-color: red;
     -fx-text-box-border: red
 }
@@ -73,6 +77,32 @@
     -fx-background-color: -fx-accent-color;
 }
 
+.table-row-cell:empty > *.table-cell {
+    -fx-background-color: -fx-view-background-color;
+    -fx-border-width: 0;
+}
+
+.table-view .virtual-flow .scroll-bar,
+.tree-view .virtual-flow .scroll-bar,
+.text-area .scroll-bar {
+    -fx-background-color: -fx-foreground-color;
+}
+
+.table-view .virtual-flow .scroll-bar .thumb,
+.tree-view .virtual-flow .scroll-bar .thumb,
+.text-area .scroll-bar .thumb {
+    -fx-background-color: -fx-subtle-font-color;
+}
+
+.table-view .virtual-flow .scroll-bar .increment-button:hover,
+.table-view .virtual-flow .scroll-bar .decrement-button:hover,
+.tree-view .virtual-flow .scroll-bar .increment-button:hover,
+.tree-view .virtual-flow .scroll-bar .decrement-button:hover,
+.text-area .scroll-bar .increment-button:hover,
+.text-area .scroll-bar .decrement-button:hover {
+    -fx-background-color: -fx-accent-color;
+}
+
 .split-pane > .split-pane-divider {
     -fx-background-color: -fx-foreground-color;
 }
@@ -87,7 +117,7 @@
 }
 
 .tree-cell:selected {
-    -fx-background-color: -fx-selected-background-color;
+    -fx-background-color: -fx-accent-color;
 }
 
 .tree-cell > .tree-disclosure-node > .arrow {

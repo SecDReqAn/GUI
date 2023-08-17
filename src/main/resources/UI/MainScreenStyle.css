@@ -1,5 +1,6 @@
 @import "CommonStyle.css";
 
+/* TODO: Refactor */
 .menu-bar {
     -fx-padding: 0;
 }
@@ -8,14 +9,14 @@
     -fx-padding: 0;
 }
 
-.menu-bar, .menu-item{
+.menu-bar, .menu-item {
     -fx-background-color: -fx-foreground-color;
     -fx-text-fill: -fx-main-font-color;
 }
 
 .menu-item {
     -fx-border-color: transparent;
-    -fx-padding:  0 2pt 0 0;
+    -fx-padding: 0 2pt 0 0;
 }
 
 .menu-item:focused {
@@ -56,6 +57,10 @@
     -fx-border-width: 1pt 1pt 1pt 1pt;
 }
 
+.table-view .column-header-background .filler {
+    -fx-background-color: #888888;
+}
+
 .table-view .placeholder .label {
     -fx-text-fill: -fx-main-font-color;
 }
@@ -73,7 +78,7 @@
     -fx-background-color: #495257;
 }
 
-.table-row-cell:empty > *.table-cell{
+.table-row-cell:empty > *.table-cell {
     -fx-background-color: -fx-view-background-color;
     -fx-border-width: 0;
 }
@@ -84,6 +89,19 @@
 
 .table-view .column-header .label {
     -fx-text-fill: white;
+}
+
+.table-view .virtual-flow .scroll-bar {
+    -fx-background-color: #888888;
+}
+
+.table-view .virtual-flow .scroll-bar .thumb {
+    -fx-background-color: -fx-focus-border-color;
+}
+
+.table-view .virtual-flow .scroll-bar .increment-button:hover,
+.table-view .virtual-flow .scroll-bar .decrement-button:hover {
+    -fx-background-color: -fx-accent-color;
 }
 
 .text-area, .text-area:focused {
@@ -109,11 +127,24 @@
     -fx-background-color: -fx-focus-border-color;
 }
 
+.text-area .scroll-bar {
+    -fx-background-color: -fx-foreground-color;
+}
+
+.text-area .scroll-bar .thumb {
+    -fx-background-color: -fx-subtle-font-color;
+}
+
+.text-area .scroll-bar .increment-button:hover,
+.text-area .scroll-bar .decrement-button:hover {
+    -fx-background-color: -fx-accent-color;
+}
+
 .grid-pane {
     -fx-background-color: -fx-foreground-color;
 }
 
-.label{
+.label {
     -fx-text-fill: -fx-main-font-color;
     -fx-padding: 5pt 5pt 5pt 5pt;
 }

@@ -150,6 +150,12 @@ public class MainScreenController {
         this.nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         this.typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
         this.descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+        this.dependenciesColumn.setCellValueFactory(new PropertyValueFactory<>("dependencies"));
+        this.violationProbabilityColumn.setCellValueFactory(new PropertyValueFactory<>("probabilityOfViolation"));
+        this.riskColumn.setCellValueFactory(new PropertyValueFactory<>("risk"));
+        this.impactColumn.setCellValueFactory(new PropertyValueFactory<>("impact"));
+        this.analyzedColumn.setCellValueFactory(new PropertyValueFactory<>("analyzed"));
+        // Deal with columns that contain array-data.
         this.entitiesColumn.setCellValueFactory(cellData -> {
             Assumption assumption = cellData.getValue();
             StringBuilder stringBuilder = new StringBuilder();
@@ -161,16 +167,12 @@ public class MainScreenController {
 
             return new ReadOnlyStringWrapper( cellValue);
         });
-        this.dependenciesColumn.setCellValueFactory(new PropertyValueFactory<>("dependencies"));
-        this.violationProbabilityColumn.setCellValueFactory(new PropertyValueFactory<>("probabilityOfViolation"));
-        this.riskColumn.setCellValueFactory(new PropertyValueFactory<>("risk"));
-        this.impactColumn.setCellValueFactory(new PropertyValueFactory<>("impact"));
-        this.analyzedColumn.setCellValueFactory(new PropertyValueFactory<>("analyzed"));
 
         // Enable text-warp in text-centric columns.
         Utilities.enableTextWrapForTableColumn(this.descriptionColumn);
         Utilities.enableTextWrapForTableColumn(this.impactColumn);
         Utilities.enableTextWrapForTableColumn(this.entitiesColumn);
+        // TODO Text-wrap for dependency column.
 
 
         // Context menu for editing assumptions within the table view.
