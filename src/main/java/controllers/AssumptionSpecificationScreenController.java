@@ -2,6 +2,7 @@ package controllers;
 
 import general.Assumption;
 import general.ModelEntity;
+import general.ModelEntityTreeCell;
 import general.Utilities;
 import io.ModelReader;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -215,7 +216,9 @@ public class AssumptionSpecificationScreenController {
                 // Clear potential red error border.
                 this.violationProbabilityTextField.getStyleClass().removeIf(style -> style.equals("text-input-error"));
             } catch (NullPointerException | NumberFormatException exception) {
-                this.violationProbabilityTextField.getStyleClass().add("text-input-error");
+                if (!this.violationProbabilityTextField.getStyleClass().contains("text-input-error")) {
+                    this.violationProbabilityTextField.getStyleClass().add("text-input-error");
+                }
             }
 
             this.checkForCompletenessOfSpecification();
@@ -229,7 +232,9 @@ public class AssumptionSpecificationScreenController {
                 // Clear potential red error border.
                 this.riskTextField.getStyleClass().removeIf(style -> style.equals("text-input-error"));
             } catch (NullPointerException | NumberFormatException exception) {
-                this.riskTextField.getStyleClass().add("text-input-error");
+                if (!this.riskTextField.getStyleClass().contains("text-input-error")) {
+                    this.riskTextField.getStyleClass().add("text-input-error");
+                }
             }
 
             this.checkForCompletenessOfSpecification();
@@ -257,6 +262,8 @@ public class AssumptionSpecificationScreenController {
             this.modelEntityTreeView.setRoot(readTreeItem.orElse(null));
             this.modelEntityTreeView.refresh();
         });
+
+        this.modelEntityTreeView.setCellFactory((TreeView<ModelEntity> p) -> new ModelEntityTreeCell());
 
         this.addContextMenus();
     }

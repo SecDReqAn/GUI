@@ -56,14 +56,4 @@ public class ModelEntity {
     public void setName(String name) {
         this.name = name;
     }
-
-    @Override
-    public String toString() {
-
-        return this.elementName.substring(0, 1).toUpperCase() + this.elementName.substring(1) + "    "
-                +  "Type: " + (this.type == null ? "N/A" : this.type) + "    "
-                + "Name: " + (this.name == null ? "N/A" : this.name) + "    "
-                + "Id: " + (this.id == null ? "N/A" : this.id);
-    }
-
 }

@@ -1,5 +1,6 @@
 package general;
 
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class Utilities {
     public static @NotNull Optional<ButtonType> showAlert(@NotNull Alert.AlertType type,
@@ -51,6 +53,13 @@ public class Utilities {
             text.getStyleClass().add("text-node");
 
             return tableCell;
+        });
+    }
+
+    public static void setCellValueFactoryForCollectionElement(@NotNull TableColumn<Assumption, String> column, @NotNull Function<Assumption, String> transformation) {
+        column.setCellValueFactory(cellData -> {
+            Assumption assumption = cellData.getValue();
+            return new ReadOnlyStringWrapper(transformation.apply(assumption));
         });
     }
 }

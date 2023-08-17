@@ -127,6 +127,10 @@
     -fx-text-fill: -fx-main-font-color;
 }
 
+.non-addable-tree-cell {
+    -fx-text-fill: -fx-subtle-font-color;
+}
+
 .tree-cell:selected {
     -fx-background-color: -fx-accent-color;
 }

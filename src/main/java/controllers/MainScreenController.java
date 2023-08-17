@@ -66,7 +66,7 @@ public class MainScreenController {
     @FXML
     private TableColumn<Assumption, String> entitiesColumn;
     @FXML
-    private TableColumn<Assumption, Set<UUID>> dependenciesColumn;
+    private TableColumn<Assumption, String> dependenciesColumn;
     @FXML
     private TableColumn<Assumption, Double> violationProbabilityColumn;
     @FXML
@@ -158,24 +158,31 @@ public class MainScreenController {
         this.riskColumn.setCellValueFactory(new PropertyValueFactory<>("risk"));
         this.impactColumn.setCellValueFactory(new PropertyValueFactory<>("impact"));
         this.analyzedColumn.setCellValueFactory(new PropertyValueFactory<>("analyzed"));
+
         // Deal with columns that contain array-data.
-        this.entitiesColumn.setCellValueFactory(cellData -> {
-            Assumption assumption = cellData.getValue();
+        Utilities.setCellValueFactoryForCollectionElement(this.entitiesColumn, assumption -> {
             StringBuilder stringBuilder = new StringBuilder();
             assumption.getAffectedEntities().forEach(affectedEntity -> {
                 stringBuilder.append(affectedEntity.getId());
                 stringBuilder.append(", ");
             });
-            String cellValue = stringBuilder.isEmpty() ? "" : stringBuilder.substring(0, stringBuilder.length() - 2);
-
-            return new ReadOnlyStringWrapper(cellValue);
+            return stringBuilder.isEmpty() ? "" : stringBuilder.substring(0, stringBuilder.length() - 2);
         });
+        Utilities.setCellValueFactoryForCollectionElement(this.dependenciesColumn, assumption -> {
+            StringBuilder stringBuilder = new StringBuilder();
+            assumption.getDependencies().forEach(dependency -> {
+                stringBuilder.append(dependency.toString());
+                stringBuilder.append(", ");
+            });
+            return stringBuilder.isEmpty() ? "" : stringBuilder.substring(0, stringBuilder.length() - 2);
+        });
+
 
         // Enable text-warp in text-centric columns.
         Utilities.enableTextWrapForTableColumn(this.descriptionColumn);
         Utilities.enableTextWrapForTableColumn(this.impactColumn);
         Utilities.enableTextWrapForTableColumn(this.entitiesColumn);
-        // TODO Text-wrap for dependency column.
+        Utilities.enableTextWrapForTableColumn(this.dependenciesColumn);
 
 
         // Context menu for editing assumptions within the table view.
