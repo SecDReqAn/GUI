@@ -13,32 +13,67 @@ import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
+import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Class responsible for managing a connection to one analysis whose URI is specified on construction.
+ */
 public class AnalysisConnector {
     private static final String PATH_CONNECTION_TEST = "test";
     private static final String PATH_ANALYSIS_EXECUTION = "run";
     private static final String PATH_MODEL_TRANSMISSION = "set/model/";
 
-    public record AnalysisParameter(String modelPath, Set<Assumption> assumptions) {
+    /**
+     * The data type that is sent to the analysis.
+     *
+     * @param modelPath   The path to the model to be analyzed.
+     * @param assumptions The {@link Collection} of {@link Assumption}s for the analysis.
+     */
+    public record AnalysisParameter(String modelPath, Collection<Assumption> assumptions) {
     }
 
+    /**
+     * The {@link Client} used for communicating with the analysis.
+     */
     private final Client client;
+    /**
+     * The {@link ObjectMapper} used for marshalling / unmarshalling tasks.
+     */
     private final ObjectMapper objectMapper;
+    /**
+     * The URI of the analysis represented as a {@link String}.
+     */
     private final String analysisUri;
 
-    public AnalysisConnector(String analysisUri) {
+    /**
+     * Constructs a new instance based on the specified URI-{@link String}.
+     *
+     * @param analysisUri The URI at which the analysis can be reached.
+     */
+    public AnalysisConnector(@Nullable String analysisUri) {
         this.client = ClientBuilder.newBuilder().register(MultiPartFeature.class).build();
         this.analysisUri = analysisUri;
         this.objectMapper = new ObjectMapper();
     }
 
-    public Pair<Integer, String> testConnection() {
+    /**
+     * Tests the connection to the analysis.
+     *
+     * <p>
+     *     Note: Status code <code>0</code> represents a local processing error.
+     *     All other status codes are regular HTTP codes sent by the analysis.
+     * </p>
+     *
+     * @return A {@link Pair} containing the status code (accessible via {@link Pair#getKey()}) and
+     * message (accessible via {@link Pair#getValue()}) resulting from the connection test.
+     */
+    public @NotNull Pair<Integer, String> testConnection() {
         Pair<Integer, String> codeMessagePair;
 
         try (var response = this.client.target(this.analysisUri).path(AnalysisConnector.PATH_CONNECTION_TEST).request(MediaType.TEXT_PLAIN).get()) {
@@ -60,7 +95,6 @@ public class AnalysisConnector {
                 return new Pair<>(response.getStatus(), response.readEntity(String.class));
             }
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
             return new Pair<>(0, "Marshalling failed due to malformed analysis parameters.");
         }
     }

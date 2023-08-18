@@ -32,6 +32,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -132,7 +133,7 @@ public class MainScreenController {
      *
      * @param hostServices The {@link HostServices} that should be set.
      */
-    public void setHostServices(HostServices hostServices) {
+    public void setHostServices(@NotNull HostServices hostServices) {
         this.hostServices = hostServices;
     }
 
@@ -207,7 +208,7 @@ public class MainScreenController {
         this.impactColumn.setCellValueFactory(new PropertyValueFactory<>("impact"));
         this.analyzedColumn.setCellValueFactory(new PropertyValueFactory<>("analyzed"));
 
-        // Deal with columns that contain array-data.
+        // Deal with columns that contain collections.
         Utilities.setCellValueFactoryForCollectionElement(this.entitiesColumn, assumption -> {
             StringBuilder stringBuilder = new StringBuilder();
             assumption.getAffectedEntities().forEach(affectedEntity -> {
@@ -252,6 +253,7 @@ public class MainScreenController {
             }
         });
 
+        // analysisPathLabel and connectionStatusLabel should show the same effect once one is hovered over.
         this.analysisPathLabel.hoverProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue && !this.connectionStatusLabel.getStyleClass().contains("label-hover")) {
                 this.connectionStatusLabel.getStyleClass().add("label-hover");
@@ -269,7 +271,7 @@ public class MainScreenController {
     }
 
     @FXML
-    private void handleNewAssumption(ActionEvent actionEvent) {
+    private void handleNewAssumption(@NotNull ActionEvent actionEvent) {
         if (this.currentConfiguration.getModelPath() == null || !(new File(this.currentConfiguration.getModelPath()).exists())) {
             Utilities.showAlert(Alert.AlertType.WARNING,
                     "Warning",
@@ -297,7 +299,7 @@ public class MainScreenController {
     }
 
     @FXML
-    private void openFromFile(ActionEvent actionEvent) {
+    private void openFromFile(@NotNull ActionEvent actionEvent) {
         var stage = (Stage) ((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow();
 
         var fileChooser = new FileChooser();
@@ -390,7 +392,7 @@ public class MainScreenController {
     }
 
     @FXML
-    private void saveAs(ActionEvent actionEvent) {
+    private void saveAs(@NotNull ActionEvent actionEvent) {
         var stage = (Stage) ((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow();
 
         FileChooser fileChooser = new FileChooser();
