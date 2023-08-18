@@ -91,6 +91,10 @@
     -fx-text-fill: white;
 }
 
+.table-view .virtual-flow .corner {
+    -fx-background-color: #888888;
+}
+
 .table-view .virtual-flow .scroll-bar {
     -fx-background-color: #888888;
 }
@@ -127,6 +131,10 @@
     -fx-background-color: -fx-focus-border-color;
 }
 
+.text-area .corner {
+    -fx-background-color: -fx-foreground-color;
+}
+
 .text-area .scroll-bar {
     -fx-background-color: -fx-foreground-color;
 }
@@ -149,7 +157,7 @@
     -fx-padding: 5pt 5pt 5pt 5pt;
 }
 
-.clickable-label:hover {
+.clickable-label:hover, .label-hover {
     -fx-background-color: #303234;
 }
 

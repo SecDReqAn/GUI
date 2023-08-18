@@ -146,6 +146,7 @@
             <children>
                   <Label fx:id="modelNameLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#handleModelNameSelection" styleClass="clickable-label" text="No model folder selected" wrapText="true" />
                   <Label fx:id="analysisPathLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#handleAnalysisPathSelection" styleClass="clickable-label" text="No analysis URI specified" wrapText="true" />
+               <Label fx:id="connectionStatusLabel" onMouseClicked="#handleAnalysisPathSelection" styleClass="clickable-label" text="❌" />
             </children>
          </HBox>
             <Button fx:id="performAnalysisButton" disable="true" mnemonicParsing="false" onAction="#handleAnalysisExecution" text="Perform Analysis" GridPane.columnIndex="1" />

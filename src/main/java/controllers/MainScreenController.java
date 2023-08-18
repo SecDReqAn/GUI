@@ -32,16 +32,16 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 // TODO: Make use of @NotNull and @Nullable annotations to avoid NullPointer-Exceptions.
-
-// TODO: Introduce background daemon that periodically checks the connection to the analysis.
 
 /**
  * The dedicated controller managing the main screen that is entered on start-up of the application.
@@ -63,6 +63,10 @@ public class MainScreenController {
      * Connector allowing for communication with a (potentially) remote analysis microservice.
      */
     private AnalysisConnector analysisConnector;
+    /**
+     * Service that periodically checks the connection to the analysis.
+     */
+    private final ScheduledExecutorService connectionTestService;
     /**
      * Services allowing access to e.g. the default browser of the host system.
      */
@@ -99,9 +103,11 @@ public class MainScreenController {
     @FXML
     private TextArea analysisOutputTextArea;
     @FXML
+    private Label modelNameLabel;
+    @FXML
     private Label analysisPathLabel;
     @FXML
-    private Label modelNameLabel;
+    private Label connectionStatusLabel;
     @FXML
     private Label statusLabel;
 
@@ -111,6 +117,14 @@ public class MainScreenController {
     public MainScreenController() {
         this.savedConfiguration = new Configuration();
         this.currentConfiguration = new Configuration();
+
+        this.connectionTestService = Executors.newSingleThreadScheduledExecutor();
+        connectionTestService.scheduleAtFixedRate(() -> {
+            if (MainScreenController.this.analysisConnector != null) {
+                var connectionTestCode = MainScreenController.this.analysisConnector.testConnection().getKey();
+                Platform.runLater(() -> MainScreenController.this.connectionStatusLabel.setText(connectionTestCode == 200 ? "✓" : " ❌"));
+            }
+        }, 0, 5, TimeUnit.SECONDS);
     }
 
     /**
@@ -138,22 +152,7 @@ public class MainScreenController {
                 this.saveToFile();
             }
         }
-    }
-
-    /**
-     * Tests the connection to the (potentially remote) analysis microservice.
-     *
-     * @param uri A {@link String} specifying the URI of the analysis microservice.
-     * @return <code>true</code> if the connection test is successful and <code>false</code> otherwise.
-     */
-    private boolean testAnalysisConnection(@Nullable String uri) {
-        this.analysisConnector = new AnalysisConnector(uri);
-
-        // Test connection to analysis.
-        var connectionSuccess = this.analysisConnector.testConnection().getKey() == 200;
-
-        this.analysisPathLabel.setText((uri == null ? "Not specified" : uri) + (connectionSuccess ? " ✓" : " ❌"));
-        return connectionSuccess;
+        this.connectionTestService.shutdown();
     }
 
     /**
@@ -252,6 +251,21 @@ public class MainScreenController {
                 this.assumptionTableView.refresh();
             }
         });
+
+        this.analysisPathLabel.hoverProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue && !this.connectionStatusLabel.getStyleClass().contains("label-hover")) {
+                this.connectionStatusLabel.getStyleClass().add("label-hover");
+            } else {
+                this.connectionStatusLabel.getStyleClass().removeIf(styleClass -> styleClass.equals("label-hover"));
+            }
+        });
+        this.connectionStatusLabel.hoverProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue && !this.analysisPathLabel.getStyleClass().contains("label-hover")) {
+                this.analysisPathLabel.getStyleClass().add("label-hover");
+            } else {
+                this.analysisPathLabel.getStyleClass().removeIf(styleClass -> styleClass.equals("label-hover"));
+            }
+        });
     }
 
     @FXML
@@ -310,8 +324,9 @@ public class MainScreenController {
             this.savedConfiguration = ConfigManager.readConfig(selectedFile);
             this.currentConfiguration = this.savedConfiguration.clone();
 
-            // Analysis
-            this.testAnalysisConnection(this.currentConfiguration.getAnalysisPath());
+            // Analysis path and connector
+            this.analysisPathLabel.setText(this.currentConfiguration.getAnalysisPath());
+            this.analysisConnector = new AnalysisConnector(this.currentConfiguration.getAnalysisPath());
 
             // Model
             var folders = this.currentConfiguration.getModelPath().split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
@@ -400,6 +415,7 @@ public class MainScreenController {
             }
         }
 
+        this.connectionTestService.shutdown();
         Platform.exit();
     }
 
@@ -413,7 +429,9 @@ public class MainScreenController {
         // Check whether forwarding the request to the analysis makes sense.
         if (!this.currentConfiguration.isMissingAnalysisParameters()) {
             this.statusLabel.setText("Trying to connect to analysis...");
-            if (this.testAnalysisConnection(this.currentConfiguration.getAnalysisPath())) {
+
+            // Execute manual connection test to analysis.
+            if (this.analysisConnector != null && this.analysisConnector.testConnection().getKey() == 200) {
                 this.statusLabel.setText("Transmit selected model to the analysis...");
                 var analysisResponse = this.analysisConnector.transferModelFiles(new File(this.currentConfiguration.getModelPath()));
                 if (analysisResponse.getKey() != 200) {
@@ -455,7 +473,8 @@ public class MainScreenController {
 
         userInput.ifPresent(input -> {
             this.currentConfiguration.setAnalysisPath(input);
-            this.testAnalysisConnection(input);
+            this.analysisPathLabel.setText(input);
+            this.analysisConnector = new AnalysisConnector(input);
             this.performAnalysisButton.setDisable(this.currentConfiguration.isMissingAnalysisParameters());
         });
     }
