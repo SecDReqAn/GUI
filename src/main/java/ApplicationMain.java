@@ -17,7 +17,7 @@ public class ApplicationMain extends Application {
         stage.setTitle("Assumption Specifier");
         stage.setScene(scene);
         stage.show();
-        stage.setOnCloseRequest(mainScreenController::handleExitRequest);
+        stage.setOnCloseRequest(windowEvent -> mainScreenController.handleExitRequest());
     }
 
     public static void main(String[] args) {

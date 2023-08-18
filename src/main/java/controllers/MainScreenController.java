@@ -6,10 +6,10 @@ import general.Assumption;
 import general.Configuration;
 import general.Constants;
 import general.Utilities;
+import io.AnalysisConnector;
 import io.ConfigManager;
 import javafx.application.HostServices;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -32,23 +32,44 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import javafx.stage.WindowEvent;
-import io.AnalysisConnector;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Set;
 import java.util.UUID;
 
 // TODO: Make use of @NotNull and @Nullable annotations to avoid NullPointer-Exceptions.
 
+// TODO: Introduce background daemon that periodically checks the connection to the analysis.
+
+/**
+ * The dedicated controller managing the main screen that is entered on start-up of the application.
+ */
 public class MainScreenController {
-    private final String defaultSaveLocation = Constants.USER_HOME_PATH + Constants.FILE_SYSTEM_SEPARATOR + "NewAssumptionSet.json";
+    /**
+     * A {@link String} specifying the default path for the save-file.
+     */
+    private final String defaultSaveLocation = Constants.USER_HOME_PATH + Constants.FILE_SYSTEM_SEPARATOR + Constants.DEFAULT_SAVE_FILE_NAME;
+    /**
+     * The {@link Configuration} that is being edited by the user.
+     */
     private Configuration currentConfiguration;
+    /**
+     * The last {@link Configuration}-state that is persisted on disk.
+     */
     private Configuration savedConfiguration;
+    /**
+     * Connector allowing for communication with a (potentially) remote analysis microservice.
+     */
     private AnalysisConnector analysisConnector;
+    /**
+     * Services allowing access to e.g. the default browser of the host system.
+     */
     private HostServices hostServices;
+    /**
+     * The actual {@link File} to which changes are persisted upon a save-operation.
+     */
     private File saveFile;
 
     @FXML
@@ -84,16 +105,27 @@ public class MainScreenController {
     @FXML
     private Label statusLabel;
 
+    /**
+     * Constructs a new instance and initializes the associated {@link Configuration}s.
+     */
     public MainScreenController() {
         this.savedConfiguration = new Configuration();
         this.currentConfiguration = new Configuration();
     }
 
+    /**
+     * Sets {@link MainScreenController#hostServices} to the specified instance.
+     *
+     * @param hostServices The {@link HostServices} that should be set.
+     */
     public void setHostServices(HostServices hostServices) {
         this.hostServices = hostServices;
     }
 
-    public void handleExitRequest(WindowEvent windowEvent) {
+    /**
+     * Handles an exit request by the user, initiated e.g., by a click on the X button of the window.
+     */
+    public void handleExitRequest() {
         if (this.hasUnsavedChanges()) {
             var confirmationResult = Utilities.showAlert(Alert.AlertType.CONFIRMATION,
                     "Unsaved Changes",
@@ -103,12 +135,18 @@ public class MainScreenController {
                     new ButtonType("Discard Changes", ButtonBar.ButtonData.NO));
 
             if (confirmationResult.isPresent() && confirmationResult.get().getButtonData() == ButtonBar.ButtonData.YES) {
-               this.saveToFile();
+                this.saveToFile();
             }
         }
     }
 
-    private boolean testAnalysisConnection(String uri) {
+    /**
+     * Tests the connection to the (potentially remote) analysis microservice.
+     *
+     * @param uri A {@link String} specifying the URI of the analysis microservice.
+     * @return <code>true</code> if the connection test is successful and <code>false</code> otherwise.
+     */
+    private boolean testAnalysisConnection(@Nullable String uri) {
         this.analysisConnector = new AnalysisConnector(uri);
 
         // Test connection to analysis.
@@ -118,6 +156,12 @@ public class MainScreenController {
         return connectionSuccess;
     }
 
+    /**
+     * Open modal window for the assumption specification-screen.
+     *
+     * @param assumption The {@link Assumption} instance that can be edited through the assumption specification-screen.
+     * @param owner      The {@link Window} owning the modal window to be created.
+     */
     private void showAssumptionSpecificationScreen(Assumption assumption, Window owner) {
         try {
             FXMLLoader loader = new FXMLLoader();
@@ -142,6 +186,11 @@ public class MainScreenController {
         }
     }
 
+    /**
+     * Checks whether the current configuration ({@link MainScreenController#currentConfiguration}) contains unsaved changes (i.e., changes not reflected in {@link MainScreenController#savedConfiguration}).
+     *
+     * @return <code>true</code> if there are unsaved changes and <code>false</code> otherwise.
+     */
     private boolean hasUnsavedChanges() {
         return !this.currentConfiguration.equals(this.savedConfiguration);
     }
@@ -281,7 +330,6 @@ public class MainScreenController {
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file exhibits an invalid structure.");
         } catch (DatabindException e) {
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not map the contents of the specified file to a valid Configuration.");
-            e.printStackTrace();
         } catch (FileNotFoundException e) {
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not find the repository file associated with the the specified model.");
         } catch (IOException e) {
@@ -323,7 +371,6 @@ public class MainScreenController {
             this.savedConfiguration = this.currentConfiguration;
         } catch (IOException e) {
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Saving failed", "Could not write to file!");
-            e.printStackTrace();
         }
     }
 
