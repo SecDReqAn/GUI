@@ -10,6 +10,7 @@ import io.AnalysisConnector;
 import io.ConfigManager;
 import javafx.application.HostServices;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -32,11 +33,13 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -112,8 +115,6 @@ public class MainScreenController {
     @FXML
     private Label statusLabel;
 
-    // TODO: Allow an analysis to alter the assumption set during its analysis.
-
     /**
      * Constructs a new instance and initializes the associated {@link Configuration}s.
      */
@@ -158,7 +159,7 @@ public class MainScreenController {
             }
         }
 
-        if(isApplicationExit){
+        if (isApplicationExit) {
             this.connectionTestService.shutdown();
         }
     }
@@ -354,7 +355,7 @@ public class MainScreenController {
             this.analysisConnector = new AnalysisConnector(this.currentConfiguration.getAnalysisPath());
 
             // Model
-            if(this.currentConfiguration.getModelPath() != null){
+            if (this.currentConfiguration.getModelPath() != null) {
                 var folders = this.currentConfiguration.getModelPath().split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
                 this.modelNameLabel.setText(folders[folders.length - 1]);
             }
@@ -464,24 +465,40 @@ public class MainScreenController {
             // Execute manual connection test to analysis.
             if (this.analysisConnector != null && this.analysisConnector.testConnection().getKey() == 200) {
                 this.statusLabel.setText("Transmit selected model to the analysis...");
-                var analysisResponse = this.analysisConnector.transferModelFiles(new File(this.currentConfiguration.getModelPath()));
-                if (analysisResponse.getKey() != 200) {
+                Pair<Integer, String> modelTransferResponse = this.analysisConnector.transferModelFiles(new File(this.currentConfiguration.getModelPath()));
+                if (modelTransferResponse.getKey() != 200) {
                     this.statusLabel.setText("Analysis aborted.");
-                    Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Transmission of the selected model to the analysis failed.", analysisResponse.getValue());
+                    Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Transmission of the selected model to the analysis failed.", modelTransferResponse.getValue());
                     return;
                 }
 
                 this.statusLabel.setText("Starting analysis...");
-                analysisResponse = this.analysisConnector.performAnalysis(
+                Pair<Integer, AnalysisConnector.AnalysisOutput> analysisResponse = this.analysisConnector.performAnalysis(
                         new AnalysisConnector.AnalysisParameter(this.currentConfiguration.getModelPath(), this.currentConfiguration.getAssumptions()));
+                String analysisResponseLog = analysisResponse.getValue().outputLog();
+                Collection<Assumption> analysisResponseAssumptions = analysisResponse.getValue().assumptions();
 
                 if (analysisResponse.getKey() != 0) {
                     this.statusLabel.setText("Analysis successfully executed.");
-                    this.analysisOutputTextArea.setText(analysisResponse.getValue());
-                    this.currentConfiguration.setAnalysisResult(analysisResponse.getValue());
+                    this.currentConfiguration.setAnalysisResult(analysisResponseLog);
+                    this.analysisOutputTextArea.setText(analysisResponseLog);
+
+                    // Update assumptions.
+                    if (analysisResponseAssumptions != null) {
+                        this.assumptionTableView.getItems().clear();
+
+                        analysisResponseAssumptions.forEach(receivedAssumption -> {
+                            this.currentConfiguration.getAssumptions().stream()
+                                    .filter(oldAssumption -> oldAssumption.getId().equals(receivedAssumption.getId()))
+                                    .findFirst().ifPresent(matchingExistingAssumption -> this.currentConfiguration.getAssumptions().remove(matchingExistingAssumption));
+                            this.currentConfiguration.getAssumptions().add(receivedAssumption);
+                        });
+                        this.assumptionTableView.setItems(FXCollections.observableArrayList(this.currentConfiguration.getAssumptions()));
+                        this.assumptionTableView.refresh();
+                    }
                 } else {
                     this.statusLabel.setText("Received invalid response from the analysis.");
-                    Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Communication with the analysis failed.", analysisResponse.getValue());
+                    Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Communication with the analysis failed.", analysisResponseLog);
                 }
             } else {
                 this.statusLabel.setText("Analysis aborted.");

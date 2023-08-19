@@ -30,12 +30,21 @@ public class AnalysisConnector {
     private static final String PATH_MODEL_TRANSMISSION = "set/model/";
 
     /**
-     * The data type that is sent to the analysis.
+     * The data type that is sent to the analysis for the actual execution.
      *
      * @param modelPath   The path to the model to be analyzed.
      * @param assumptions The {@link Collection} of {@link Assumption}s for the analysis.
      */
     public record AnalysisParameter(String modelPath, Collection<Assumption> assumptions) {
+    }
+
+    /**
+     * The data type that is received from the analysis after an execution.
+     *
+     * @param outputLog   The log produced by the analysis (e.g., the console output) or a potential error message.
+     * @param assumptions The (potentially changed) {@link Assumption}s.
+     */
+    public record AnalysisOutput(String outputLog, Collection<Assumption> assumptions) {
     }
 
     /**
@@ -66,8 +75,8 @@ public class AnalysisConnector {
      * Tests the connection to the analysis.
      *
      * <p>
-     *     Note: Status code <code>0</code> represents a local processing error.
-     *     All other status codes are regular HTTP codes sent by the analysis.
+     * Note: Status code <code>0</code> represents a local processing error.
+     * All other status codes are regular HTTP codes sent by the analysis.
      * </p>
      *
      * @return A {@link Pair} containing the status code (accessible via {@link Pair#getKey()}) and
@@ -87,15 +96,18 @@ public class AnalysisConnector {
         return codeMessagePair;
     }
 
-    public Pair<Integer, String> performAnalysis(AnalysisParameter analysisParameter) {
+    public Pair<Integer, AnalysisOutput> performAnalysis(AnalysisParameter analysisParameter) {
         try {
             var jsonString = this.objectMapper.writeValueAsString(analysisParameter);
 
-            try (var response = this.client.target(this.analysisUri).path(AnalysisConnector.PATH_ANALYSIS_EXECUTION).request().post(Entity.entity(jsonString, MediaType.APPLICATION_JSON))) {
-                return new Pair<>(response.getStatus(), response.readEntity(String.class));
+            try (var response = this.client.target(this.analysisUri).path(AnalysisConnector.PATH_ANALYSIS_EXECUTION)
+                    .request(MediaType.APPLICATION_JSON_TYPE)
+                    .post(Entity.entity(jsonString, MediaType.APPLICATION_JSON))) {
+                String jsonResponse = response.readEntity(String.class);
+                return new Pair<>(response.getStatus(), this.objectMapper.readValue(jsonResponse, AnalysisOutput.class));
             }
         } catch (JsonProcessingException e) {
-            return new Pair<>(0, "Marshalling failed due to malformed analysis parameters.");
+            return new Pair<>(0, new AnalysisOutput("Marshalling failed due to malformed analysis parameters.", null));
         }
     }
 
