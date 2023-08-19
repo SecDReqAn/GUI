@@ -28,6 +28,8 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.Optional;
 
+// TODO Allow dependencies between assumptions to be specified.
+
 /**
  * The dedicated controller managing the assumption-specification screen that is initiated by {@link MainScreenController}.
  */

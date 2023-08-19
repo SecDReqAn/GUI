@@ -4,7 +4,9 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.CheckMenuItem?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -25,15 +27,27 @@
    <children>
       <VBox fx:id="topLevelVBox" alignment="CENTER" layoutX="80.0" layoutY="148.0" style="-fx-padding: 5pt;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <TextField fx:id="nameTextField" promptText="Assumption Name ...">
+            <GridPane hgap="10.0">
                <VBox.margin>
-                  <Insets bottom="5.0" />
+                  <Insets top="5.0" />
                </VBox.margin>
-               <styleClass>
-                  <String fx:value="text" />
-                  <String fx:value="control-foreground" />
-               </styleClass>
-            </TextField>
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <TextField fx:id="nameTextField" promptText="Assumption Name ..." />
+                  <MenuButton mnemonicParsing="false" text="Assumption Dependencies" GridPane.columnIndex="1">
+                    <items>
+                        <CheckMenuItem mnemonicParsing="false" text="Unspecified Action" />
+                        <CheckMenuItem mnemonicParsing="false" text="Unspecified Action" />
+                    </items>
+                  </MenuButton>
+               </children>
+            </GridPane>
             <BorderPane>
                <left>
                   <RadioButton fx:id="resolveUncertaintyToggle" mnemonicParsing="false" styleClass="text" text="Resolve Uncertainty" BorderPane.alignment="CENTER">
@@ -49,7 +63,7 @@
                   <CheckBox fx:id="analyzedCheckBox" alignment="BOTTOM_LEFT" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onAction="#handleAnalyzedToggle" styleClass="text" text="Analyzed" BorderPane.alignment="CENTER" />
                </right>
                <VBox.margin>
-                  <Insets bottom="5.0" />
+                  <Insets bottom="10.0" top="10.0" />
                </VBox.margin>
                <padding>
                   <Insets left="10.0" right="10.0" />

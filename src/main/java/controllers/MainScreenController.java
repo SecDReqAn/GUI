@@ -115,6 +115,8 @@ public class MainScreenController {
     @FXML
     private Label statusLabel;
 
+    // TODO Change TitledPane of analysis output to TobPane.
+
     /**
      * Constructs a new instance and initializes the associated {@link Configuration}s.
      */

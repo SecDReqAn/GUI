@@ -6,10 +6,24 @@
     -fx-border-color: -fx-focus-border-color;
 }
 
-.radio-button, .check-box {
+.menu-button {
+    -fx-background-color: -fx-foreground-color;
+}
+
+.menu-button .label {
     -fx-text-fill: -fx-main-font-color;
 }
 
+.context-menu {
+    -fx-background-color: -fx-accent-pale-color;
+    -fx-padding: 0;
+}
+
+/* TODO: Complete styling for (check)-menu-items */
+
+.radio-button, .check-box {
+    -fx-text-fill: -fx-main-font-color;
+}
 
 .text-area, .text-area:focused, .text-field {
     -fx-prompt-text-fill: -fx-subtle-font-color;
