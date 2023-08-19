@@ -1,4 +1,5 @@
 import controllers.MainScreenController;
+import general.Constants;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -14,10 +15,10 @@ public class ApplicationMain extends Application {
         var mainScreenController = (MainScreenController) loader.getController();
         mainScreenController.setHostServices(this.getHostServices());
 
-        stage.setTitle("Assumption Specifier");
+        stage.setTitle(Constants.DEFAULT_STAGE_TITLE);
         stage.setScene(scene);
         stage.show();
-        stage.setOnCloseRequest(windowEvent -> mainScreenController.handleExitRequest());
+        stage.setOnCloseRequest(windowEvent -> mainScreenController.handleExitRequest(true));
     }
 
     public static void main(String[] args) {

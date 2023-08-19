@@ -58,7 +58,7 @@
                 <Menu mnemonicParsing="false" text="Action">
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#handleNewAssumption" text="New Assumption" />
-                        <MenuItem mnemonicParsing="false" onAction="#newAnalysis" text="New Analysis" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleNewConfiguration" text="New Configuration" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem mnemonicParsing="false" onAction="#openFromFile" text="Open Configuration…" />
                         <Menu mnemonicParsing="false" onAction="#openRecent" text="Open Recent Configuration" />
@@ -135,18 +135,18 @@
         </SplitPane>
         <GridPane alignment="BASELINE_CENTER" minHeight="30.0" styleClass="grid-pane" VBox.vgrow="NEVER">
             <columnConstraints>
-                <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="45.0" prefWidth="100.0" />
+                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             </rowConstraints>
-         <HBox prefHeight="100.0" prefWidth="200.0">
+         <HBox maxWidth="1.7976931348623157E308" prefHeight="100.0">
             <children>
                   <Label fx:id="modelNameLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#handleModelNameSelection" styleClass="clickable-label" text="No model folder selected" wrapText="true" />
                   <Label fx:id="analysisPathLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#handleAnalysisPathSelection" styleClass="clickable-label" text="No analysis URI specified" wrapText="true" />
-               <Label fx:id="connectionStatusLabel" onMouseClicked="#handleAnalysisPathSelection" styleClass="clickable-label" text="❌" />
+               <Label fx:id="connectionStatusLabel" minHeight="-Infinity" minWidth="25.0" onMouseClicked="#handleAnalysisPathSelection" styleClass="clickable-label" text="❌" />
             </children>
          </HBox>
             <Button fx:id="performAnalysisButton" disable="true" mnemonicParsing="false" onAction="#handleAnalysisExecution" text="Perform Analysis" GridPane.columnIndex="1" />

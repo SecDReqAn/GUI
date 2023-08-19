@@ -112,6 +112,8 @@ public class MainScreenController {
     @FXML
     private Label statusLabel;
 
+    // TODO: Allow an analysis to alter the assumption set during its analysis.
+
     /**
      * Constructs a new instance and initializes the associated {@link Configuration}s.
      */
@@ -139,8 +141,10 @@ public class MainScreenController {
 
     /**
      * Handles an exit request by the user, initiated e.g., by a click on the X button of the window.
+     *
+     * @param isApplicationExit Indicates whether the exit request wishes to terminate the entire application.
      */
-    public void handleExitRequest() {
+    public void handleExitRequest(boolean isApplicationExit) {
         if (this.hasUnsavedChanges()) {
             var confirmationResult = Utilities.showAlert(Alert.AlertType.CONFIRMATION,
                     "Unsaved Changes",
@@ -153,7 +157,10 @@ public class MainScreenController {
                 this.saveToFile();
             }
         }
-        this.connectionTestService.shutdown();
+
+        if(isApplicationExit){
+            this.connectionTestService.shutdown();
+        }
     }
 
     /**
@@ -162,7 +169,7 @@ public class MainScreenController {
      * @param assumption The {@link Assumption} instance that can be edited through the assumption specification-screen.
      * @param owner      The {@link Window} owning the modal window to be created.
      */
-    private void showAssumptionSpecificationScreen(Assumption assumption, Window owner) {
+    private void showAssumptionSpecificationScreen(@NotNull Assumption assumption, @NotNull Window owner) {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("../UI/AssumptionSpecificationScreen.fxml"));
@@ -271,7 +278,7 @@ public class MainScreenController {
     }
 
     @FXML
-    private void handleNewAssumption(@NotNull ActionEvent actionEvent) {
+    private void handleNewAssumption(ActionEvent actionEvent) {
         if (this.currentConfiguration.getModelPath() == null || !(new File(this.currentConfiguration.getModelPath()).exists())) {
             Utilities.showAlert(Alert.AlertType.WARNING,
                     "Warning",
@@ -293,14 +300,30 @@ public class MainScreenController {
     }
 
     @FXML
-    private void newAnalysis() {
-        // TODO Leverage isSavedField.
-        System.out.println("Not implemented!");
+    private void handleNewConfiguration(ActionEvent actionEvent) {
+        var stage = Utilities.getStageOfMenuItem((MenuItem) actionEvent.getSource());
+
+        this.handleExitRequest(false);
+
+        stage.setTitle(Constants.DEFAULT_STAGE_TITLE);
+        this.currentConfiguration = new Configuration();
+        this.savedConfiguration = new Configuration();
+        this.analysisConnector = null;
+        this.saveFile = null;
+
+        // Clear UI elements.
+        this.assumptionTableView.getItems().clear();
+        this.analysisOutputTextArea.setText("");
+        this.modelNameLabel.setText("No model folder selected");
+        this.analysisPathLabel.setText("No analysis URI specified");
+        this.connectionStatusLabel.setText("❌");
+        this.statusLabel.setText("");
+        this.performAnalysisButton.setDisable(true);
     }
 
     @FXML
     private void openFromFile(@NotNull ActionEvent actionEvent) {
-        var stage = (Stage) ((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow();
+        var stage = Utilities.getStageOfMenuItem((MenuItem) actionEvent.getSource());
 
         var fileChooser = new FileChooser();
         fileChooser.setTitle("Select an existing File");
@@ -331,8 +354,10 @@ public class MainScreenController {
             this.analysisConnector = new AnalysisConnector(this.currentConfiguration.getAnalysisPath());
 
             // Model
-            var folders = this.currentConfiguration.getModelPath().split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
-            this.modelNameLabel.setText(folders[folders.length - 1]);
+            if(this.currentConfiguration.getModelPath() != null){
+                var folders = this.currentConfiguration.getModelPath().split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
+                this.modelNameLabel.setText(folders[folders.length - 1]);
+            }
 
             // Assumptions
             this.assumptionTableView.getItems().clear();
@@ -343,6 +368,7 @@ public class MainScreenController {
 
             this.saveFile = selectedFile;
             this.performAnalysisButton.setDisable(this.currentConfiguration.isMissingAnalysisParameters());
+            stage.setTitle(Constants.APPLICATION_NAME + " — " + this.saveFile.getName());
         } catch (StreamReadException e) {
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file exhibits an invalid structure.");
         } catch (DatabindException e) {
@@ -386,6 +412,9 @@ public class MainScreenController {
             this.saveFile.createNewFile();
             ConfigManager.writeConfig(this.saveFile, this.currentConfiguration);
             this.savedConfiguration = this.currentConfiguration;
+
+            Stage stage = (Stage) this.assumptionTableView.getScene().getWindow();
+            stage.setTitle(Constants.APPLICATION_NAME + " — " + this.saveFile.getName());
         } catch (IOException e) {
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Saving failed", "Could not write to file!");
         }
@@ -393,7 +422,7 @@ public class MainScreenController {
 
     @FXML
     private void saveAs(@NotNull ActionEvent actionEvent) {
-        var stage = (Stage) ((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow();
+        var stage = Utilities.getStageOfMenuItem((MenuItem) actionEvent.getSource());
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Save Location");

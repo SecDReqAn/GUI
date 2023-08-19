@@ -10,6 +10,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -61,5 +62,15 @@ public class Utilities {
             Assumption assumption = cellData.getValue();
             return new ReadOnlyStringWrapper(transformation.apply(assumption));
         });
+    }
+
+    /**
+     * Utility function that retrieves the {@link Stage} associated with a given {@link MenuItem}.
+     *
+     * @param menuItem The {@link MenuItem} whose associated {@link Stage} should be retrieved.
+     * @return The associated {@link Stage}.
+     */
+    public static @NotNull Stage getStageOfMenuItem(@NotNull MenuItem menuItem) {
+        return (Stage) menuItem.getParentPopup().getOwnerWindow();
     }
 }
