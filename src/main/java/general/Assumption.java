@@ -32,7 +32,7 @@ public class Assumption implements Cloneable{
     private String name;
     private AssumptionType type;
     private Set<ModelEntity> affectedEntities;
-    private Set<UUID> dependencies; // TODO Properly integrate
+    private Set<UUID> dependencies;
     private String description;
     private Double probabilityOfViolation;
     private Double risk;

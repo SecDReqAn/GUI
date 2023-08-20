@@ -22,6 +22,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
@@ -233,7 +234,7 @@ public class MainScreenController {
                 Optional<Assumption> associatedAssumption = this.currentConfiguration.getAssumptions().stream()
                         .filter(assumptionInConfig -> assumptionInConfig.getId().equals(dependency)).findFirst();
 
-                if(associatedAssumption.isPresent()) {
+                if (associatedAssumption.isPresent()) {
                     stringBuilder.append("\"").append(associatedAssumption.get().getName()).append("\"");
                     stringBuilder.append(" (Id: ");
                     stringBuilder.append(dependency.toString(), 0, Math.min(5, dependency.toString().length()));
@@ -250,15 +251,19 @@ public class MainScreenController {
         Utilities.enableTextWrapForTableColumn(this.entitiesColumn);
         Utilities.enableTextWrapForTableColumn(this.dependenciesColumn);
 
-
-        // Context menu for editing assumptions within the table view.
-        Utilities.addFunctionalityToContextMenu(this.assumptionTableView, "Edit Assumption", (ActionEvent actionEvent) -> {
+        // Anonymous helper function used in the ContextMenu and on double click.
+        Runnable retrieveAssumptionAndOpenSpecificationScreen = () -> {
             Assumption selectedAssumption = this.assumptionTableView.getSelectionModel().getSelectedItem();
 
             if (selectedAssumption != null) {
-                this.showAssumptionSpecificationScreen(selectedAssumption, ((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow());
+                this.showAssumptionSpecificationScreen(selectedAssumption, this.assumptionTableView.getScene().getWindow());
                 this.assumptionTableView.refresh();
             }
+        };
+
+        // Context menu for editing assumptions within the table view.
+        Utilities.addFunctionalityToContextMenu(this.assumptionTableView, "Edit Assumption", (ActionEvent actionEvent) -> {
+            retrieveAssumptionAndOpenSpecificationScreen.run();
         });
         // Context menu for removing an assumptions from the table view.
         Utilities.addFunctionalityToContextMenu(this.assumptionTableView, "Remove Assumption", (ActionEvent actionEvent) -> {
@@ -273,6 +278,17 @@ public class MainScreenController {
                 this.assumptionTableView.getItems().remove(assumptionForDeletion);
                 this.assumptionTableView.refresh();
             }
+        });
+
+        // Allow a double click on a row to open the specification screen for the selected assumption.
+        this.assumptionTableView.setRowFactory(tv -> {
+            var row = new TableRow<Assumption>();
+            row.setOnMouseClicked(mouseEvent -> {
+                if (mouseEvent.getClickCount() == 2 && (!row.isEmpty())) {
+                    retrieveAssumptionAndOpenSpecificationScreen.run();
+                }
+            });
+            return row;
         });
 
         // analysisPathLabel and connectionStatusLabel should show the same effect once one is hovered over.
