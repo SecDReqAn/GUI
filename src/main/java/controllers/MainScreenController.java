@@ -21,10 +21,11 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
@@ -40,7 +41,9 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -107,7 +110,7 @@ public class MainScreenController {
     @FXML
     private TableColumn<Assumption, Boolean> analyzedColumn;
     @FXML
-    private TextArea analysisOutputTextArea;
+    private TabPane analysisOutputTabPane;
     @FXML
     private Label modelNameLabel;
     @FXML
@@ -344,7 +347,7 @@ public class MainScreenController {
 
         // Clear UI elements.
         this.assumptionTableView.getItems().clear();
-        this.analysisOutputTextArea.setText("");
+        this.analysisOutputTabPane.getTabs().clear();
         this.modelNameLabel.setText("No model folder selected");
         this.analysisPathLabel.setText("No analysis URI specified");
         this.connectionStatusLabel.setText("❌");
@@ -395,7 +398,10 @@ public class MainScreenController {
             this.assumptionTableView.getItems().addAll(this.currentConfiguration.getAssumptions());
 
             // Analysis result
-            this.analysisOutputTextArea.setText(this.currentConfiguration.getAnalysisResult());
+            this.analysisOutputTabPane.getTabs().clear();
+            this.analysisOutputTabPane.getTabs().addAll(
+                    Utilities.createAnalysisResultTabs(this.currentConfiguration.getAnalysisResults().toArray(new Configuration.AnalysisResult[0])));
+
 
             this.saveFile = selectedFile;
             this.performAnalysisButton.setDisable(this.currentConfiguration.isMissingAnalysisParameters());
@@ -403,6 +409,7 @@ public class MainScreenController {
         } catch (StreamReadException e) {
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file exhibits an invalid structure.");
         } catch (DatabindException e) {
+            e.printStackTrace();
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not map the contents of the specified file to a valid Configuration.");
         } catch (FileNotFoundException e) {
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not find the repository file associated with the the specified model.");
@@ -510,8 +517,12 @@ public class MainScreenController {
 
                 if (analysisResponse.getKey() != 0) {
                     this.statusLabel.setText("Analysis successfully executed.");
-                    this.currentConfiguration.setAnalysisResult(analysisResponseLog);
-                    this.analysisOutputTextArea.setText(analysisResponseLog);
+
+                    var analysisResultTitle = new SimpleDateFormat("dd.MM.yy. HH:mm:ss").format(new Date());
+                    var newAnalysisResult = new Configuration.AnalysisResult(analysisResultTitle, analysisResponseLog);
+
+                    this.currentConfiguration.getAnalysisResults().add(newAnalysisResult);
+                    this.analysisOutputTabPane.getTabs().addAll(Utilities.createAnalysisResultTabs(newAnalysisResult));
 
                     // Update assumptions.
                     if (analysisResponseAssumptions != null) {

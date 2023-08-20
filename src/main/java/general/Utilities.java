@@ -7,12 +7,17 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TextArea;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -72,5 +77,22 @@ public class Utilities {
      */
     public static @NotNull Stage getStageOfMenuItem(@NotNull MenuItem menuItem) {
         return (Stage) menuItem.getParentPopup().getOwnerWindow();
+    }
+
+    public static @NotNull Collection<Tab> createAnalysisResultTabs(Configuration.AnalysisResult... analysisResults){
+        var tabs = new HashSet<Tab>();
+
+        Arrays.stream(analysisResults).forEach(analysisResult -> {
+            var tab = new Tab();
+            tab.setText(analysisResult.getTitle());
+            var textArea = new TextArea();
+            textArea.setText(analysisResult.getResult());
+
+            tab.setContent(textArea);
+
+            tabs.add(tab);
+        });
+
+        return tabs;
     }
 }

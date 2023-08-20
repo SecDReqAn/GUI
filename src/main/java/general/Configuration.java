@@ -1,25 +1,65 @@
 package general;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class Configuration implements Cloneable {
+    public static class AnalysisResult implements Cloneable {
+        private String title;
+        private String result;
+
+        public AnalysisResult(){
+
+        }
+
+        public AnalysisResult(@NotNull String title, @NotNull String result){
+            this.title = title;
+            this.result = result;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getResult() {
+            return result;
+        }
+
+        @Override
+        public AnalysisResult clone() {
+            try {
+                AnalysisResult clone = (AnalysisResult) super.clone();
+
+                clone.title = this.title;
+                clone.result = this.result;
+
+                return clone;
+            } catch (CloneNotSupportedException e) {
+                throw new AssertionError();
+            }
+        }
+    }
+
     private String analysisPath;
     private String modelPath;
     private TreeSet<Assumption> assumptions;
-    private String analysisResult;
+    private HashSet<AnalysisResult> analysisResults;
 
     public Configuration() {
         this.assumptions = new TreeSet<>(new Assumption.AssumptionComparator());
+        this.analysisResults = new HashSet<>();
     }
 
-    public Configuration(String analysisPath, String modelPath, Set<Assumption> assumptions, String analysisResult) {
+    public Configuration(String analysisPath, String modelPath, Set<Assumption> assumptions, Set<AnalysisResult> analysisResults) {
         this.analysisPath = analysisPath;
         this.modelPath = modelPath;
-        this.analysisResult = analysisResult;
+        this.analysisResults = new HashSet<>();
+        this.analysisResults.addAll(analysisResults);
         this.assumptions = new TreeSet<>(new Assumption.AssumptionComparator());
         this.assumptions.addAll(assumptions);
     }
@@ -28,8 +68,8 @@ public class Configuration implements Cloneable {
     public boolean isEmpty() {
         return this.analysisPath == null &&
                 this.modelPath == null &&
-                this.assumptions == null &&
-                this.analysisResult == null;
+                this.assumptions.isEmpty() &&
+                this.analysisResults.isEmpty();
     }
 
     @JsonIgnore
@@ -60,21 +100,8 @@ public class Configuration implements Cloneable {
         return assumptions;
     }
 
-    public void setAssumptions(Set<Assumption> assumptions) {
-        if (assumptions == null) {
-            this.assumptions = null;
-        } else {
-            this.assumptions = new TreeSet<>(new Assumption.AssumptionComparator());
-            this.assumptions.addAll(assumptions);
-        }
-    }
-
-    public String getAnalysisResult() {
-        return analysisResult;
-    }
-
-    public void setAnalysisResult(String analysisResult) {
-        this.analysisResult = analysisResult;
+    public Set<AnalysisResult> getAnalysisResults() {
+        return analysisResults;
     }
 
     @Override
@@ -98,7 +125,7 @@ public class Configuration implements Cloneable {
 
             return Objects.equals(this.analysisPath, otherConfiguration.analysisPath)
                     && Objects.equals(this.modelPath, otherConfiguration.modelPath)
-                    && Objects.equals(this.analysisResult, otherConfiguration.analysisResult)
+                    && Objects.equals(this.analysisResults, otherConfiguration.analysisResults)
                     && assumptionsEqual;
         }
 
@@ -111,7 +138,7 @@ public class Configuration implements Cloneable {
                 "analysisPath='" + analysisPath + '\'' +
                 ", modelPath='" + modelPath + '\'' +
                 ", assumptions=" + assumptions +
-                ", analysisResult='" + analysisResult + '\'' +
+                ", analysisResults=" + analysisResults +
                 '}';
     }
 
@@ -121,7 +148,9 @@ public class Configuration implements Cloneable {
             Configuration clone = (Configuration) super.clone();
             clone.analysisPath = this.analysisPath;
             clone.modelPath = this.modelPath;
-            clone.analysisResult = this.analysisResult;
+
+            clone.analysisResults = new HashSet<>();
+            this.analysisResults.forEach(analysisResult -> clone.analysisResults.add(analysisResult.clone()));
 
             clone.assumptions = new TreeSet<>(new Assumption.AssumptionComparator());
             this.assumptions.forEach(assumption -> clone.assumptions.add(assumption.clone()));

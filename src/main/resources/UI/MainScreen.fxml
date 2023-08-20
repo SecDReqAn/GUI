@@ -40,9 +40,9 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -92,7 +92,7 @@
                 </Menu>
             </menus>
         </MenuBar>
-        <SplitPane dividerPositions="0.9" orientation="VERTICAL" prefHeight="643.0" prefWidth="1000.0" VBox.vgrow="ALWAYS">
+        <SplitPane dividerPositions="0.8" orientation="VERTICAL" prefHeight="643.0" prefWidth="1000.0" VBox.vgrow="ALWAYS">
             <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                     <children>
@@ -122,11 +122,7 @@
                     <children>
                         <TitledPane alignment="CENTER" collapsible="false" text="Analysis Output" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-padding: 0;">
-                                    <children>
-                                        <TextArea fx:id="analysisOutputTextArea" editable="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                    </children>
-                                </AnchorPane>
+                        <TabPane fx:id="analysisOutputTabPane" side="RIGHT" />
                             </content>
                         </TitledPane>
                     </children>
