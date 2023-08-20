@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -179,8 +180,7 @@ public class MainScreenController {
             AnchorPane root = loader.load();
 
             AssumptionSpecificationScreenController controller = loader.getController();
-            controller.initAssumption(assumption);
-            controller.initModelFolder(this.currentConfiguration.getModelPath());
+            controller.initWithMainData(this.currentConfiguration.getAssumptions(), assumption, this.currentConfiguration.getModelPath());
 
             var stage = new Stage();
             stage.setScene(new Scene(root));
@@ -220,7 +220,7 @@ public class MainScreenController {
 
         // Deal with columns that contain collections.
         Utilities.setCellValueFactoryForCollectionElement(this.entitiesColumn, assumption -> {
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
             assumption.getAffectedEntities().forEach(affectedEntity -> {
                 stringBuilder.append(affectedEntity.getId());
                 stringBuilder.append(", ");
@@ -228,10 +228,17 @@ public class MainScreenController {
             return stringBuilder.isEmpty() ? "" : stringBuilder.substring(0, stringBuilder.length() - 2);
         });
         Utilities.setCellValueFactoryForCollectionElement(this.dependenciesColumn, assumption -> {
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
             assumption.getDependencies().forEach(dependency -> {
-                stringBuilder.append(dependency.toString());
-                stringBuilder.append(", ");
+                Optional<Assumption> associatedAssumption = this.currentConfiguration.getAssumptions().stream()
+                        .filter(assumptionInConfig -> assumptionInConfig.getId().equals(dependency)).findFirst();
+
+                if(associatedAssumption.isPresent()) {
+                    stringBuilder.append("\"").append(associatedAssumption.get().getName()).append("\"");
+                    stringBuilder.append(" (Id: ");
+                    stringBuilder.append(dependency.toString(), 0, Math.min(5, dependency.toString().length()));
+                    stringBuilder.append("...),\n");
+                }
             });
             return stringBuilder.isEmpty() ? "" : stringBuilder.substring(0, stringBuilder.length() - 2);
         });
@@ -255,10 +262,15 @@ public class MainScreenController {
         });
         // Context menu for removing an assumptions from the table view.
         Utilities.addFunctionalityToContextMenu(this.assumptionTableView, "Remove Assumption", (ActionEvent actionEvent) -> {
-            Assumption selectedAssumption = this.assumptionTableView.getSelectionModel().getSelectedItem();
+            Assumption assumptionForDeletion = this.assumptionTableView.getSelectionModel().getSelectedItem();
 
-            if (selectedAssumption != null && this.currentConfiguration.getAssumptions().remove(selectedAssumption)) {
-                this.assumptionTableView.getItems().remove(selectedAssumption);
+            if (assumptionForDeletion != null && this.currentConfiguration.getAssumptions().remove(assumptionForDeletion)) {
+                // Remove deleted assumption from dependency lists of other assumptions if necessary.
+                this.currentConfiguration.getAssumptions().forEach(specifiedAssumption -> {
+                    assumptionForDeletion.getDependencies().remove(assumptionForDeletion.getId());
+                });
+
+                this.assumptionTableView.getItems().remove(assumptionForDeletion);
                 this.assumptionTableView.refresh();
             }
         });

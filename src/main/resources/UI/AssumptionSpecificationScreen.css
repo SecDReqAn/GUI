@@ -10,7 +10,7 @@
     -fx-background-color: -fx-foreground-color;
 }
 
-.menu-button .label {
+.menu-button .label, .menu-item .label {
     -fx-text-fill: -fx-main-font-color;
 }
 
@@ -19,7 +19,20 @@
     -fx-padding: 0;
 }
 
-/* TODO: Complete styling for (check)-menu-items */
+.menu-item {
+    -fx-background-color: -fx-foreground-color;
+    -fx-text-fill: -fx-main-font-color;
+    -fx-border-color: transparent;
+}
+
+.menu-item:focused {
+    -fx-background-color: -fx-accent-color;
+    -fx-border-color: #2B2B2B;
+}
+
+.check-menu-item {
+    -fx-mark-color: -fx-main-font-color;
+}
 
 .radio-button, .check-box {
     -fx-text-fill: -fx-main-font-color;

@@ -14,6 +14,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -26,9 +28,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Optional;
-
-// TODO Allow dependencies between assumptions to be specified.
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * The dedicated controller managing the assumption-specification screen that is initiated by {@link MainScreenController}.
@@ -39,6 +42,10 @@ public class AssumptionSpecificationScreenController {
      */
     private Assumption assumption;
     /**
+     * The {@link Collection} of already specified {@link Assumption}s.
+     */
+    private Collection<Assumption> specifiedAssumptions;
+    /**
      * The {@link ModelReader} that is used for accessing model entities.
      */
     private ModelReader modelReader;
@@ -47,6 +54,8 @@ public class AssumptionSpecificationScreenController {
     private VBox topLevelVBox;
     @FXML
     private TextField nameTextField;
+    @FXML
+    private MenuButton dependenciesMenuButton; // TODO: Consider replacing with some kind of graph visualization (maybe https://github.com/jgrapht/jgrapht).
     @FXML
     private ToggleGroup typeToggleGroup;
     @FXML
@@ -81,30 +90,25 @@ public class AssumptionSpecificationScreenController {
     private TreeView<ModelEntity> modelEntityTreeView;
 
     /**
-     * Initializes the assumption instance that should be specified through the specification screen.
+     * Initializes the controller with data required for the assumption specification process.
      *
-     * @param assumption The {@link Assumption} instance that should be filled with data by the user.
+     * @param specifiedAssumptions The {@link Collection} of {@link Assumption}s that the user has already entered into the application.
+     * @param assumption           The {@link Assumption} instance that should be filled with data by the user.
+     * @param modelPath            The absolute path to the folder of the PCM model.
      */
-    public void initAssumption(Assumption assumption) {
+    public void initWithMainData(Collection<Assumption> specifiedAssumptions, Assumption assumption, String modelPath) {
         this.assumption = assumption;
+        this.specifiedAssumptions = specifiedAssumptions;
 
         // Set analyzed to false (default) if not already set.
         if (this.assumption.isAnalyzed() == null) {
             this.assumption.setAnalyzed(false);
         }
 
-        // Initialize UI with possibly pre-existing data.
+        // Initialize UI with (existing) assumption data.
         this.initializeUIElements();
-    }
 
-    /**
-     * Initializes the path to the model folder whose contents are then read by the {@link ModelReader} instance to determine the available model entities.
-     *
-     * @param modelPath The absolute path to the folder of the PCM model.
-     */
-    public void initModelFolder(String modelPath) {
         this.modelReader = new ModelReader(new File(modelPath));
-
         // Init TableView with available entities read from the selected model.
         this.modelViewTableView.setItems(FXCollections.observableArrayList(this.modelReader.getModelFiles()));
     }
@@ -137,6 +141,36 @@ public class AssumptionSpecificationScreenController {
 
         if (this.assumption.isAnalyzed() != null) {
             this.analyzedCheckBox.setSelected(this.assumption.isAnalyzed());
+        }
+
+        // Populate dependenciesMenuButton with content.
+        this.specifiedAssumptions.forEach(specifiedAssumption -> {
+            // Do not allow a dependency on itself.
+            if (!this.assumption.getId().equals(specifiedAssumption.getId())) {
+                var dependencyCheckMenuItem = new CheckMenuItem(specifiedAssumption.getName() + " (Id: " + specifiedAssumption.getId().toString().substring(0, 5) + "...)");
+                Set<UUID> dependenciesOfCurrentAssumption = this.assumption.getDependencies();
+
+                // Set CheckMenuItem to selected id dependency is already present.
+                if(dependenciesOfCurrentAssumption.contains(specifiedAssumption.getId())){
+                    dependencyCheckMenuItem.setSelected(true);
+                }
+
+                // Deal with (de)selection of the CheckMenuItem
+                dependencyCheckMenuItem.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        // Add new dependency.
+                        dependenciesOfCurrentAssumption.add(specifiedAssumption.getId());
+                    } else {
+                        // (Potentially) remove existing dependency.
+                        dependenciesOfCurrentAssumption.remove(specifiedAssumption.getId());
+                    }
+                });
+
+                this.dependenciesMenuButton.getItems().add(dependencyCheckMenuItem);
+            }
+        });
+        if (this.dependenciesMenuButton.getItems().isEmpty()) {
+            this.dependenciesMenuButton.setDisable(true);
         }
 
         this.affectedEntityTableView.setItems(FXCollections.observableArrayList(this.assumption.getAffectedEntities()));
