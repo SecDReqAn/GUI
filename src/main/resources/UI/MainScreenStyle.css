@@ -71,15 +71,15 @@
 }
 
 .table-row-cell:odd {
-    -fx-background-color: -fx-view-background-color;
+    -fx-background-color: #4c4c4f;
 }
 
 .table-row-cell:even {
     -fx-background-color: #495257;
 }
 
-.table-row-cell:empty > *.table-cell {
-    -fx-background-color: -fx-view-background-color;
+.table-row-cell:empty, .table-row-cell:empty .table-cell {
+    -fx-background-color: transparent;
     -fx-border-width: 0;
 }
 
