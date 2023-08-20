@@ -6,16 +6,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class Configuration implements Cloneable {
     public static class AnalysisResult implements Cloneable {
         private String title;
         private String result;
-
-        public AnalysisResult(){
-
-        }
 
         public AnalysisResult(@NotNull String title, @NotNull String result){
             this.title = title;
@@ -47,8 +44,9 @@ public class Configuration implements Cloneable {
 
     private String analysisPath;
     private String modelPath;
-    private TreeSet<Assumption> assumptions;
-    private HashSet<AnalysisResult> analysisResults;
+    // TODO: Fix deserialization bug where the custom comparator cannot be found (a subsequent cast to Comparable obviously fails).
+    private SortedSet<Assumption> assumptions; // Require sorted property for efficient comparison of configurations.
+    private Set<AnalysisResult> analysisResults;
 
     public Configuration() {
         this.assumptions = new TreeSet<>(new Assumption.AssumptionComparator());
