@@ -1,5 +1,6 @@
 package general;
 
+import general.entities.ModelEntity;
 import javafx.scene.control.TreeCell;
 
 public class ModelEntityTreeCell extends TreeCell<ModelEntity> {

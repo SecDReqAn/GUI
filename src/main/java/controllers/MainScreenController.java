@@ -2,7 +2,8 @@ package controllers;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
-import general.Assumption;
+import general.entities.AnalysisResult;
+import general.entities.Assumption;
 import general.Configuration;
 import general.Constants;
 import general.Utilities;
@@ -21,11 +22,10 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -110,7 +111,11 @@ public class MainScreenController {
     @FXML
     private TableColumn<Assumption, Boolean> analyzedColumn;
     @FXML
-    private TabPane analysisOutputTabPane;
+    private TextArea analysisOutputTextArea;
+    @FXML
+    private TableColumn<AnalysisResult, String> outputTitleColumn;
+    @FXML
+    private TableView<AnalysisResult> analysisOutputTableView;
     @FXML
     private Label modelNameLabel;
     @FXML
@@ -247,6 +252,12 @@ public class MainScreenController {
             return stringBuilder.isEmpty() ? "" : stringBuilder.substring(0, stringBuilder.length() - 2);
         });
 
+        // Analysis Results TableView.
+        this.outputTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+
+        this.analysisOutputTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            this.analysisOutputTextArea.setText(newValue.getResult());
+        });
 
         // Enable text-warp in text-centric columns.
         Utilities.enableTextWrapForTableColumn(this.descriptionColumn);
@@ -265,23 +276,21 @@ public class MainScreenController {
         };
 
         // Context menu for editing assumptions within the table view.
-        Utilities.addFunctionalityToContextMenu(this.assumptionTableView, "Edit Assumption", (ActionEvent actionEvent) -> {
-            retrieveAssumptionAndOpenSpecificationScreen.run();
-        });
+        Utilities.addFunctionalityToContextMenu(this.assumptionTableView, "Edit Assumption", (ActionEvent actionEvent) -> retrieveAssumptionAndOpenSpecificationScreen.run());
         // Context menu for removing an assumptions from the table view.
         Utilities.addFunctionalityToContextMenu(this.assumptionTableView, "Remove Assumption", (ActionEvent actionEvent) -> {
             Assumption assumptionForDeletion = this.assumptionTableView.getSelectionModel().getSelectedItem();
 
             if (assumptionForDeletion != null && this.currentConfiguration.getAssumptions().remove(assumptionForDeletion)) {
                 // Remove deleted assumption from dependency lists of other assumptions if necessary.
-                this.currentConfiguration.getAssumptions().forEach(specifiedAssumption -> {
-                    assumptionForDeletion.getDependencies().remove(assumptionForDeletion.getId());
-                });
+                this.currentConfiguration.getAssumptions().forEach(specifiedAssumption -> assumptionForDeletion.getDependencies().remove(assumptionForDeletion.getId()));
 
                 this.assumptionTableView.getItems().remove(assumptionForDeletion);
                 this.assumptionTableView.refresh();
             }
         });
+
+        // TODO: ContextMenu for analysis result TableView (delete operation).
 
         // Allow a double click on a row to open the specification screen for the selected assumption.
         this.assumptionTableView.setRowFactory(tv -> {
@@ -347,7 +356,8 @@ public class MainScreenController {
 
         // Clear UI elements.
         this.assumptionTableView.getItems().clear();
-        this.analysisOutputTabPane.getTabs().clear();
+        this.analysisOutputTextArea.setText("");
+        this.analysisOutputTableView.getItems().clear();
         this.modelNameLabel.setText("No model folder selected");
         this.analysisPathLabel.setText("No analysis URI specified");
         this.connectionStatusLabel.setText("❌");
@@ -398,10 +408,7 @@ public class MainScreenController {
             this.assumptionTableView.getItems().addAll(this.currentConfiguration.getAssumptions());
 
             // Analysis result
-            this.analysisOutputTabPane.getTabs().clear();
-            this.analysisOutputTabPane.getTabs().addAll(
-                    Utilities.createAnalysisResultTabs(this.currentConfiguration.getAnalysisResults().toArray(new Configuration.AnalysisResult[0])));
-
+            this.analysisOutputTableView.getItems().addAll(this.currentConfiguration.getAnalysisResults());
 
             this.saveFile = selectedFile;
             this.performAnalysisButton.setDisable(this.currentConfiguration.isMissingAnalysisParameters());
@@ -409,7 +416,6 @@ public class MainScreenController {
         } catch (StreamReadException e) {
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file exhibits an invalid structure.");
         } catch (DatabindException e) {
-            e.printStackTrace();
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not map the contents of the specified file to a valid Configuration.");
         } catch (FileNotFoundException e) {
             Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not find the repository file associated with the the specified model.");
@@ -502,7 +508,8 @@ public class MainScreenController {
             // Execute manual connection test to analysis.
             if (this.analysisConnector != null && this.analysisConnector.testConnection().getKey() == 200) {
                 this.statusLabel.setText("Transmit selected model to the analysis...");
-                Pair<Integer, String> modelTransferResponse = this.analysisConnector.transferModelFiles(new File(this.currentConfiguration.getModelPath()));
+                Pair<Integer, String> modelTransferResponse = this.analysisConnector.transferModelFiles(
+                        new File(Objects.requireNonNull(this.currentConfiguration.getModelPath())));
                 if (modelTransferResponse.getKey() != 200) {
                     this.statusLabel.setText("Analysis aborted.");
                     Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Transmission of the selected model to the analysis failed.", modelTransferResponse.getValue());
@@ -519,10 +526,12 @@ public class MainScreenController {
                     this.statusLabel.setText("Analysis successfully executed.");
 
                     var analysisResultTitle = new SimpleDateFormat("dd.MM.yy. HH:mm:ss").format(new Date());
-                    var newAnalysisResult = new Configuration.AnalysisResult(analysisResultTitle, analysisResponseLog);
+                    var newAnalysisResult = new AnalysisResult(analysisResultTitle, analysisResponseLog);
 
                     this.currentConfiguration.getAnalysisResults().add(newAnalysisResult);
-                    this.analysisOutputTabPane.getTabs().addAll(Utilities.createAnalysisResultTabs(newAnalysisResult));
+                    this.analysisOutputTableView.getItems().add(newAnalysisResult);
+
+                    // TODO Select new result in TableView and display its contents in the TextArea.
 
                     // Update assumptions.
                     if (analysisResponseAssumptions != null) {
@@ -588,7 +597,8 @@ public class MainScreenController {
                 // Accept valid selection.
                 this.currentConfiguration.setModelPath(absolutePathToSelectedFolder);
                 // Only display last subfolder of the path for better readability.
-                var folders = this.currentConfiguration.getModelPath().split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
+                var folders = Objects.requireNonNull(this.currentConfiguration.getModelPath()).
+                        split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
                 originatingLabel.setText(folders[folders.length - 1]);
 
                 this.performAnalysisButton.setDisable(this.currentConfiguration.isMissingAnalysisParameters());

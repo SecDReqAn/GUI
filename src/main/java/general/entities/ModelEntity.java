@@ -1,4 +1,4 @@
-package general;
+package general.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jetbrains.annotations.NotNull;
@@ -14,10 +14,10 @@ public class ModelEntity {
     private Boolean ownName;
 
     /**
-     * Default constructor required for unmarshalling JSON.
+     * Default constructor as <b>required</b> for Jackson deserialization.
      */
+    @SuppressWarnings("unused")
     private ModelEntity() {
-
     }
 
     public ModelEntity(String id, @NotNull String modelView, @NotNull String elementName, @Nullable String name, @Nullable String type) {

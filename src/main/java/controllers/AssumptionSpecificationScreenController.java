@@ -1,7 +1,7 @@
 package controllers;
 
-import general.Assumption;
-import general.ModelEntity;
+import general.entities.Assumption;
+import general.entities.ModelEntity;
 import general.ModelEntityTreeCell;
 import general.Utilities;
 import io.ModelReader;

@@ -1,6 +1,6 @@
 package io;
 
-import general.ModelEntity;
+import general.entities.ModelEntity;
 import javafx.scene.control.TreeItem;
 import org.jetbrains.annotations.NotNull;
 

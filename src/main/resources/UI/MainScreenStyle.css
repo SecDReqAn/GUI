@@ -1,4 +1,5 @@
 @import "CommonStyle.css";
+@import "SubtleTableView.css";
 
 /* TODO: Refactor */
 .menu-bar {
@@ -43,68 +44,68 @@
     -fx-padding: 0 1 0 1;
 }
 
-.table-view {
-    -fx-background-color: -fx-view-background-color;
-}
-
 .text-node {
     -fx-fill: -fx-main-font-color;
 }
 
-.table-view .column-header {
+.primary-table-view {
+    -fx-background-color: -fx-view-background-color;
+}
+
+.primary-table-view .column-header {
     -fx-background-color: #888888;
     -fx-border-color: -fx-subtle-font-color;
     -fx-border-width: 1pt 1pt 1pt 1pt;
 }
 
-.table-view .column-header-background .filler {
+.primary-table-view .column-header-background .filler {
     -fx-background-color: #888888;
 }
 
-.table-view .placeholder .label {
+.primary-table-view .placeholder .label {
     -fx-text-fill: -fx-main-font-color;
 }
 
-.table-cell {
+.primary-table-view .table-cell {
     -fx-text-fill: -fx-main-font-color;
     -fx-border-color: -fx-subtle-font-color;
 }
 
-.table-row-cell:odd {
+.primary-table-view .table-row-cell:odd {
     -fx-background-color: #4c4c4f;
 }
 
-.table-row-cell:even {
+.primary-table-view .table-row-cell:even {
     -fx-background-color: #495257;
 }
 
-.table-row-cell:empty, .table-row-cell:empty .table-cell {
+.primary-table-view .table-row-cell:empty, .table-row-cell:empty .table-cell {
     -fx-background-color: transparent;
     -fx-border-width: 0;
 }
 
-.table-row-cell:selected {
+.primary-table-view .table-row-cell:selected {
     -fx-background-color: -fx-accent-color;
 }
 
-.table-view .column-header .label {
+.primary-table-view .column-header .label {
     -fx-text-fill: white;
 }
 
-.table-view .virtual-flow .corner {
+.primary-table-view .virtual-flow .corner {
     -fx-background-color: #888888;
 }
 
-.table-view .virtual-flow .scroll-bar {
+.primary-table-view .virtual-flow .scroll-bar {
     -fx-background-color: #888888;
 }
 
-.table-view .virtual-flow .scroll-bar .thumb {
+.primary-table-view .virtual-flow .scroll-bar .thumb {
     -fx-background-color: -fx-focus-border-color;
 }
 
-.table-view .virtual-flow .scroll-bar .increment-button:hover,
-.table-view .virtual-flow .scroll-bar .decrement-button:hover {
+.primary-table-view .virtual-flow .scroll-bar .increment-button:hover,
+.primary-table-view .virtual-flow .scroll-bar .decrement-button:hover {
     -fx-background-color: -fx-accent-color;
 }
 
