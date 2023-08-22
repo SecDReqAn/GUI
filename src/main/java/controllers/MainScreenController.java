@@ -214,6 +214,17 @@ public class MainScreenController {
         return !this.currentConfiguration.equals(this.savedConfiguration);
     }
 
+    private void clearControlElements(){
+        this.assumptionTableView.getItems().clear();
+        this.analysisOutputTextArea.setText("");
+        this.analysisOutputTableView.getItems().clear();
+        this.modelNameLabel.setText("No model folder selected");
+        this.analysisPathLabel.setText("No analysis URI specified");
+        this.connectionStatusLabel.setText("❌");
+        this.statusLabel.setText("");
+        this.performAnalysisButton.setDisable(true);
+    }
+
     @FXML
     private void initialize() {
         // Extract fields of an assumption into their appropriate column of the TableView.
@@ -255,9 +266,7 @@ public class MainScreenController {
         // Analysis Results TableView.
         this.outputTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 
-        this.analysisOutputTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            this.analysisOutputTextArea.setText(newValue.getResult());
-        });
+        this.analysisOutputTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> this.analysisOutputTextArea.setText(newValue.getResult()));
 
         // Enable text-warp in text-centric columns.
         Utilities.enableTextWrapForTableColumn(this.descriptionColumn);
@@ -354,15 +363,7 @@ public class MainScreenController {
         this.analysisConnector = null;
         this.saveFile = null;
 
-        // Clear UI elements.
-        this.assumptionTableView.getItems().clear();
-        this.analysisOutputTextArea.setText("");
-        this.analysisOutputTableView.getItems().clear();
-        this.modelNameLabel.setText("No model folder selected");
-        this.analysisPathLabel.setText("No analysis URI specified");
-        this.connectionStatusLabel.setText("❌");
-        this.statusLabel.setText("");
-        this.performAnalysisButton.setDisable(true);
+        this.clearControlElements();
     }
 
     @FXML
@@ -393,6 +394,9 @@ public class MainScreenController {
             this.savedConfiguration = ConfigManager.readConfig(selectedFile);
             this.currentConfiguration = this.savedConfiguration.clone();
 
+            // TODO: Resolve crash when loading same config repeatedly.
+            this.clearControlElements();
+
             // Analysis path and connector
             this.analysisPathLabel.setText(this.currentConfiguration.getAnalysisPath());
             this.analysisConnector = new AnalysisConnector(this.currentConfiguration.getAnalysisPath());
@@ -409,6 +413,11 @@ public class MainScreenController {
 
             // Analysis result
             this.analysisOutputTableView.getItems().addAll(this.currentConfiguration.getAnalysisResults());
+            if (!this.analysisOutputTableView.getItems().isEmpty()) {
+                AnalysisResult firstAnalysisResultInTable = this.analysisOutputTableView.getItems().get(0);
+                this.analysisOutputTableView.getSelectionModel().select(0);
+                this.analysisOutputTextArea.setText(firstAnalysisResultInTable.getResult());
+            }
 
             this.saveFile = selectedFile;
             this.performAnalysisButton.setDisable(this.currentConfiguration.isMissingAnalysisParameters());
@@ -530,6 +539,8 @@ public class MainScreenController {
 
                     this.currentConfiguration.getAnalysisResults().add(newAnalysisResult);
                     this.analysisOutputTableView.getItems().add(newAnalysisResult);
+                    this.analysisOutputTableView.getSelectionModel().select(this.analysisOutputTableView.getItems().size() - 1);
+                    this.analysisOutputTextArea.setText(newAnalysisResult.getResult());
 
                     // TODO Select new result in TableView and display its contents in the TextArea.
 

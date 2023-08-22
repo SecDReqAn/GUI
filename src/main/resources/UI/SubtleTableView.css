@@ -2,10 +2,15 @@
 
 .subtle-table-view {
     -fx-background-color: -fx-view-background-color;
+    -fx-padding: 0;
+    -fx-border-color: -fx-view-background-color;
+    -fx-border-width: 1pt 0 1pt 1pt;
 }
 
 .subtle-table-view .column-header {
     -fx-background-color: -fx-foreground-color;
+    -fx-border-color: -fx-view-background-color;
+    -fx-border-width: 0 0 1pt 0;
 }
 
 .subtle-table-view .column-header-background {
@@ -27,14 +32,11 @@
 
 .subtle-table-view .table-cell {
     -fx-text-fill: -fx-main-font-color;
+    -fx-padding: 0 0 0 10pt;
 }
 
-.subtle-table-view .table-row-cell:odd {
-    -fx-background-color: -fx-foreground-color;
-}
-
-.subtle-table-view .table-row-cell:even {
-    -fx-background-color: -fx-accent-pale-color;
+.subtle-table-view .table-row-cell {
+    -fx-border-color: -fx-view-background-color;
 }
 
 .subtle-table-view .table-row-cell:selected {
