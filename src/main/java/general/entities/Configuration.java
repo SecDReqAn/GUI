@@ -1,8 +1,6 @@
-package general;
+package general.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import general.entities.AnalysisResult;
-import general.entities.Assumption;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

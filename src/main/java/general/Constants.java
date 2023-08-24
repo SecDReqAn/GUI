@@ -8,4 +8,7 @@ public class Constants {
     public static final String DEFAULT_STAGE_TITLE = Constants.APPLICATION_NAME + " — " + Constants.DEFAULT_SAVE_FILE_NAME;
     public static final String DEFAULT_ANALYSIS_PATH = "http://localhost:2406/";
     public static final String DOCUMENTATION_URL = "https://git.scc.kit.edu/i43/stud/praktika/sose2023/timnorbertbaechle";
+
+    public static final String CONNECTION_SUCCESS_TEXT = "✓";
+    public static final String CONNECTION_FAILURE_TEXT = "❌";
 }

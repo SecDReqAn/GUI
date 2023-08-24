@@ -1,7 +1,7 @@
 package io;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import general.Configuration;
+import general.entities.Configuration;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;

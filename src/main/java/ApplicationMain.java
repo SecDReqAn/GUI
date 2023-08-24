@@ -18,7 +18,7 @@ public class ApplicationMain extends Application {
         stage.setTitle(Constants.DEFAULT_STAGE_TITLE);
         stage.setScene(scene);
         stage.show();
-        stage.setOnCloseRequest(windowEvent -> mainScreenController.handleExitRequest(true));
+        stage.setOnCloseRequest(windowEvent -> mainScreenController.handleExitRequest());
     }
 
     public static void main(String[] args) {

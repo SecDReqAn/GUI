@@ -1,6 +1,5 @@
 package general.entities;
 
-import general.Configuration;
 import org.jetbrains.annotations.NotNull;
 
 public class AnalysisResult implements Cloneable {

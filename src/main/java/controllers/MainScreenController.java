@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import general.entities.AnalysisResult;
 import general.entities.Assumption;
-import general.Configuration;
+import general.entities.Configuration;
 import general.Constants;
 import general.Utilities;
 import io.AnalysisConnector;
@@ -125,8 +125,6 @@ public class MainScreenController {
     @FXML
     private Label statusLabel;
 
-    // TODO Change TitledPane of analysis output to TobPane.
-
     /**
      * Constructs a new instance and initializes the associated {@link Configuration}s.
      */
@@ -138,7 +136,8 @@ public class MainScreenController {
         connectionTestService.scheduleAtFixedRate(() -> {
             if (MainScreenController.this.analysisConnector != null) {
                 var connectionTestCode = MainScreenController.this.analysisConnector.testConnection().getKey();
-                Platform.runLater(() -> MainScreenController.this.connectionStatusLabel.setText(connectionTestCode == 200 ? "✓" : " ❌"));
+                Platform.runLater(() -> MainScreenController.this.connectionStatusLabel.setText(
+                        connectionTestCode == 200 ? Constants.CONNECTION_SUCCESS_TEXT : Constants.CONNECTION_FAILURE_TEXT));
             }
         }, 0, 5, TimeUnit.SECONDS);
     }
@@ -153,16 +152,16 @@ public class MainScreenController {
     }
 
     /**
-     * Handles an exit request by the user, initiated e.g., by a click on the X button of the window.
+     * Checks for unsaved changes in the current configuration and alerts the user if necessary.
      *
-     * @param isApplicationExit Indicates whether the exit request wishes to terminate the entire application.
+     * @param alertContent The {@link String} that should be shown as part of the {@link Alert} pop-up in case of unsaved changes.
      */
-    public void handleExitRequest(boolean isApplicationExit) {
+    public void alertUserOfUnsavedChanges(@NotNull String alertContent) {
         if (this.hasUnsavedChanges()) {
             var confirmationResult = Utilities.showAlert(Alert.AlertType.CONFIRMATION,
                     "Unsaved Changes",
                     "There exist unsaved changed in the current configuration",
-                    "Save changes before exiting?",
+                    alertContent,
                     new ButtonType("Save Changes", ButtonBar.ButtonData.YES),
                     new ButtonType("Discard Changes", ButtonBar.ButtonData.NO));
 
@@ -170,10 +169,14 @@ public class MainScreenController {
                 this.saveToFile();
             }
         }
+    }
 
-        if (isApplicationExit) {
-            this.connectionTestService.shutdown();
-        }
+    /**
+     * Handles an exit request by the user, initiated by a click on the X button of the window.
+     */
+    public void handleExitRequest() {
+        this.alertUserOfUnsavedChanges("Save changes before exiting?");
+        this.connectionTestService.shutdown();
     }
 
     /**
@@ -214,13 +217,13 @@ public class MainScreenController {
         return !this.currentConfiguration.equals(this.savedConfiguration);
     }
 
-    private void clearControlElements(){
+    private void clearControlElements() {
         this.assumptionTableView.getItems().clear();
         this.analysisOutputTextArea.setText("");
         this.analysisOutputTableView.getItems().clear();
         this.modelNameLabel.setText("No model folder selected");
         this.analysisPathLabel.setText("No analysis URI specified");
-        this.connectionStatusLabel.setText("❌");
+        this.connectionStatusLabel.setText(Constants.CONNECTION_FAILURE_TEXT);
         this.statusLabel.setText("");
         this.performAnalysisButton.setDisable(true);
     }
@@ -266,7 +269,11 @@ public class MainScreenController {
         // Analysis Results TableView.
         this.outputTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 
-        this.analysisOutputTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> this.analysisOutputTextArea.setText(newValue.getResult()));
+        this.analysisOutputTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                this.analysisOutputTextArea.setText(newValue.getResult());
+            }
+        });
 
         // Enable text-warp in text-centric columns.
         Utilities.enableTextWrapForTableColumn(this.descriptionColumn);
@@ -298,8 +305,20 @@ public class MainScreenController {
                 this.assumptionTableView.refresh();
             }
         });
+        // Context menu for removing an existing analysis result.
+        Utilities.addFunctionalityToContextMenu(this.analysisOutputTableView, "Remove Analysis Output", (ActionEvent actionEvent) -> {
+            AnalysisResult analysisResultForDeletion = this.analysisOutputTableView.getSelectionModel().getSelectedItem();
 
-        // TODO: ContextMenu for analysis result TableView (delete operation).
+            if (analysisResultForDeletion != null && this.currentConfiguration.getAnalysisResults().remove(analysisResultForDeletion)) {
+                this.analysisOutputTableView.getItems().remove(analysisResultForDeletion);
+
+                // Deal with TextArea if necessary.
+                if (this.analysisOutputTableView.getSelectionModel().getSelectedItem() == null) {
+                    this.analysisOutputTextArea.setText("No outputs found");
+                }
+
+            }
+        });
 
         // Allow a double click on a row to open the specification screen for the selected assumption.
         this.assumptionTableView.setRowFactory(tv -> {
@@ -355,8 +374,7 @@ public class MainScreenController {
     private void handleNewConfiguration(ActionEvent actionEvent) {
         var stage = Utilities.getStageOfMenuItem((MenuItem) actionEvent.getSource());
 
-        this.handleExitRequest(false);
-
+        this.alertUserOfUnsavedChanges("Save changes before opening a new configuration?");
         stage.setTitle(Constants.DEFAULT_STAGE_TITLE);
         this.currentConfiguration = new Configuration();
         this.savedConfiguration = new Configuration();
@@ -382,20 +400,15 @@ public class MainScreenController {
         }
 
         if (!selectedFile.exists() || !selectedFile.isFile()) {
-            var alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning");
-            alert.setHeaderText("Loading Failed");
-            alert.setContentText("The specified file could not be read!");
-
-            alert.show();
+            Utilities.showAlert(Alert.AlertType.WARNING, "Warning", "Loading Failed", "The specified file could not be read!");
         }
+
+        this.alertUserOfUnsavedChanges("Save changes before opening file?");
+        this.clearControlElements();
 
         try {
             this.savedConfiguration = ConfigManager.readConfig(selectedFile);
             this.currentConfiguration = this.savedConfiguration.clone();
-
-            // TODO: Resolve crash when loading same config repeatedly.
-            this.clearControlElements();
 
             // Analysis path and connector
             this.analysisPathLabel.setText(this.currentConfiguration.getAnalysisPath());
@@ -539,10 +552,9 @@ public class MainScreenController {
 
                     this.currentConfiguration.getAnalysisResults().add(newAnalysisResult);
                     this.analysisOutputTableView.getItems().add(newAnalysisResult);
-                    this.analysisOutputTableView.getSelectionModel().select(this.analysisOutputTableView.getItems().size() - 1);
+                    this.analysisOutputTableView.getSelectionModel().select(newAnalysisResult);
                     this.analysisOutputTextArea.setText(newAnalysisResult.getResult());
 
-                    // TODO Select new result in TableView and display its contents in the TextArea.
 
                     // Update assumptions.
                     if (analysisResponseAssumptions != null) {
