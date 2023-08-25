@@ -30,6 +30,10 @@ public class AnalysisResult implements Cloneable {
         return title;
     }
 
+    public void setTitle(@NotNull String title){
+        this.title = title;
+    }
+
     public @NotNull String getResult() {
         return result;
     }

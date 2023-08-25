@@ -28,6 +28,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
@@ -113,9 +114,9 @@ public class MainScreenController {
     @FXML
     private TextArea analysisOutputTextArea;
     @FXML
-    private TableColumn<AnalysisResult, String> outputTitleColumn;
-    @FXML
     private TableView<AnalysisResult> analysisOutputTableView;
+    @FXML
+    private TableColumn<AnalysisResult, String> outputTitleColumn;
     @FXML
     private Label modelNameLabel;
     @FXML
@@ -319,6 +320,29 @@ public class MainScreenController {
 
             }
         });
+
+        // Allow the title of an analysis result ot be renamed by the user.
+        this.outputTitleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        this.outputTitleColumn.setOnEditCommit(
+                (TableColumn.CellEditEvent<AnalysisResult, String> t) -> {
+                    String desiredTitle = t.getNewValue();
+                    AnalysisResult selectedAnalysisResult = t.getTableView().getItems().get(t.getTablePosition().getRow());
+                    // Check that the desired title is not already present.
+                    Optional<AnalysisResult> conflictingAnalysisResult = this.currentConfiguration.getAnalysisResults().stream()
+                            .filter(analysisResult -> analysisResult.getTitle().equals(desiredTitle)).findFirst();
+
+                    if(conflictingAnalysisResult.isEmpty()) {
+                        selectedAnalysisResult.setTitle(desiredTitle);
+                    } else {
+                        if(conflictingAnalysisResult.get() != selectedAnalysisResult) {
+                            Utilities.showAlert(Alert.AlertType.WARNING,
+                                    "Invalid Title",
+                                    "The entered title \"" + desiredTitle + "\" is already used for another output!",
+                                    "The title will be reset to its prior value.");
+                            this.analysisOutputTableView.refresh();
+                        }
+                    }
+                });
 
         // Allow a double click on a row to open the specification screen for the selected assumption.
         this.assumptionTableView.setRowFactory(tv -> {

@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+
+// TODO: IMPORTANT Add dedicated field indicating whether Assumption has already been taken care of (should visually highlight the assumption, e.g., by coloring it green).
 public class Assumption implements Cloneable{
     public static class AssumptionComparator implements Comparator<Assumption>{
         @Override
@@ -28,16 +30,16 @@ public class Assumption implements Cloneable{
         }
     }
 
-    private UUID id;
-    private String name;
-    private AssumptionType type;
-    private Set<ModelEntity> affectedEntities;
-    private Set<UUID> dependencies;
+    private UUID id; // ?
+    private String name; // ?
+    private AssumptionType type; // X (X = send to analysis)
+    private Set<ModelEntity> affectedEntities; //X
+    private Set<UUID> dependencies; // -
     private String description;
-    private Double probabilityOfViolation;
-    private Double risk;
-    private String impact;
-    private Boolean analyzed;
+    private Double probabilityOfViolation; // X
+    private Double risk; // -
+    private String impact; // X
+    private Boolean analyzed; // X
 
     public Assumption() {
         this(UUID.randomUUID());

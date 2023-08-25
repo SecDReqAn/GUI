@@ -1,5 +1,6 @@
 package io;
 
+import general.Utilities;
 import general.entities.ModelEntity;
 import javafx.scene.control.TreeItem;
 import org.jetbrains.annotations.NotNull;
@@ -32,33 +33,26 @@ public class ModelReader {
         public int compare(TreeItem<ModelEntity> first, TreeItem<ModelEntity> second) {
             ModelEntity firstEntity = first.getValue();
             ModelEntity secondEntity = second.getValue();
-            if (firstEntity.getType() != null && secondEntity.getType() == null) {
-                return -1;
-            } else if (firstEntity.getType() == null && secondEntity.getType() != null) {
-                return 1;
-            } else if (firstEntity.getType() != null) {
-                int typeComparison = firstEntity.getType().compareTo(secondEntity.getType());
 
-                if (typeComparison != 0) {
-                    return typeComparison;
+            int typeComparison = Utilities.compareStrings(firstEntity.getType(), secondEntity.getType());
+            if (typeComparison != 0) {
+                return typeComparison;
+            } else {
+                int nameComparison = Utilities.compareStrings(firstEntity.getName(), secondEntity.getName());
+
+                if (nameComparison != 0) {
+                    return nameComparison;
                 } else {
-                    // Types were identical. Continue by looking at the names of the entities.
-                    if (firstEntity.getName() != null && secondEntity.getName() == null) {
-                        return -1;
-                    } else if (firstEntity.getName() == null && secondEntity.getName() != null) {
-                        return 1;
-                    } else if (firstEntity.getName() != null) {
-                        int nameComparison = firstEntity.getName().compareTo(secondEntity.getName());
+                    int idComparison = Utilities.compareStrings(firstEntity.getId(), secondEntity.getId());
 
-                        if (nameComparison != 0) {
-                            return nameComparison;
-                        } else {
-                            return firstEntity.getElementName().compareTo(secondEntity.getElementName());
-                        }
+                    if (idComparison != 0) {
+                        return idComparison;
+                    } else {
+                        // ElementName is always set (i.e., != null).
+                        return Utilities.compareStrings(firstEntity.getElementName(), secondEntity.getElementName());
                     }
                 }
             }
-            return 0;
         }
     }
 

@@ -13,6 +13,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -73,5 +74,32 @@ public class Utilities {
      */
     public static @NotNull Stage getStageOfMenuItem(@NotNull MenuItem menuItem) {
         return (Stage) menuItem.getParentPopup().getOwnerWindow();
+    }
+
+    /**
+     * Compares two strings for order. This comparison considers null values
+     * and uses lexicographic ordering for non-null values.
+     *
+     * @param s1 The first {@link String} for the comparison.
+     * @param s2 The second {@link String} for the comparison.
+     * @return A negative integer if {@code s1} is non-null and {@code s2} is null,
+     *         a positive integer if {@code s1} is null and {@code s2} is non-null,
+     *         the result of lexicographic comparison of {@code s1} and {@code s2}
+     *         if both are non-null, or 0 if both are null.
+     */
+    public static int compareStrings(@Nullable String s1, @Nullable String s2) {
+        if (s1 != null && s2 == null) {
+            // Second null.
+            return -1;
+        } else if (s1 == null && s2 != null) {
+            // First null.
+            return 1;
+        } else if (s1 != null) {
+            // Both not null.
+            return s1.compareTo(s2);
+        } else {
+            // Both null.
+            return 0;
+        }
     }
 }

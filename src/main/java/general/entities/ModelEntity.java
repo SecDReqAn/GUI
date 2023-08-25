@@ -5,13 +5,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ModelEntity {
-    private String id;
-    private String modelView;
-    private String elementName;
-    private String name;
-    private String type;
+    @Nullable private String id;
+    @NotNull private String modelView;
+    @NotNull private String elementName;
+    @Nullable private String name;
+    @Nullable private String type;
     @JsonIgnore
-    private Boolean ownName;
+    private boolean ownName;
 
     /**
      * Default constructor as <b>required</b> for Jackson deserialization.
@@ -20,7 +20,7 @@ public class ModelEntity {
     private ModelEntity() {
     }
 
-    public ModelEntity(String id, @NotNull String modelView, @NotNull String elementName, @Nullable String name, @Nullable String type) {
+    public ModelEntity(@Nullable String id, @NotNull String modelView, @NotNull String elementName, @Nullable String name, @Nullable String type) {
         this.id = id;
         this.modelView = modelView;
         this.elementName = elementName;
@@ -29,31 +29,31 @@ public class ModelEntity {
         this.ownName = this.name != null;
     }
 
-    public String getId() {
+    public @Nullable String getId() {
         return this.id;
     }
 
-    public String getModelView() {
+    public @NotNull String getModelView() {
         return this.modelView;
     }
 
-    public String getElementName() {
+    public @NotNull String getElementName() {
         return this.elementName;
     }
 
-    public String getName() {
+    public @Nullable String getName() {
         return this.name;
     }
 
-    public String getType() {
+    public @Nullable String getType() {
         return this.type;
     }
 
-    public Boolean hasOwnName() {
+    public boolean hasOwnName() {
         return this.ownName;
     }
 
-    public void setName(String name) {
+    public void setName(@Nullable String name) {
         this.name = name;
     }
 }

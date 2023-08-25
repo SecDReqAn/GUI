@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+// TODO: IMPORTANT Split APIs according to Sophie's proposal.
+
 /**
  * Class responsible for managing a connection to one analysis whose URI is specified on construction.
  */
