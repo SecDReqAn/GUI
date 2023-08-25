@@ -8,6 +8,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.text.Text;
@@ -43,6 +44,15 @@ public class Utilities {
             controlElement.getContextMenu().getItems().add(menuItem);
         }
 
+    }
+
+    /**
+     * Utility function that adds a new {@link SeparatorMenuItem} to the {@link ContextMenu} of the specified {@link Control} element.
+     *
+     * @param controlElement The {@link Control} element to whose {@link ContextMenu} the {@link SeparatorMenuItem} should be added.
+     */
+    public static void addSeparatorToContextMenu(@NotNull Control controlElement) {
+        controlElement.getContextMenu().getItems().add(new SeparatorMenuItem());
     }
 
     public static void enableTextWrapForTableColumn(@NotNull TableColumn<Assumption, String> column) {
@@ -83,9 +93,9 @@ public class Utilities {
      * @param s1 The first {@link String} for the comparison.
      * @param s2 The second {@link String} for the comparison.
      * @return A negative integer if {@code s1} is non-null and {@code s2} is null,
-     *         a positive integer if {@code s1} is null and {@code s2} is non-null,
-     *         the result of lexicographic comparison of {@code s1} and {@code s2}
-     *         if both are non-null, or 0 if both are null.
+     * a positive integer if {@code s1} is null and {@code s2} is non-null,
+     * the result of lexicographic comparison of {@code s1} and {@code s2}
+     * if both are non-null, or 0 if both are null.
      */
     public static int compareStrings(@Nullable String s1, @Nullable String s2) {
         if (s1 != null && s2 == null) {

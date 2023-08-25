@@ -2,16 +2,17 @@ package controllers;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
+import general.Constants;
+import general.Utilities;
 import general.entities.AnalysisResult;
 import general.entities.Assumption;
 import general.entities.Configuration;
-import general.Constants;
-import general.Utilities;
 import io.AnalysisConnector;
 import io.ConfigManager;
 import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -229,8 +230,7 @@ public class MainScreenController {
         this.performAnalysisButton.setDisable(true);
     }
 
-    @FXML
-    private void initialize() {
+    private void initializeAssumptionTableView(){
         // Extract fields of an assumption into their appropriate column of the TableView.
         this.idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         this.nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -267,15 +267,6 @@ public class MainScreenController {
             return stringBuilder.isEmpty() ? "" : stringBuilder.substring(0, stringBuilder.length() - 2);
         });
 
-        // Analysis Results TableView.
-        this.outputTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
-
-        this.analysisOutputTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                this.analysisOutputTextArea.setText(newValue.getResult());
-            }
-        });
-
         // Enable text-warp in text-centric columns.
         Utilities.enableTextWrapForTableColumn(this.descriptionColumn);
         Utilities.enableTextWrapForTableColumn(this.impactColumn);
@@ -292,9 +283,16 @@ public class MainScreenController {
             }
         };
 
-        // Context menu for editing assumptions within the table view.
+        // Context menu item for editing assumptions within the table view.
         Utilities.addFunctionalityToContextMenu(this.assumptionTableView, "Edit Assumption", (ActionEvent actionEvent) -> retrieveAssumptionAndOpenSpecificationScreen.run());
-        // Context menu for removing an assumptions from the table view.
+        // Context menu item for marking an assumption as "manually analyzed".
+        Utilities.addFunctionalityToContextMenu(this.assumptionTableView, "Toggle manually analyzed", (ActionEvent actionEvent) -> {
+            Assumption selectedAssumption = this.assumptionTableView.getSelectionModel().getSelectedItem();
+            selectedAssumption.setManuallyAnalyzed(!selectedAssumption.getManuallyAnalyzed());
+        });
+        Utilities.addSeparatorToContextMenu(this.assumptionTableView);
+
+        // Context menu item for removing an assumptions from the table view.
         Utilities.addFunctionalityToContextMenu(this.assumptionTableView, "Remove Assumption", (ActionEvent actionEvent) -> {
             Assumption assumptionForDeletion = this.assumptionTableView.getSelectionModel().getSelectedItem();
 
@@ -306,6 +304,45 @@ public class MainScreenController {
                 this.assumptionTableView.refresh();
             }
         });
+
+        // Custom RowFactory for double-click functionality and custom styling based on "manuallyAnalyzed" property.
+        this.assumptionTableView.setRowFactory(tv -> {
+            var row = new TableRow<Assumption>() {
+                @Override
+                protected void updateItem(Assumption assumption, boolean empty){
+                    super.updateItem(assumption, empty);
+
+                    if(assumption != null && assumption.getManuallyAnalyzed()){
+                        // Enable custom styling and disable even / odd styling.
+                        if(!this.getStyleClass().contains("manually-analyzed-row")) {
+                            this.getStyleClass().add("manually-analyzed-row");
+                        }
+                        this.pseudoClassStateChanged(PseudoClass.getPseudoClass(this.getIndex() % 2 == 0 ? "even" : "odd"), false);
+                    } else {
+                        // Disable custom styling and turn even / odd styling back on.
+                        this.getStyleClass().removeIf(styleClass -> styleClass.equals("manually-analyzed-row"));
+                        this.pseudoClassStateChanged(PseudoClass.getPseudoClass(this.getIndex() % 2 == 0 ? "even" : "odd"), true);
+                    }
+                }
+            };
+
+            row.setOnMouseClicked(mouseEvent -> {
+                if (mouseEvent.getClickCount() == 2 && (!row.isEmpty())) {
+                    retrieveAssumptionAndOpenSpecificationScreen.run();
+                }
+            });
+            return row;
+        });
+    }
+
+    private void initializeAnalysisOutputTableView(){
+        this.outputTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+        this.analysisOutputTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                this.analysisOutputTextArea.setText(newValue.getResult());
+            }
+        });
+
         // Context menu for removing an existing analysis result.
         Utilities.addFunctionalityToContextMenu(this.analysisOutputTableView, "Remove Analysis Output", (ActionEvent actionEvent) -> {
             AnalysisResult analysisResultForDeletion = this.analysisOutputTableView.getSelectionModel().getSelectedItem();
@@ -320,6 +357,12 @@ public class MainScreenController {
 
             }
         });
+    }
+
+    @FXML
+    private void initialize() {
+        this.initializeAssumptionTableView();
+        this.initializeAnalysisOutputTableView();
 
         // Allow the title of an analysis result ot be renamed by the user.
         this.outputTitleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -343,17 +386,6 @@ public class MainScreenController {
                         }
                     }
                 });
-
-        // Allow a double click on a row to open the specification screen for the selected assumption.
-        this.assumptionTableView.setRowFactory(tv -> {
-            var row = new TableRow<Assumption>();
-            row.setOnMouseClicked(mouseEvent -> {
-                if (mouseEvent.getClickCount() == 2 && (!row.isEmpty())) {
-                    retrieveAssumptionAndOpenSpecificationScreen.run();
-                }
-            });
-            return row;
-        });
 
         // analysisPathLabel and connectionStatusLabel should show the same effect once one is hovered over.
         this.analysisPathLabel.hoverProperty().addListener((observable, oldValue, newValue) -> {

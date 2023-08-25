@@ -8,15 +8,20 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-
-// TODO: IMPORTANT Add dedicated field indicating whether Assumption has already been taken care of (should visually highlight the assumption, e.g., by coloring it green).
 public class Assumption implements Cloneable{
+    /**
+     * Custom {@link Comparator} that compares {@link Assumption}s based on their unique IDs.
+     */
     public static class AssumptionComparator implements Comparator<Assumption>{
         @Override
         public int compare(Assumption a1, Assumption a2) {
             return a1.id.compareTo(a2.id);
         }
     }
+
+    /**
+     * Enum representing the two types of {@link Assumption}s.
+     */
     public enum AssumptionType {
         INTRODUCE_UNCERTAINTY, RESOLVE_UNCERTAINTY;
 
@@ -30,15 +35,20 @@ public class Assumption implements Cloneable{
         }
     }
 
+    // TODO Create data type for the security analysis only containing the necessary fields.
     private UUID id; // ?
     private String name; // ?
+    private boolean manuallyAnalyzed;
+
+    private Set<UUID> dependencies; // -
+    private Double risk; // -
+
     private AssumptionType type; // X (X = send to analysis)
     private Set<ModelEntity> affectedEntities; //X
-    private Set<UUID> dependencies; // -
     private String description;
     private Double probabilityOfViolation; // X
-    private Double risk; // -
     private String impact; // X
+    // TODO Set to true on successful analysis.
     private Boolean analyzed; // X
 
     public Assumption() {
@@ -49,6 +59,7 @@ public class Assumption implements Cloneable{
         this.id = id;
         this.dependencies = new HashSet<>();
         this.affectedEntities = new HashSet<>();
+        this.manuallyAnalyzed = false;
         // Implicitly set all other fields to null.
     }
 
@@ -58,6 +69,14 @@ public class Assumption implements Cloneable{
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean getManuallyAnalyzed(){
+        return this.manuallyAnalyzed;
+    }
+
+    public void setManuallyAnalyzed(boolean manuallyAnalyzed){
+        this.manuallyAnalyzed = manuallyAnalyzed;
     }
 
     public void setAffectedEntities(Set<ModelEntity> affectedEntities) {
@@ -147,7 +166,8 @@ public class Assumption implements Cloneable{
                 Objects.equals(this.probabilityOfViolation, otherAssumption.probabilityOfViolation) &&
                 Objects.equals(this.risk, otherAssumption.risk) &&
                 Objects.equals(this.impact, otherAssumption.impact) &&
-                Objects.equals(this.analyzed, otherAssumption.analyzed);
+                Objects.equals(this.analyzed, otherAssumption.analyzed) &&
+                this.manuallyAnalyzed == otherAssumption.manuallyAnalyzed;
     }
 
     @Override

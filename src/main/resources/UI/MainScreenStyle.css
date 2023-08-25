@@ -79,6 +79,10 @@
     -fx-background-color: #495257;
 }
 
+.manually-analyzed-row {
+    -fx-background-color: rgba(1, 87, 1, 0.25);
+}
+
 .primary-table-view .table-row-cell:empty, .table-row-cell:empty .table-cell {
     -fx-background-color: transparent;
     -fx-border-width: 0;

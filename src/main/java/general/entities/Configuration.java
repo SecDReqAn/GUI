@@ -73,6 +73,7 @@ public class Configuration implements Cloneable {
         return analysisResults;
     }
 
+    // TODO Move into its own dedicated function
     @Override
     public boolean equals(Object object) {
         if (object instanceof Configuration otherConfiguration) {
