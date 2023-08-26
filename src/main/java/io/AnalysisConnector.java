@@ -3,6 +3,7 @@ package io;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import general.entities.Assumption;
+import general.entities.SecurityCheckAssumption;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,7 +39,7 @@ public class AnalysisConnector {
      * @param modelPath   The path to the model to be analyzed.
      * @param assumptions The {@link Collection} of {@link Assumption}s for the analysis.
      */
-    public record AnalysisParameter(String modelPath, Collection<Assumption> assumptions) {
+    private record AnalysisParameter(String modelPath, Collection<SecurityCheckAssumption> assumptions) {
     }
 
     /**
@@ -46,7 +48,7 @@ public class AnalysisConnector {
      * @param outputLog   The log produced by the analysis (e.g., the console output) or a potential error message.
      * @param assumptions The (potentially changed) {@link Assumption}s.
      */
-    public record AnalysisOutput(String outputLog, Collection<Assumption> assumptions) {
+    public record AnalysisOutput(String outputLog, Collection<SecurityCheckAssumption> assumptions) {
     }
 
     /**
@@ -98,9 +100,24 @@ public class AnalysisConnector {
         return codeMessagePair;
     }
 
-    public Pair<Integer, AnalysisOutput> performAnalysis(AnalysisParameter analysisParameter) {
+    /**
+     * Sends the specified data to the previously specified security analysis and initiates the actual analysis.
+     * <p>
+     * Note: Changes of the {@link Assumption}s caused by the security analysis (e.g., the <code>analyzed</code>
+     * field) will be reflected in the {@link Assumption}s specified by the <code>assumptions</code> parameter.
+     * </p>
+     *
+     * @param modelPath   The path to the PCM model that should be used for the analysis.
+     * @param assumptions The {@link Collection} of {@link Assumption}s that should be used for the analysis.
+     * @return A {@link Pair} encompassing a status code accessible via {@link Pair#getKey()} and the output log of the
+     * analysis accessible via {@link Pair#getValue()}
+     */
+    public Pair<Integer, AnalysisOutput> performAnalysis(@NotNull String modelPath, @NotNull Collection<Assumption> assumptions) {
         try {
-            var jsonString = this.objectMapper.writeValueAsString(analysisParameter);
+            HashSet<SecurityCheckAssumption> securityCheckAssumptions = new HashSet<>(assumptions.size());
+            securityCheckAssumptions.addAll(assumptions.stream().map(SecurityCheckAssumption::fromAssumption).collect(Collectors.toSet()));
+
+            var jsonString = this.objectMapper.writeValueAsString(new AnalysisParameter(modelPath, securityCheckAssumptions));
 
             try (var response = this.client.target(this.analysisUri).path(AnalysisConnector.PATH_ANALYSIS_EXECUTION)
                     .request(MediaType.APPLICATION_JSON_TYPE)

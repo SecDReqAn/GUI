@@ -33,6 +33,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+// TODO Fix bug where exiting the window also inserts the assumption if it is sufficiently specified.
+
 /**
  * The dedicated controller managing the assumption-specification screen that is initiated by {@link MainScreenController}.
  */
@@ -100,11 +102,6 @@ public class AssumptionSpecificationScreenController {
         this.assumption = assumption;
         this.specifiedAssumptions = specifiedAssumptions;
 
-        // Set analyzed to false (default) if not already set.
-        if (this.assumption.isAnalyzed() == null) {
-            this.assumption.setAnalyzed(false);
-        }
-
         // Initialize UI with (existing) assumption data.
         this.initializeUIElements();
 
@@ -139,9 +136,7 @@ public class AssumptionSpecificationScreenController {
             }
         }
 
-        if (this.assumption.isAnalyzed() != null) {
-            this.analyzedCheckBox.setSelected(this.assumption.isAnalyzed());
-        }
+        this.analyzedCheckBox.setSelected(this.assumption.isAnalyzed());
 
         // Populate dependenciesMenuButton with content.
         this.specifiedAssumptions.forEach(specifiedAssumption -> {
@@ -151,7 +146,7 @@ public class AssumptionSpecificationScreenController {
                 Set<UUID> dependenciesOfCurrentAssumption = this.assumption.getDependencies();
 
                 // Set CheckMenuItem to selected id dependency is already present.
-                if(dependenciesOfCurrentAssumption.contains(specifiedAssumption.getId())){
+                if (dependenciesOfCurrentAssumption.contains(specifiedAssumption.getId())) {
                     dependencyCheckMenuItem.setSelected(true);
                 }
 
@@ -246,7 +241,7 @@ public class AssumptionSpecificationScreenController {
 
         // Listen for changes of the text in the probability of violation TextField.
         this.violationProbabilityTextField.textProperty().addListener((observable, oldText, newText) -> {
-            if(newText == null || newText.isEmpty()){
+            if (newText == null || newText.isEmpty()) {
                 this.assumption.setProbabilityOfViolation(null);
                 return;
             } else {
@@ -267,7 +262,7 @@ public class AssumptionSpecificationScreenController {
 
         // Listen for changes of the text in the risk TextField.
         this.riskTextField.textProperty().addListener((observable, oldText, newText) -> {
-            if(newText == null || newText.isEmpty()){
+            if (newText == null || newText.isEmpty()) {
                 this.assumption.setRisk(null);
                 return;
             } else {

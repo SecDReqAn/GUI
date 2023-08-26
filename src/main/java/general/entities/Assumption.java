@@ -1,6 +1,7 @@
 package general.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 import java.util.HashSet;
@@ -49,18 +50,30 @@ public class Assumption implements Cloneable{
     private Double probabilityOfViolation; // X
     private String impact; // X
     // TODO Set to true on successful analysis.
-    private Boolean analyzed; // X
+    private boolean analyzed; // X
 
     public Assumption() {
         this(UUID.randomUUID());
     }
 
-    public Assumption(UUID id) {
+    public Assumption(@NotNull UUID id) {
         this.id = id;
         this.dependencies = new HashSet<>();
         this.affectedEntities = new HashSet<>();
+        this.analyzed = false;
         this.manuallyAnalyzed = false;
         // Implicitly set all other fields to null.
+    }
+
+    public void updateWith(@NotNull SecurityCheckAssumption securityCheckAssumption){
+        if(securityCheckAssumption.id().equals(this.id)){
+            this.type = securityCheckAssumption.type();
+            this.description = securityCheckAssumption.description();
+            this.affectedEntities = securityCheckAssumption.affectedEntities();
+            this.probabilityOfViolation = securityCheckAssumption.probabilityOfViolation();
+            this.impact = securityCheckAssumption.impact();
+            this.analyzed = securityCheckAssumption.analyzed();
+        }
     }
 
     public String getName() {
@@ -107,7 +120,7 @@ public class Assumption implements Cloneable{
         this.impact = impact;
     }
 
-    public void setAnalyzed(Boolean analyzed) {
+    public void setAnalyzed(boolean analyzed) {
         this.analyzed = analyzed;
     }
 
@@ -143,7 +156,7 @@ public class Assumption implements Cloneable{
         return this.impact;
     }
 
-    public Boolean isAnalyzed() {
+    public boolean isAnalyzed() {
         return this.analyzed;
     }
 

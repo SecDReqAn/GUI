@@ -7,6 +7,7 @@ import general.Utilities;
 import general.entities.AnalysisResult;
 import general.entities.Assumption;
 import general.entities.Configuration;
+import general.entities.SecurityCheckAssumption;
 import io.AnalysisConnector;
 import io.ConfigManager;
 import javafx.application.HostServices;
@@ -595,10 +596,9 @@ public class MainScreenController {
                 }
 
                 this.statusLabel.setText("Starting analysis...");
-                Pair<Integer, AnalysisConnector.AnalysisOutput> analysisResponse = this.analysisConnector.performAnalysis(
-                        new AnalysisConnector.AnalysisParameter(this.currentConfiguration.getModelPath(), this.currentConfiguration.getAssumptions()));
+                Pair<Integer, AnalysisConnector.AnalysisOutput> analysisResponse = this.analysisConnector.performAnalysis(this.currentConfiguration.getModelPath(), this.currentConfiguration.getAssumptions());
                 String analysisResponseLog = analysisResponse.getValue().outputLog();
-                Collection<Assumption> analysisResponseAssumptions = analysisResponse.getValue().assumptions();
+                Collection<SecurityCheckAssumption> analysisResponseAssumptions = analysisResponse.getValue().assumptions();
 
                 if (analysisResponse.getKey() != 0) {
                     this.statusLabel.setText("Analysis successfully executed.");
@@ -616,11 +616,10 @@ public class MainScreenController {
                     if (analysisResponseAssumptions != null) {
                         this.assumptionTableView.getItems().clear();
 
-                        analysisResponseAssumptions.forEach(receivedAssumption -> {
+                        analysisResponseAssumptions.forEach(securityCheckAssumption -> {
                             this.currentConfiguration.getAssumptions().stream()
-                                    .filter(oldAssumption -> oldAssumption.getId().equals(receivedAssumption.getId()))
-                                    .findFirst().ifPresent(matchingExistingAssumption -> this.currentConfiguration.getAssumptions().remove(matchingExistingAssumption));
-                            this.currentConfiguration.getAssumptions().add(receivedAssumption);
+                                    .filter(assumption -> assumption.getId().equals(securityCheckAssumption.id()))
+                                    .findFirst().ifPresent(matchingAssumption -> matchingAssumption.updateWith(securityCheckAssumption));
                         });
                         this.assumptionTableView.setItems(FXCollections.observableArrayList(this.currentConfiguration.getAssumptions()));
                         this.assumptionTableView.refresh();
