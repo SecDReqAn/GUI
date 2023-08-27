@@ -33,8 +33,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-// TODO Fix bug where exiting the window also inserts the assumption if it is sufficiently specified.
-
 /**
  * The dedicated controller managing the assumption-specification screen that is initiated by {@link MainScreenController}.
  */
@@ -51,6 +49,10 @@ public class AssumptionSpecificationScreenController {
      * The {@link ModelReader} that is used for accessing model entities.
      */
     private ModelReader modelReader;
+    /**
+     * A flag indicating whether the user confirmed his input / changes.
+     */
+    private boolean userConfirmation;
 
     @FXML
     private VBox topLevelVBox;
@@ -91,6 +93,10 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private TreeView<ModelEntity> modelEntityTreeView;
 
+    public AssumptionSpecificationScreenController() {
+        this.userConfirmation = false;
+    }
+
     /**
      * Initializes the controller with data required for the assumption specification process.
      *
@@ -101,7 +107,6 @@ public class AssumptionSpecificationScreenController {
     public void initWithMainData(Collection<Assumption> specifiedAssumptions, Assumption assumption, String modelPath) {
         this.assumption = assumption;
         this.specifiedAssumptions = specifiedAssumptions;
-
         // Initialize UI with (existing) assumption data.
         this.initializeUIElements();
 
@@ -115,6 +120,10 @@ public class AssumptionSpecificationScreenController {
      */
     private void checkForCompletenessOfSpecification() {
         this.insertButton.setDisable(!this.assumption.isSufficientlySpecified());
+    }
+
+    public boolean getUserConfirmation() {
+        return this.userConfirmation;
     }
 
     /**
@@ -328,6 +337,8 @@ public class AssumptionSpecificationScreenController {
      */
     @FXML
     private void handleInsertButton(ActionEvent actionEvent) {
+        this.userConfirmation = true;
+
         var stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         stage.close();
     }

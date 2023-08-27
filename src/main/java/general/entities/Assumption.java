@@ -36,7 +36,6 @@ public class Assumption implements Cloneable{
         }
     }
 
-    // TODO Create data type for the security analysis only containing the necessary fields.
     private UUID id; // ?
     private String name; // ?
     private boolean manuallyAnalyzed;

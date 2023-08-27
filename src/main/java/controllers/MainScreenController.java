@@ -185,10 +185,12 @@ public class MainScreenController {
     /**
      * Open modal window for the assumption specification-screen.
      *
-     * @param assumption The {@link Assumption} instance that can be edited through the assumption specification-screen.
+     * @param assumption The {@link Assumption} instance that can be specified / edited through the assumption specification-screen.
      * @param owner      The {@link Window} owning the modal window to be created.
+     * @return An {@link Optional} holding an {@link Assumption} the specified / edited {@link Assumption} or
+     * {@link Optional#empty()} if the user aborted the specification / editing.
      */
-    private void showAssumptionSpecificationScreen(@NotNull Assumption assumption, @NotNull Window owner) {
+    private @NotNull Optional<Assumption> showAssumptionSpecificationScreen(@NotNull Assumption assumption, @NotNull Window owner) {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("../UI/AssumptionSpecificationScreen.fxml"));
@@ -204,11 +206,23 @@ public class MainScreenController {
             stage.initOwner(owner);
             stage.showAndWait();
 
+            return controller.getUserConfirmation() ? Optional.of(assumption) : Optional.empty();
         } catch (IOException e) {
-            // TODO Proper handling of this case.
-            throw new RuntimeException(e);
-
+            Utilities.showAlert(Alert.AlertType.ERROR,
+                    "Error",
+                    "Assumption Specification screen could not be opened",
+                    "An error occurred when trying to read the FXML file of the specification screen.");
         }
+
+        return Optional.empty();
+    }
+
+    private @NotNull Optional<Assumption> editAssumption(@NotNull Assumption assumption, @NotNull Window owner) {
+        return this.showAssumptionSpecificationScreen(assumption.clone(), owner);
+    }
+
+    private @NotNull Optional<Assumption> specifyNewAssumption(@NotNull Window owner) {
+        return this.showAssumptionSpecificationScreen(new Assumption(), owner);
     }
 
     /**
@@ -217,7 +231,7 @@ public class MainScreenController {
      * @return <code>true</code> if there are unsaved changes and <code>false</code> otherwise.
      */
     private boolean hasUnsavedChanges() {
-        return !this.currentConfiguration.equals(this.savedConfiguration);
+        return !this.currentConfiguration.semanticallyEqualTo(this.savedConfiguration);
     }
 
     private void clearControlElements() {
@@ -231,7 +245,7 @@ public class MainScreenController {
         this.performAnalysisButton.setDisable(true);
     }
 
-    private void initializeAssumptionTableView(){
+    private void initializeAssumptionTableView() {
         // Extract fields of an assumption into their appropriate column of the TableView.
         this.idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         this.nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -279,8 +293,22 @@ public class MainScreenController {
             Assumption selectedAssumption = this.assumptionTableView.getSelectionModel().getSelectedItem();
 
             if (selectedAssumption != null) {
-                this.showAssumptionSpecificationScreen(selectedAssumption, this.assumptionTableView.getScene().getWindow());
-                this.assumptionTableView.refresh();
+                Optional<Assumption> editedAssumption = this.editAssumption(selectedAssumption, this.assumptionTableView.getScene().getWindow());
+
+                if (editedAssumption.isPresent()) {
+                    // Remove old assumption from TableView and Configuration and replace with edited one.
+                    Optional<Assumption> assumptionToBeReplaced = this.currentConfiguration.getAssumptions().stream().filter(assumption -> assumption.getId().equals(editedAssumption.get().getId())).findFirst();
+
+                    if(assumptionToBeReplaced.isPresent()){
+                        this.currentConfiguration.getAssumptions().remove(assumptionToBeReplaced.get());
+                        this.assumptionTableView.getItems().remove(assumptionToBeReplaced.get());
+                    }
+
+                    this.currentConfiguration.getAssumptions().add(editedAssumption.get());
+                    this.assumptionTableView.getItems().add(editedAssumption.get());
+                    this.assumptionTableView.refresh();
+                    this.assumptionTableView.getSelectionModel().select(editedAssumption.get());
+                }
             }
         };
 
@@ -310,12 +338,12 @@ public class MainScreenController {
         this.assumptionTableView.setRowFactory(tv -> {
             var row = new TableRow<Assumption>() {
                 @Override
-                protected void updateItem(Assumption assumption, boolean empty){
+                protected void updateItem(Assumption assumption, boolean empty) {
                     super.updateItem(assumption, empty);
 
-                    if(assumption != null && assumption.getManuallyAnalyzed()){
+                    if (assumption != null && assumption.getManuallyAnalyzed()) {
                         // Enable custom styling and disable even / odd styling.
-                        if(!this.getStyleClass().contains("manually-analyzed-row")) {
+                        if (!this.getStyleClass().contains("manually-analyzed-row")) {
                             this.getStyleClass().add("manually-analyzed-row");
                         }
                         this.pseudoClassStateChanged(PseudoClass.getPseudoClass(this.getIndex() % 2 == 0 ? "even" : "odd"), false);
@@ -336,7 +364,7 @@ public class MainScreenController {
         });
     }
 
-    private void initializeAnalysisOutputTableView(){
+    private void initializeAnalysisOutputTableView() {
         this.outputTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         this.analysisOutputTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -375,10 +403,10 @@ public class MainScreenController {
                     Optional<AnalysisResult> conflictingAnalysisResult = this.currentConfiguration.getAnalysisResults().stream()
                             .filter(analysisResult -> analysisResult.getTitle().equals(desiredTitle)).findFirst();
 
-                    if(conflictingAnalysisResult.isEmpty()) {
+                    if (conflictingAnalysisResult.isEmpty()) {
                         selectedAnalysisResult.setTitle(desiredTitle);
                     } else {
-                        if(conflictingAnalysisResult.get() != selectedAnalysisResult) {
+                        if (conflictingAnalysisResult.get() != selectedAnalysisResult) {
                             Utilities.showAlert(Alert.AlertType.WARNING,
                                     "Invalid Title",
                                     "The entered title \"" + desiredTitle + "\" is already used for another output!",
@@ -416,13 +444,12 @@ public class MainScreenController {
         }
 
         // Create new modal window for entry of assumption parameters.
-        Assumption newAssumption = new Assumption();
-        this.showAssumptionSpecificationScreen(newAssumption, ((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow());
+        Optional<Assumption> newAssumption = this.specifyNewAssumption(((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow());
 
         // Only add assumption in case it was fully specified by the user.
-        if (newAssumption.isSufficientlySpecified()) {
-            this.currentConfiguration.getAssumptions().add(newAssumption);
-            this.assumptionTableView.getItems().add(newAssumption);
+        if (newAssumption.isPresent() && newAssumption.get().isSufficientlySpecified()) {
+            this.currentConfiguration.getAssumptions().add(newAssumption.get());
+            this.assumptionTableView.getItems().add(newAssumption.get());
             this.performAnalysisButton.setDisable(this.currentConfiguration.isMissingAnalysisParameters());
         }
     }
@@ -558,7 +585,7 @@ public class MainScreenController {
 
     @FXML
     private void handleQuit() {
-        if (!this.savedConfiguration.equals(this.currentConfiguration)) {
+        if (this.hasUnsavedChanges()) {
             var confirmationResult = Utilities.showAlert(Alert.AlertType.CONFIRMATION,
                     "Unsaved Changes",
                     "There exist unsaved changed in the current configuration",
@@ -616,11 +643,9 @@ public class MainScreenController {
                     if (analysisResponseAssumptions != null) {
                         this.assumptionTableView.getItems().clear();
 
-                        analysisResponseAssumptions.forEach(securityCheckAssumption -> {
-                            this.currentConfiguration.getAssumptions().stream()
-                                    .filter(assumption -> assumption.getId().equals(securityCheckAssumption.id()))
-                                    .findFirst().ifPresent(matchingAssumption -> matchingAssumption.updateWith(securityCheckAssumption));
-                        });
+                        analysisResponseAssumptions.forEach(securityCheckAssumption -> this.currentConfiguration.getAssumptions().stream()
+                                .filter(assumption -> assumption.getId().equals(securityCheckAssumption.id()))
+                                .findFirst().ifPresent(matchingAssumption -> matchingAssumption.updateWith(securityCheckAssumption)));
                         this.assumptionTableView.setItems(FXCollections.observableArrayList(this.currentConfiguration.getAssumptions()));
                         this.assumptionTableView.refresh();
                     }

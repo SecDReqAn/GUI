@@ -73,44 +73,38 @@ public class Configuration implements Cloneable {
         return analysisResults;
     }
 
-    // TODO Move into its own dedicated function
-    @Override
-    public boolean equals(Object object) {
-        if (object instanceof Configuration otherConfiguration) {
-            // Check whether the Assumption instances are semantically identical.
-            if (this.assumptions.size() != otherConfiguration.assumptions.size()) {
-                return false;
-            }
-
-            ArrayList<Assumption> assumptionsThis = new ArrayList<>(this.assumptions);
-            ArrayList<Assumption> assumptionsOther = new ArrayList<>(otherConfiguration.assumptions);
-            var assumptionComparator = new Assumption.AssumptionComparator();
-            assumptionsThis.sort(assumptionComparator);
-            assumptionsOther.sort(assumptionComparator);
-            for (int i = 0; i < assumptionsThis.size(); i++) {
-                if (!assumptionsThis.get(i).semanticallyEqualTo(assumptionsOther.get(i))) {
-                    return false;
-                }
-            }
-
-
-            // Check whether AnalysisResult instances are semantically identical (titles are assumed to be unique identifiers).
-            if (this.analysisResults.size() != otherConfiguration.analysisResults.size()) {
-                return false;
-            }
-
-            Set<String> titlesThis = this.analysisResults.stream().map(AnalysisResult::getTitle).collect(Collectors.toSet());
-            // Enforce HashSet on other set for O(1) lookup.
-            HashSet<String> titlesOther = otherConfiguration.analysisResults.stream().map(AnalysisResult::getTitle).collect(Collectors.toCollection(HashSet::new));
-            boolean analysisResultsEqual = titlesThis.stream().filter(title -> !titlesOther.contains(title)).findFirst().isEmpty();
-
-
-            return analysisResultsEqual
-                    && Objects.equals(this.analysisPath, otherConfiguration.analysisPath)
-                    && Objects.equals(this.modelPath, otherConfiguration.modelPath);
+    public boolean semanticallyEqualTo(Configuration otherConfiguration) {
+        // Check whether the Assumption instances are semantically identical.
+        if (this.assumptions.size() != otherConfiguration.assumptions.size()) {
+            return false;
         }
 
-        return false;
+        ArrayList<Assumption> assumptionsThis = new ArrayList<>(this.assumptions);
+        ArrayList<Assumption> assumptionsOther = new ArrayList<>(otherConfiguration.assumptions);
+        var assumptionComparator = new Assumption.AssumptionComparator();
+        assumptionsThis.sort(assumptionComparator);
+        assumptionsOther.sort(assumptionComparator);
+        for (int i = 0; i < assumptionsThis.size(); i++) {
+            if (!assumptionsThis.get(i).semanticallyEqualTo(assumptionsOther.get(i))) {
+                return false;
+            }
+        }
+
+
+        // Check whether AnalysisResult instances are semantically identical (titles are assumed to be unique identifiers).
+        if (this.analysisResults.size() != otherConfiguration.analysisResults.size()) {
+            return false;
+        }
+
+        Set<String> titlesThis = this.analysisResults.stream().map(AnalysisResult::getTitle).collect(Collectors.toSet());
+        // Enforce HashSet on other set for O(1) lookup.
+        HashSet<String> titlesOther = otherConfiguration.analysisResults.stream().map(AnalysisResult::getTitle).collect(Collectors.toCollection(HashSet::new));
+        boolean analysisResultsEqual = titlesThis.stream().filter(title -> !titlesOther.contains(title)).findFirst().isEmpty();
+
+
+        return analysisResultsEqual
+                && Objects.equals(this.analysisPath, otherConfiguration.analysisPath)
+                && Objects.equals(this.modelPath, otherConfiguration.modelPath);
     }
 
     @Override
