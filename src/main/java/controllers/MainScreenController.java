@@ -6,6 +6,7 @@ import general.Constants;
 import general.Utilities;
 import general.entities.AnalysisResult;
 import general.entities.Assumption;
+import general.entities.AssumptionType;
 import general.entities.Configuration;
 import general.entities.SecurityCheckAssumption;
 import io.AnalysisConnector;
@@ -98,7 +99,7 @@ public class MainScreenController {
     @FXML
     private TableColumn<Assumption, String> nameColumn;
     @FXML
-    private TableColumn<Assumption, Assumption.AssumptionType> typeColumn;
+    private TableColumn<Assumption, AssumptionType> typeColumn;
     @FXML
     private TableColumn<Assumption, String> descriptionColumn;
     @FXML
@@ -644,7 +645,7 @@ public class MainScreenController {
                         this.assumptionTableView.getItems().clear();
 
                         analysisResponseAssumptions.forEach(securityCheckAssumption -> this.currentConfiguration.getAssumptions().stream()
-                                .filter(assumption -> assumption.getId().equals(securityCheckAssumption.id()))
+                                .filter(assumption -> assumption.getId().equals(securityCheckAssumption.getId()))
                                 .findFirst().ifPresent(matchingAssumption -> matchingAssumption.updateWith(securityCheckAssumption)));
                         this.assumptionTableView.setItems(FXCollections.observableArrayList(this.currentConfiguration.getAssumptions()));
                         this.assumptionTableView.refresh();

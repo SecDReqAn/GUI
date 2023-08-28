@@ -19,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,7 +38,7 @@ public class AnalysisConnector {
      * @param modelPath   The path to the model to be analyzed.
      * @param assumptions The {@link Collection} of {@link Assumption}s for the analysis.
      */
-    private record AnalysisParameter(String modelPath, Collection<SecurityCheckAssumption> assumptions) {
+    private record AnalysisParameter(String modelPath, Collection<Assumption> assumptions) {
     }
 
     /**
@@ -114,10 +113,8 @@ public class AnalysisConnector {
      */
     public Pair<Integer, AnalysisOutput> performAnalysis(@NotNull String modelPath, @NotNull Collection<Assumption> assumptions) {
         try {
-            HashSet<SecurityCheckAssumption> securityCheckAssumptions = new HashSet<>(assumptions.size());
-            securityCheckAssumptions.addAll(assumptions.stream().map(SecurityCheckAssumption::fromAssumption).collect(Collectors.toSet()));
-
-            var jsonString = this.objectMapper.writeValueAsString(new AnalysisParameter(modelPath, securityCheckAssumptions));
+            var jsonString = this.objectMapper.writerWithView(AssumptionViews.SecurityCheckAnalysisView.class)
+                    .writeValueAsString(new AnalysisParameter(modelPath, assumptions));
 
             try (var response = this.client.target(this.analysisUri).path(AnalysisConnector.PATH_ANALYSIS_EXECUTION)
                     .request(MediaType.APPLICATION_JSON_TYPE)
@@ -127,6 +124,9 @@ public class AnalysisConnector {
             }
         } catch (JsonProcessingException e) {
             return new Pair<>(0, new AnalysisOutput("Marshalling failed due to malformed analysis parameters.", null));
+        } catch (ProcessingException e) {
+            return new Pair<>(0, new AnalysisOutput("Processing Exception: " + e.getMessage(), null));
+
         }
     }
 

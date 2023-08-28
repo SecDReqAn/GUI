@@ -1,78 +1,47 @@
 package general.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import io.AssumptionViews;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-public class Assumption implements Cloneable{
+// TODO Find better name for class.
+public class Assumption extends SecurityCheckAssumption implements Cloneable{
     /**
      * Custom {@link Comparator} that compares {@link Assumption}s based on their unique IDs.
      */
     public static class AssumptionComparator implements Comparator<Assumption>{
         @Override
         public int compare(Assumption a1, Assumption a2) {
-            return a1.id.compareTo(a2.id);
+            return a1.getId().compareTo(a2.getId());
         }
     }
 
-    /**
-     * Enum representing the two types of {@link Assumption}s.
-     */
-    public enum AssumptionType {
-        INTRODUCE_UNCERTAINTY, RESOLVE_UNCERTAINTY;
-
-        @Override
-        public String toString() {
-            if(this == INTRODUCE_UNCERTAINTY){
-                return "Introduce Uncertainty";
-            } else {
-                return "Resolve Uncertainty";
-            }
-        }
-    }
-
-    private UUID id; // ?
+    @JsonView(AssumptionViews.AssumptionGraphAnalysisView.class)
     private String name; // ?
+    @JsonView(AssumptionViews.AssumptionGraphAnalysisView.class)
     private boolean manuallyAnalyzed;
-
+    @JsonView(AssumptionViews.AssumptionGraphAnalysisView.class)
     private Set<UUID> dependencies; // -
+    @JsonView(AssumptionViews.AssumptionGraphAnalysisView.class)
     private Double risk; // -
-
-    private AssumptionType type; // X (X = send to analysis)
-    private Set<ModelEntity> affectedEntities; //X
-    private String description;
-    private Double probabilityOfViolation; // X
-    private String impact; // X
-    // TODO Set to true on successful analysis.
-    private boolean analyzed; // X
 
     public Assumption() {
         this(UUID.randomUUID());
     }
 
     public Assumption(@NotNull UUID id) {
-        this.id = id;
+        super(id);
         this.dependencies = new HashSet<>();
-        this.affectedEntities = new HashSet<>();
-        this.analyzed = false;
         this.manuallyAnalyzed = false;
         // Implicitly set all other fields to null.
-    }
-
-    public void updateWith(@NotNull SecurityCheckAssumption securityCheckAssumption){
-        if(securityCheckAssumption.id().equals(this.id)){
-            this.type = securityCheckAssumption.type();
-            this.description = securityCheckAssumption.description();
-            this.affectedEntities = securityCheckAssumption.affectedEntities();
-            this.probabilityOfViolation = securityCheckAssumption.probabilityOfViolation();
-            this.impact = securityCheckAssumption.impact();
-            this.analyzed = securityCheckAssumption.analyzed();
-        }
     }
 
     public String getName() {
@@ -91,72 +60,16 @@ public class Assumption implements Cloneable{
         this.manuallyAnalyzed = manuallyAnalyzed;
     }
 
-    public void setAffectedEntities(Set<ModelEntity> affectedEntities) {
-        this.affectedEntities = affectedEntities;
-    }
-
-    public void setDependencies(Set<UUID> dependencies) {
-        this.dependencies = dependencies;
-    }
-
-    public void setType(AssumptionType type) {
-        this.type = type;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setProbabilityOfViolation(Double probabilityOfViolation) {
-        this.probabilityOfViolation = probabilityOfViolation;
-    }
-
     public void setRisk(Double risk) {
         this.risk = risk;
     }
 
-    public void setImpact(String impact) {
-        this.impact = impact;
-    }
-
-    public void setAnalyzed(boolean analyzed) {
-        this.analyzed = analyzed;
-    }
-
-    public UUID getId() {
-        return this.id;
-    }
-
-    public Set<ModelEntity> getAffectedEntities() {
-        return this.affectedEntities;
-    }
-
-    public Set<UUID> getDependencies() {
+    public Collection<UUID> getDependencies() {
         return this.dependencies;
-    }
-
-    public AssumptionType getType() {
-        return this.type;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public Double getProbabilityOfViolation() {
-        return this.probabilityOfViolation;
     }
 
     public Double getRisk() {
         return this.risk;
-    }
-
-    public String getImpact() {
-        return this.impact;
-    }
-
-    public boolean isAnalyzed() {
-        return this.analyzed;
     }
 
     @JsonIgnore
@@ -169,7 +82,7 @@ public class Assumption implements Cloneable{
     }
 
     public boolean semanticallyEqualTo(Assumption otherAssumption){
-        return Objects.equals(this.id, otherAssumption.id) &&
+        return Objects.equals(this.getId(), otherAssumption.getId()) &&
                 Objects.equals(this.name, otherAssumption.name) &&
                 Objects.equals(this.type, otherAssumption.type) &&
                 Objects.equals(this.affectedEntities, otherAssumption.affectedEntities) &&
@@ -182,38 +95,27 @@ public class Assumption implements Cloneable{
                 this.manuallyAnalyzed == otherAssumption.manuallyAnalyzed;
     }
 
-    @Override
-    public String toString() {
-        return "id=" + id +
-                ", description='" + description + '\'' +
-                ", affectedComponent='" + affectedEntities + '\'' +
-                ", type=" + type +
-                ", dependencies=" + dependencies +
-                ", probabilityOfViolation=" + probabilityOfViolation +
-                ", risk=" + risk +
-                ", impact='" + impact + '\'' +
-                ", analyzed=" + analyzed;
+    public void updateWith(SecurityCheckAssumption securityCheckAssumption){
+        assert securityCheckAssumption.getId().equals(this.getId());
+
+        this.type = securityCheckAssumption.type;
+        this.description = securityCheckAssumption.description;
+        this.affectedEntities = securityCheckAssumption.affectedEntities;
+        this.probabilityOfViolation = securityCheckAssumption.probabilityOfViolation;
+        this.impact = securityCheckAssumption.impact;
+        this.analyzed = securityCheckAssumption.analyzed;
     }
 
     @Override
     public Assumption clone() {
-        try {
-            Assumption clone = (Assumption) super.clone();
+        Assumption clone = (Assumption) super.clone();
 
-            // UUID, String and primitive wrapper instances are immutable.
-            clone.id = this.id;
-            clone.dependencies = new HashSet<>(this.dependencies);
-            clone.affectedEntities = new HashSet<>(this.affectedEntities);
-            clone.type = this.type;
-            clone.description = this.description;
-            clone.probabilityOfViolation = this.probabilityOfViolation;
-            clone.risk = this.risk;
-            clone.impact = this.impact;
-            clone.analyzed = this.analyzed;
+        // UUID, String and primitive wrapper instances are immutable.
+        clone.name = this.name;
+        clone.manuallyAnalyzed = this.manuallyAnalyzed;
+        clone.dependencies = new HashSet<>(this.dependencies);
+        clone.risk = this.risk;
 
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
+        return clone;
     }
 }

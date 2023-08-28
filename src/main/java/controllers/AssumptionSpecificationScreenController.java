@@ -1,9 +1,10 @@
 package controllers;
 
-import general.entities.Assumption;
-import general.entities.ModelEntity;
 import general.ModelEntityTreeCell;
 import general.Utilities;
+import general.entities.Assumption;
+import general.entities.AssumptionType;
+import general.entities.ModelEntity;
 import io.ModelReader;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -30,7 +31,6 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -138,7 +138,7 @@ public class AssumptionSpecificationScreenController {
         this.riskTextField.setText(this.assumption.getRisk() != null ? String.valueOf(this.assumption.getRisk()) : "");
 
         if (this.assumption.getType() != null) {
-            if (this.assumption.getType() == Assumption.AssumptionType.INTRODUCE_UNCERTAINTY) {
+            if (this.assumption.getType() == AssumptionType.INTRODUCE_UNCERTAINTY) {
                 this.introduceUncertaintyToggle.setSelected(true);
             } else {
                 this.resolveUncertaintyToggle.setSelected(true);
@@ -152,7 +152,7 @@ public class AssumptionSpecificationScreenController {
             // Do not allow a dependency on itself.
             if (!this.assumption.getId().equals(specifiedAssumption.getId())) {
                 var dependencyCheckMenuItem = new CheckMenuItem(specifiedAssumption.getName() + " (Id: " + specifiedAssumption.getId().toString().substring(0, 5) + "...)");
-                Set<UUID> dependenciesOfCurrentAssumption = this.assumption.getDependencies();
+                Collection<UUID> dependenciesOfCurrentAssumption = this.assumption.getDependencies();
 
                 // Set CheckMenuItem to selected id dependency is already present.
                 if (dependenciesOfCurrentAssumption.contains(specifiedAssumption.getId())) {
@@ -227,8 +227,8 @@ public class AssumptionSpecificationScreenController {
         this.topLevelVBox.setAlignment(Pos.CENTER);
 
         // Init user data for the toggle buttons.
-        resolveUncertaintyToggle.setUserData(Assumption.AssumptionType.RESOLVE_UNCERTAINTY);
-        introduceUncertaintyToggle.setUserData(Assumption.AssumptionType.INTRODUCE_UNCERTAINTY);
+        resolveUncertaintyToggle.setUserData(AssumptionType.RESOLVE_UNCERTAINTY);
+        introduceUncertaintyToggle.setUserData(AssumptionType.INTRODUCE_UNCERTAINTY);
 
         // Listen for changes of the text in the name TextField.
         this.nameTextField.textProperty().addListener((observable, oldText, newText) -> {
@@ -238,7 +238,7 @@ public class AssumptionSpecificationScreenController {
 
         // Listen for changes with regard to the toggle-group.
         this.typeToggleGroup.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
-            this.assumption.setType((Assumption.AssumptionType) newToggle.getUserData());
+            this.assumption.setType((AssumptionType) newToggle.getUserData());
             this.checkForCompletenessOfSpecification();
         });
 
