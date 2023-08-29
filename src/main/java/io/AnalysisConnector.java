@@ -22,8 +22,6 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-// TODO: IMPORTANT Split APIs according to Sophie's proposal.
-
 /**
  * Class responsible for managing a connection to one analysis whose URI is specified on construction.
  */
@@ -102,14 +100,18 @@ public class AnalysisConnector {
     /**
      * Sends the specified data to the previously specified security analysis and initiates the actual analysis.
      * <p>
-     * Note: Changes of the {@link Assumption}s caused by the security analysis (e.g., the <code>analyzed</code>
+     * <b>Note</b>: Changes of the {@link Assumption}s caused by the security analysis (e.g., the <code>analyzed</code>
      * field) will be reflected in the {@link Assumption}s specified by the <code>assumptions</code> parameter.
+     * <br/>
+     * <b>Note</b>: The {@link Assumption}s specified via <code>assumptions</code> are not sent to the security analysis
+     * in full. Instead, {@link io.AssumptionViews.SecurityCheckAnalysisView} (cf. annotations in {@link Assumption})
+     * is used to only serialize the necessary fields.
      * </p>
      *
      * @param modelPath   The path to the PCM model that should be used for the analysis.
      * @param assumptions The {@link Collection} of {@link Assumption}s that should be used for the analysis.
      * @return A {@link Pair} encompassing a status code accessible via {@link Pair#getKey()} and the output log of the
-     * analysis accessible via {@link Pair#getValue()}
+     * analysis accessible via {@link Pair#getValue()}.
      */
     public Pair<Integer, AnalysisOutput> performAnalysis(@NotNull String modelPath, @NotNull Collection<Assumption> assumptions) {
         try {
@@ -130,6 +132,13 @@ public class AnalysisConnector {
         }
     }
 
+    /**
+     * Transfers the model-view-files locates in the specified model folder to the analysis.
+     *
+     * @param modelPath The {@link File} specifying the folder containing the model-view-files.
+     * @return A {@link Pair} encompassing a status code accessible via {@link Pair#getKey()} and a potential status
+     * message accessible via {@link Pair#getValue()}.
+     */
     public Pair<Integer, String> transferModelFiles(@NotNull File modelPath) {
         // Determine list of files that are part of the model and must be transferred to the analysis.
         var filesInModelFolder = modelPath.listFiles();

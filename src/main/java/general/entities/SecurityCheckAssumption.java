@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-// TODO Make inheritance idea working with Jackson serialization
 public class SecurityCheckAssumption implements Cloneable {
     @JsonView(AssumptionViews.SecurityCheckAnalysisView.class)
     private @NotNull UUID id;
@@ -38,7 +37,7 @@ public class SecurityCheckAssumption implements Cloneable {
         // Implicitly set all other fields to null.
     }
 
-    public UUID getId() {
+    public @NotNull UUID getId() {
         return id;
     }
 

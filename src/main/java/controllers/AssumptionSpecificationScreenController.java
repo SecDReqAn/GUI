@@ -59,7 +59,7 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private TextField nameTextField;
     @FXML
-    private MenuButton dependenciesMenuButton; // TODO: Consider replacing with some kind of graph visualization (maybe https://github.com/jgrapht/jgrapht).
+    private MenuButton dependenciesMenuButton;
     @FXML
     private ToggleGroup typeToggleGroup;
     @FXML

@@ -55,7 +55,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+// TODO: IMPORTANT Introduce AssumptionGraphAnalysisAPI
 // TODO: Make use of @NotNull and @Nullable annotations to avoid NullPointer-Exceptions.
+// TODO: Investigate why EvalScenario2Recreation does not produce right output
 
 /**
  * The dedicated controller managing the main screen that is entered on start-up of the application.
@@ -539,10 +541,6 @@ public class MainScreenController {
 
     @FXML
     private void saveToFile() {
-        if (this.currentConfiguration.isEmpty()) {
-            return;
-        }
-
         // Use default file if not otherwise set by the user.
         if (this.saveFile == null) {
             this.saveFile = new File(this.defaultSaveLocation);
@@ -608,7 +606,7 @@ public class MainScreenController {
 
     @FXML
     private void handleAnalysisExecution() {
-        // Check whether forwarding the request to the analysis makes sense.
+        // Sanity check (analysis should only be executable once the configuration is sufficiently specified).
         if (!this.currentConfiguration.isMissingAnalysisParameters()) {
             this.statusLabel.setText("Trying to connect to analysis...");
 
@@ -659,8 +657,10 @@ public class MainScreenController {
                 Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Communication with the analysis failed.", "Connection to the analysis could not be established.");
             }
         } else {
-            // TODO Error
-            System.out.println("Error (Not implemented)");
+            Utilities.showAlert(Alert.AlertType.WARNING,
+                    "Warning",
+                    "Not enough information provided",
+                    "Model path, analysis URI, and at least one assumption need to be specified before performing an analysis.");
         }
     }
 
