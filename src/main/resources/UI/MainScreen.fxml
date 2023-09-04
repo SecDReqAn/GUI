@@ -60,8 +60,8 @@
                         <MenuItem mnemonicParsing="false" onAction="#handleNewAssumption" text="New Assumption" />
                         <MenuItem mnemonicParsing="false" onAction="#handleNewConfiguration" text="New Configuration" />
                         <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" onAction="#openFromFile" text="Open Configuration…" />
-                        <Menu mnemonicParsing="false" onAction="#openRecent" text="Open Recent Configuration" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleOpenFromFile" text="Open Configuration…" />
+                        <Menu fx:id="openRecentConfigMenu" mnemonicParsing="false" text="Open Recent Configuration" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem mnemonicParsing="false" onAction="#saveToFile" text="Save Configuration" />
                         <MenuItem mnemonicParsing="false" onAction="#saveAs" text="Save Configuration As…" />
@@ -69,17 +69,6 @@
                         <MenuItem mnemonicParsing="false" text="Preferences…" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem mnemonicParsing="false" onAction="#handleQuit" text="Quit" />
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Edit">
-                    <items>
-                        <MenuItem mnemonicParsing="false" text="Cut" />
-                        <MenuItem mnemonicParsing="false" text="Copy" />
-                        <MenuItem mnemonicParsing="false" text="Paste" />
-                        <MenuItem mnemonicParsing="false" text="Delete" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" text="Select All" />
-                        <MenuItem mnemonicParsing="false" text="Unselect All" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">

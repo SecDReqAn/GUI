@@ -24,6 +24,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -93,7 +94,7 @@ public class MainScreenController {
     private File saveFile;
 
     @FXML
-    private Button performAnalysisButton;
+    private Menu openRecentConfigMenu;
     @FXML
     private TableView<Assumption> assumptionTableView;
     @FXML
@@ -122,6 +123,8 @@ public class MainScreenController {
     private TableView<AnalysisResult> analysisOutputTableView;
     @FXML
     private TableColumn<AnalysisResult, String> outputTitleColumn;
+    @FXML
+    private Button performAnalysisButton;
     @FXML
     private Label modelNameLabel;
     @FXML
@@ -178,6 +181,37 @@ public class MainScreenController {
     }
 
     /**
+     * Adds the current save-file to the list of previously opened save-files if it exists and is not already present.
+     *
+     * @param stage The {@link Stage} whose title should change upon the selection of a previous save-file.
+     */
+    public void addSaveFileToPreviouslyOpened(@NotNull Stage stage){
+        File currentSaveFile = this.saveFile;
+        if(currentSaveFile != null && currentSaveFile.exists()){
+            // Check whether the save-file is already present and abort if so.
+            var fileAlreadyPresent = this.openRecentConfigMenu.getItems().stream()
+                    .filter(menuItem -> currentSaveFile.equals(menuItem.getUserData()))
+                    .findFirst();
+
+            if(fileAlreadyPresent.isPresent()){
+                return;
+            }
+
+            // Create new MenuItem for the current save-file.
+            var newMenuItem = new MenuItem(currentSaveFile.getName());
+
+            newMenuItem.setUserData(currentSaveFile);
+            newMenuItem.setOnAction(actionEvent -> {
+                addSaveFileToPreviouslyOpened(stage);
+                this.loadSaveFile(currentSaveFile, stage);
+            });
+
+            // Add the menu item to the "Open Recent..." menu.
+            this.openRecentConfigMenu.getItems().add(newMenuItem);
+        }
+    }
+
+    /**
      * Handles an exit request by the user, initiated by a click on the X button of the window.
      */
     public void handleExitRequest() {
@@ -226,6 +260,51 @@ public class MainScreenController {
 
     private @NotNull Optional<Assumption> specifyNewAssumption(@NotNull Window owner) {
         return this.showAssumptionSpecificationScreen(new Assumption(), owner);
+    }
+
+
+    private void loadSaveFile(@NotNull File saveFile, @NotNull Stage ownerStage) {
+        this.alertUserOfUnsavedChanges("Save changes before opening file?");
+        this.clearControlElements();
+
+        try {
+            this.savedConfiguration = ConfigManager.readConfig(saveFile);
+            this.currentConfiguration = this.savedConfiguration.clone();
+
+            // Analysis path and connector
+            this.analysisPathLabel.setText(this.currentConfiguration.getAnalysisPath());
+            this.analysisConnector = new AnalysisConnector(this.currentConfiguration.getAnalysisPath());
+
+            // Model
+            if (this.currentConfiguration.getModelPath() != null) {
+                var folders = this.currentConfiguration.getModelPath().split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
+                this.modelNameLabel.setText(folders[folders.length - 1]);
+            }
+
+            // Assumptions
+            this.assumptionTableView.getItems().clear();
+            this.assumptionTableView.getItems().addAll(this.currentConfiguration.getAssumptions());
+
+            // Analysis result
+            this.analysisOutputTableView.getItems().addAll(this.currentConfiguration.getAnalysisResults());
+            if (!this.analysisOutputTableView.getItems().isEmpty()) {
+                AnalysisResult firstAnalysisResultInTable = this.analysisOutputTableView.getItems().get(0);
+                this.analysisOutputTableView.getSelectionModel().select(0);
+                this.analysisOutputTextArea.setText(firstAnalysisResultInTable.getResult());
+            }
+
+            this.saveFile = saveFile;
+            this.performAnalysisButton.setDisable(this.currentConfiguration.isMissingAnalysisParameters());
+            ownerStage.setTitle(Constants.APPLICATION_NAME + " — " + this.saveFile.getName());
+        } catch (StreamReadException e) {
+            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file exhibits an invalid structure.");
+        } catch (DatabindException e) {
+            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not map the contents of the specified file to a valid Configuration.");
+        } catch (FileNotFoundException e) {
+            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not find the repository file associated with the the specified model.");
+        } catch (IOException e) {
+            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Encountered a low-level I/O problem when trying to read from the file.");
+        }
     }
 
     /**
@@ -462,6 +541,8 @@ public class MainScreenController {
         var stage = Utilities.getStageOfMenuItem((MenuItem) actionEvent.getSource());
 
         this.alertUserOfUnsavedChanges("Save changes before opening a new configuration?");
+        this.addSaveFileToPreviouslyOpened(stage);
+
         stage.setTitle(Constants.DEFAULT_STAGE_TITLE);
         this.currentConfiguration = new Configuration();
         this.savedConfiguration = new Configuration();
@@ -472,9 +553,10 @@ public class MainScreenController {
     }
 
     @FXML
-    private void openFromFile(@NotNull ActionEvent actionEvent) {
+    private void handleOpenFromFile(@NotNull ActionEvent actionEvent) {
         var stage = Utilities.getStageOfMenuItem((MenuItem) actionEvent.getSource());
 
+        // Prompt user to select save-file.
         var fileChooser = new FileChooser();
         fileChooser.setTitle("Select an existing File");
         fileChooser.setInitialFileName("NewAssumptions.xml");
@@ -490,53 +572,9 @@ public class MainScreenController {
             Utilities.showAlert(Alert.AlertType.WARNING, "Warning", "Loading Failed", "The specified file could not be read!");
         }
 
-        this.alertUserOfUnsavedChanges("Save changes before opening file?");
-        this.clearControlElements();
-
-        try {
-            this.savedConfiguration = ConfigManager.readConfig(selectedFile);
-            this.currentConfiguration = this.savedConfiguration.clone();
-
-            // Analysis path and connector
-            this.analysisPathLabel.setText(this.currentConfiguration.getAnalysisPath());
-            this.analysisConnector = new AnalysisConnector(this.currentConfiguration.getAnalysisPath());
-
-            // Model
-            if (this.currentConfiguration.getModelPath() != null) {
-                var folders = this.currentConfiguration.getModelPath().split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
-                this.modelNameLabel.setText(folders[folders.length - 1]);
-            }
-
-            // Assumptions
-            this.assumptionTableView.getItems().clear();
-            this.assumptionTableView.getItems().addAll(this.currentConfiguration.getAssumptions());
-
-            // Analysis result
-            this.analysisOutputTableView.getItems().addAll(this.currentConfiguration.getAnalysisResults());
-            if (!this.analysisOutputTableView.getItems().isEmpty()) {
-                AnalysisResult firstAnalysisResultInTable = this.analysisOutputTableView.getItems().get(0);
-                this.analysisOutputTableView.getSelectionModel().select(0);
-                this.analysisOutputTextArea.setText(firstAnalysisResultInTable.getResult());
-            }
-
-            this.saveFile = selectedFile;
-            this.performAnalysisButton.setDisable(this.currentConfiguration.isMissingAnalysisParameters());
-            stage.setTitle(Constants.APPLICATION_NAME + " — " + this.saveFile.getName());
-        } catch (StreamReadException e) {
-            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file exhibits an invalid structure.");
-        } catch (DatabindException e) {
-            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not map the contents of the specified file to a valid Configuration.");
-        } catch (FileNotFoundException e) {
-            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not find the repository file associated with the the specified model.");
-        } catch (IOException e) {
-            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Encountered a low-level I/O problem when trying to read from the file.");
-        }
-    }
-
-    @FXML
-    private void openRecent() {
-        // TODO Maybe start with recent files in the current execution. Otherwise some form of persistent config file is required.
-        System.out.println("Not implemented!");
+        this.addSaveFileToPreviouslyOpened(stage);
+        // Actual load.
+        this.loadSaveFile(selectedFile, stage);
     }
 
     @FXML
