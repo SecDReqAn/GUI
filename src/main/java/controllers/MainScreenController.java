@@ -254,10 +254,31 @@ public class MainScreenController {
         return Optional.empty();
     }
 
+    /**
+     * Convenience function that shows the assumption specification screen pre-initialized with
+     * the fields contained in the specified {@link Assumption}.
+     *
+     * <p><b>Note</b>: The {@link Assumption} specified via <code>assumption</code> is not altered by the users inputs.</p>
+     *
+     * @param assumption The {@link Assumption} whose fields should be used to initialize the
+     *                   assumption specification screen.
+     * @param owner The owner {@link Window} of the to be shown assumption specification screen (required for
+     *              modal-window functionality).
+     * @return An {@link Optional} containing the edited {@link Assumption} instance or {@link Optional#empty()} if
+     * the assumption specification screen could not be opened or the user aborted the specification.
+     */
     private @NotNull Optional<Assumption> editAssumption(@NotNull Assumption assumption, @NotNull Window owner) {
         return this.showAssumptionSpecificationScreen(assumption.clone(), owner);
     }
 
+    /**
+     * Convenience function that shows an empty assumption specification for the specification of a new {@link Assumption}
+     *
+     * @param owner The owner {@link Window} of the to be shown assumption specification screen (required for
+     *              modal-window functionality).
+     * @return An {@link Optional} containing the newly specified {@link Assumption} instance or {@link Optional#empty()} if
+     * the assumption specification screen could not be opened or the user aborted the specification.
+     */
     private @NotNull Optional<Assumption> specifyNewAssumption(@NotNull Window owner) {
         return this.showAssumptionSpecificationScreen(new Assumption(), owner);
     }
