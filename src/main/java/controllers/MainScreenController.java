@@ -61,7 +61,7 @@ import java.util.concurrent.TimeUnit;
 // TODO: Investigate why EvalScenario2Recreation does not produce right output
 
 /**
- * The dedicated controller managing the main screen that is entered on start-up of the application.
+ * The controller managing the main screen that is entered on start-up of the application.
  */
 public class MainScreenController {
     /**
@@ -93,6 +93,7 @@ public class MainScreenController {
      */
     private File saveFile;
 
+    // FXML controls.
     @FXML
     private Menu openRecentConfigMenu;
     @FXML
@@ -135,7 +136,7 @@ public class MainScreenController {
     private Label statusLabel;
 
     /**
-     * Constructs a new instance and initializes the associated {@link Configuration}s.
+     * Default constructor, which constructs a new instance and initializes the associated {@link Configuration}s.
      */
     public MainScreenController() {
         this.savedConfiguration = new Configuration();
@@ -163,7 +164,8 @@ public class MainScreenController {
     /**
      * Checks for unsaved changes in the current configuration and alerts the user if necessary.
      *
-     * @param alertContent The {@link String} that should be shown as part of the {@link Alert} pop-up in case of unsaved changes.
+     * @param alertContent The {@link String} that should be shown as part of the {@link Alert} pop-up in case
+     *                     of unsaved changes.
      */
     public void alertUserOfUnsavedChanges(@NotNull String alertContent) {
         if (this.hasUnsavedChanges()) {
@@ -185,15 +187,15 @@ public class MainScreenController {
      *
      * @param stage The {@link Stage} whose title should change upon the selection of a previous save-file.
      */
-    public void addSaveFileToPreviouslyOpened(@NotNull Stage stage){
+    public void addSaveFileToPreviouslyOpened(@NotNull Stage stage) {
         File currentSaveFile = this.saveFile;
-        if(currentSaveFile != null && currentSaveFile.exists()){
+        if (currentSaveFile != null && currentSaveFile.exists()) {
             // Check whether the save-file is already present and abort if so.
             var fileAlreadyPresent = this.openRecentConfigMenu.getItems().stream()
                     .filter(menuItem -> currentSaveFile.equals(menuItem.getUserData()))
                     .findFirst();
 
-            if(fileAlreadyPresent.isPresent()){
+            if (fileAlreadyPresent.isPresent()) {
                 return;
             }
 
@@ -220,9 +222,10 @@ public class MainScreenController {
     }
 
     /**
-     * Open modal window for the assumption specification-screen.
+     * Opens modal window for the assumption specification-screen.
      *
-     * @param assumption The {@link Assumption} instance that can be specified / edited through the assumption specification-screen.
+     * @param assumption The {@link Assumption} instance that can be specified / edited through the assumption
+     *                   specification-screen.
      * @param owner      The {@link Window} owning the modal window to be created.
      * @return An {@link Optional} holding an {@link Assumption} the specified / edited {@link Assumption} or
      * {@link Optional#empty()} if the user aborted the specification / editing.
@@ -262,8 +265,8 @@ public class MainScreenController {
      *
      * @param assumption The {@link Assumption} whose fields should be used to initialize the
      *                   assumption specification screen.
-     * @param owner The owner {@link Window} of the to be shown assumption specification screen (required for
-     *              modal-window functionality).
+     * @param owner      The owner {@link Window} of the to be shown assumption specification screen (required for
+     *                   modal-window functionality).
      * @return An {@link Optional} containing the edited {@link Assumption} instance or {@link Optional#empty()} if
      * the assumption specification screen could not be opened or the user aborted the specification.
      */
@@ -283,10 +286,15 @@ public class MainScreenController {
         return this.showAssumptionSpecificationScreen(new Assumption(), owner);
     }
 
-
+    /**
+     * Tries to load the configuration contained in the specified {@link File}.
+     *
+     * @param saveFile   The {@link File} containing the configuration tht should be loaded.
+     * @param ownerStage The {@link Stage} whose title should be changed upon successful load.
+     */
     private void loadSaveFile(@NotNull File saveFile, @NotNull Stage ownerStage) {
         this.alertUserOfUnsavedChanges("Save changes before opening file?");
-        this.clearControlElements();
+        this.resetControlElements();
 
         try {
             this.savedConfiguration = ConfigManager.readConfig(saveFile);
@@ -329,7 +337,8 @@ public class MainScreenController {
     }
 
     /**
-     * Checks whether the current configuration ({@link MainScreenController#currentConfiguration}) contains unsaved changes (i.e., changes not reflected in {@link MainScreenController#savedConfiguration}).
+     * Checks whether the current configuration ({@link MainScreenController#currentConfiguration})
+     * contains unsaved changes (i.e., changes not reflected in {@link MainScreenController#savedConfiguration}).
      *
      * @return <code>true</code> if there are unsaved changes and <code>false</code> otherwise.
      */
@@ -337,7 +346,10 @@ public class MainScreenController {
         return !this.currentConfiguration.semanticallyEqualTo(this.savedConfiguration);
     }
 
-    private void clearControlElements() {
+    /**
+     * Rests the JavaFX controls to their default values.
+     */
+    private void resetControlElements() {
         this.assumptionTableView.getItems().clear();
         this.analysisOutputTextArea.setText("");
         this.analysisOutputTableView.getItems().clear();
@@ -348,6 +360,9 @@ public class MainScreenController {
         this.performAnalysisButton.setDisable(true);
     }
 
+    /**
+     * Convenience function that initializes various aspects of {@link MainScreenController#assumptionTableView}.
+     */
     private void initializeAssumptionTableView() {
         // Extract fields of an assumption into their appropriate column of the TableView.
         this.idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -402,7 +417,7 @@ public class MainScreenController {
                     // Remove old assumption from TableView and Configuration and replace with edited one.
                     Optional<Assumption> assumptionToBeReplaced = this.currentConfiguration.getAssumptions().stream().filter(assumption -> assumption.getId().equals(editedAssumption.get().getId())).findFirst();
 
-                    if(assumptionToBeReplaced.isPresent()){
+                    if (assumptionToBeReplaced.isPresent()) {
                         this.currentConfiguration.getAssumptions().remove(assumptionToBeReplaced.get());
                         this.assumptionTableView.getItems().remove(assumptionToBeReplaced.get());
                     }
@@ -467,6 +482,9 @@ public class MainScreenController {
         });
     }
 
+    /**
+     * Convenience function that initializes various aspects of {@link MainScreenController#analysisOutputTableView}.
+     */
     private void initializeAnalysisOutputTableView() {
         this.outputTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         this.analysisOutputTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -491,6 +509,9 @@ public class MainScreenController {
         });
     }
 
+    /**
+     * Initializer function called on scene creation.
+     */
     @FXML
     private void initialize() {
         this.initializeAssumptionTableView();
@@ -570,7 +591,7 @@ public class MainScreenController {
         this.analysisConnector = null;
         this.saveFile = null;
 
-        this.clearControlElements();
+        this.resetControlElements();
     }
 
     @FXML

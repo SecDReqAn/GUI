@@ -54,6 +54,7 @@ public class AssumptionSpecificationScreenController {
      */
     private boolean userConfirmation;
 
+    // FXML controls.
     @FXML
     private VBox topLevelVBox;
     @FXML
@@ -93,6 +94,9 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private TreeView<ModelEntity> modelEntityTreeView;
 
+    /**
+     * Default constructor.
+     */
     public AssumptionSpecificationScreenController() {
         this.userConfirmation = false;
     }
@@ -116,18 +120,27 @@ public class AssumptionSpecificationScreenController {
     }
 
     /**
-     * Checks whether the mandatory fields of the {@link Assumption} instance have been filled and enables a button to exit the pop-up window.
+     * Checks whether the mandatory fields of the {@link Assumption} instance have been filled and enables a
+     * button to exit the pop-up window.
      */
     private void checkForCompletenessOfSpecification() {
         this.insertButton.setDisable(!this.assumption.isSufficientlySpecified());
     }
 
+    /**
+     * Gets the boolean indicating whether the user confirmed his input.
+     *
+     * @return The boolean, indicating whether the user confirmed his input (<code>true</code>) or whether
+     * he aborted the specification (<code>false</code>).
+     */
     public boolean getUserConfirmation() {
         return this.userConfirmation;
     }
 
     /**
-     * Populates the GUI control elements with existing values in case {@link AssumptionSpecificationScreenController#assumption} already contains data. This is the case if the user decided to edit an already existing {@link Assumption}.
+     * Populates the GUI control elements with existing values in case
+     * {@link AssumptionSpecificationScreenController#assumption} already contains data. This is the case if the user
+     * decided to edit an already existing {@link Assumption}.
      */
     private void initializeUIElements() {
         this.nameTextField.setText(this.assumption.getName() != null ? this.assumption.getName() : "");
@@ -181,7 +194,9 @@ public class AssumptionSpecificationScreenController {
     }
 
     /**
-     * Convenience method that adds appropriate context menus to {@link AssumptionSpecificationScreenController#modelEntityTreeView} and {@link AssumptionSpecificationScreenController#affectedEntityTableView}.
+     * Convenience method that adds appropriate context menus to
+     * {@link AssumptionSpecificationScreenController#modelEntityTreeView} and
+     * {@link AssumptionSpecificationScreenController#affectedEntityTableView}.
      */
     private void addContextMenus() {
         // Show context menu for the TreeView only for the ModelEntities that are associated with an id.
