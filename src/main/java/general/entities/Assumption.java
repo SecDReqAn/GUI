@@ -13,30 +13,58 @@ import java.util.Set;
 import java.util.UUID;
 
 // TODO Find better name for class.
-public class Assumption extends SecurityCheckAssumption implements Cloneable{
+
+/**
+ * An extended assumption that extends a {@link SecurityCheckAssumption} by some properties tailored towards a
+ * more high-level analysis.
+ */
+public class Assumption extends SecurityCheckAssumption implements Cloneable {
     /**
      * Custom {@link Comparator} that compares {@link Assumption}s based on their unique IDs.
      */
-    public static class AssumptionComparator implements Comparator<Assumption>{
+    public static class AssumptionComparator implements Comparator<Assumption> {
         @Override
         public int compare(Assumption a1, Assumption a2) {
             return a1.getId().compareTo(a2.getId());
         }
     }
 
+    /**
+     * The user-specified name of the {@link Assumption}.
+     */
     @JsonView(AssumptionViews.AssumptionGraphAnalysisView.class)
-    private String name; // ?
+    private String name;
+    /**
+     * A flag indicating whether the user marked the {@link Assumption} as manually analyzed.
+     */
     @JsonView(AssumptionViews.AssumptionGraphAnalysisView.class)
     private boolean manuallyAnalyzed;
+    /**
+     * A {@link Set} containing the unique <code>id</code>s of all {@link Assumption}s on which this
+     * {@link Assumption} depends.
+     */
     @JsonView(AssumptionViews.AssumptionGraphAnalysisView.class)
-    private Set<UUID> dependencies; // -
+    private Set<UUID> dependencies;
+    /**
+     * The risk associated with the {@link Assumption}.
+     */
     @JsonView(AssumptionViews.AssumptionGraphAnalysisView.class)
     private Double risk; // -
 
+    /**
+     * Default constructor that only initializes the <code>id</code> of the {@link Assumption}
+     * with a randomly generated {@link UUID}.
+     */
     public Assumption() {
-        this(UUID.randomUUID());
+        super();
     }
 
+    /**
+     * Constructor which sets the <code>id</code> of the {@link Assumption} to the specified {@link UUID}
+     * and minimally initializes the other fields.
+     *
+     * @param id The {@link UUID} that should be used as the {@link Assumption}'s <code>id</code>.
+     */
     public Assumption(@NotNull UUID id) {
         super(id);
         this.dependencies = new HashSet<>();
@@ -52,11 +80,11 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable{
         this.name = name;
     }
 
-    public boolean getManuallyAnalyzed(){
+    public boolean getManuallyAnalyzed() {
         return this.manuallyAnalyzed;
     }
 
-    public void setManuallyAnalyzed(boolean manuallyAnalyzed){
+    public void setManuallyAnalyzed(boolean manuallyAnalyzed) {
         this.manuallyAnalyzed = manuallyAnalyzed;
     }
 
@@ -81,13 +109,13 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable{
                 !this.description.isEmpty();
     }
 
-    public boolean semanticallyEqualTo(Assumption otherAssumption){
+    public boolean semanticallyEqualTo(Assumption otherAssumption) {
         return Objects.equals(this.getId(), otherAssumption.getId()) &&
                 Objects.equals(this.name, otherAssumption.name) &&
                 Objects.equals(this.type, otherAssumption.type) &&
                 Objects.equals(this.affectedEntities, otherAssumption.affectedEntities) &&
                 Objects.equals(this.dependencies, otherAssumption.dependencies) &&
-                Objects.equals(this.description, otherAssumption.description)&&
+                Objects.equals(this.description, otherAssumption.description) &&
                 Objects.equals(this.probabilityOfViolation, otherAssumption.probabilityOfViolation) &&
                 Objects.equals(this.risk, otherAssumption.risk) &&
                 Objects.equals(this.impact, otherAssumption.impact) &&
@@ -95,7 +123,7 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable{
                 this.manuallyAnalyzed == otherAssumption.manuallyAnalyzed;
     }
 
-    public void updateWith(SecurityCheckAssumption securityCheckAssumption){
+    public void updateWith(SecurityCheckAssumption securityCheckAssumption) {
         assert securityCheckAssumption.getId().equals(this.getId());
 
         this.type = securityCheckAssumption.type;

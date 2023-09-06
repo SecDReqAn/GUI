@@ -10,7 +10,8 @@ public class AnalysisResult implements Cloneable {
      * The title of the {@link AnalysisResult} (by default the current date and time in the format dd.mm.yy hh:mm:ss).
      *
      * <p>
-     * Note: The title attribute uniquely identifies an {@link AnalysisResult} within a {@link Configuration} (i.e., is is strictly forbidden for two {@link AnalysisResult}s to share the same title).
+     * Note: The title attribute uniquely identifies an {@link AnalysisResult} within a {@link Configuration}
+     * (i.e., is is strictly forbidden for two {@link AnalysisResult}s to share the same title).
      * </p>
      */
     private @NotNull String title;
@@ -51,8 +52,9 @@ public class AnalysisResult implements Cloneable {
 
     /**
      * Sets the <code>title</code> of this {@link AnalysisResult}.
+     *
      * @param title The <code>title</code> that should be set. (<b>Note</b>: Has to be unique within a
-     * {@link Configuration}).
+     *              {@link Configuration}).
      */
     public void setTitle(@NotNull String title) {
         this.title = title;
