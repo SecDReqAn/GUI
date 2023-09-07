@@ -10,6 +10,12 @@ import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Conceptual entry point of Assumption Analyzer.
+ *
+ * <p><b>Note</b>: To start Assumption Analyzer, {@link Main} should be executed instead. This avoids problems with
+ * regard to the application's module path</p>
+ */
 public class ApplicationMain extends Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationMain.class);
 

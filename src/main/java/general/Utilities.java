@@ -20,7 +20,20 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * Convenience class providing various utility functions (mostly with regard to JavaFX controls).
+ */
 public class Utilities {
+    /**
+     * Utility function that shows an {@link Alert} to the user with the specified attributes.
+     *
+     * @param type        The {@link javafx.scene.control.Alert.AlertType} that should be used.
+     * @param title       The title {@link String} that should be displayed.
+     * @param header      The header {@link String} that should be displayed.
+     * @param content     The content {@link String} that should be displayed.
+     * @param buttonTypes The {@link ButtonType}s that should be used with the {@link Alert}.
+     * @return The {@link Optional} of {@link ButtonType} returned by {@link Alert#showAndWait()}.
+     */
     public static @NotNull Optional<ButtonType> showAlert(@NotNull Alert.AlertType type,
                                                           @NotNull String title,
                                                           @NotNull String header,
