@@ -2,7 +2,7 @@ package general.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
-import io.AssumptionViews;
+import io.securitycheck.AssumptionViews;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

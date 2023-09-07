@@ -1,4 +1,4 @@
-package io;
+package io.securitycheck;
 
 public class AssumptionViews {
     public static class SecurityCheckAnalysisView{

@@ -5,7 +5,7 @@ import general.Utilities;
 import general.entities.Assumption;
 import general.entities.AssumptionType;
 import general.entities.ModelEntity;
-import io.ModelReader;
+import io.local.ModelReader;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;

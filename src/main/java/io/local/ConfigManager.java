@@ -1,4 +1,4 @@
-package io;
+package io.local;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import general.entities.Configuration;

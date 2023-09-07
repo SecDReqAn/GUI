@@ -1,4 +1,4 @@
-package io;
+package io.securitycheck;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 /**
  * Class responsible for managing a connection to one analysis whose URI is specified on construction.
  */
-public class AnalysisConnector {
+public class SecurityAnalysisConnector {
     private static final String PATH_CONNECTION_TEST = "test";
     private static final String PATH_ANALYSIS_EXECUTION = "run";
     private static final String PATH_MODEL_TRANSMISSION = "set/model/";
@@ -66,7 +66,7 @@ public class AnalysisConnector {
      *
      * @param analysisUri The URI at which the analysis can be reached.
      */
-    public AnalysisConnector(@Nullable String analysisUri) {
+    public SecurityAnalysisConnector(@Nullable String analysisUri) {
         this.client = ClientBuilder.newBuilder().register(MultiPartFeature.class).build();
         this.analysisUri = analysisUri;
         this.objectMapper = new ObjectMapper();
@@ -86,7 +86,7 @@ public class AnalysisConnector {
     public @NotNull Pair<Integer, String> testConnection() {
         Pair<Integer, String> codeMessagePair;
 
-        try (var response = this.client.target(this.analysisUri).path(AnalysisConnector.PATH_CONNECTION_TEST).request(MediaType.TEXT_PLAIN).get()) {
+        try (var response = this.client.target(this.analysisUri).path(SecurityAnalysisConnector.PATH_CONNECTION_TEST).request(MediaType.TEXT_PLAIN).get()) {
             codeMessagePair = new Pair<>(response.getStatus(), response.readEntity(String.class));
         } catch (IllegalArgumentException | NullPointerException e) {
             codeMessagePair = new Pair<>(0, "The specified URI is invalid.");
@@ -104,7 +104,7 @@ public class AnalysisConnector {
      * field) will be reflected in the {@link Assumption}s specified by the <code>assumptions</code> parameter.
      * <br/>
      * <b>Note</b>: The {@link Assumption}s specified via <code>assumptions</code> are not sent to the security analysis
-     * in full. Instead, {@link io.AssumptionViews.SecurityCheckAnalysisView} (cf. annotations in {@link Assumption})
+     * in full. Instead, {@link AssumptionViews.SecurityCheckAnalysisView} (cf. annotations in {@link Assumption})
      * is used to only serialize the necessary fields.
      * </p>
      *
@@ -118,7 +118,7 @@ public class AnalysisConnector {
             var jsonString = this.objectMapper.writerWithView(AssumptionViews.SecurityCheckAnalysisView.class)
                     .writeValueAsString(new AnalysisParameter(modelPath, assumptions));
 
-            try (var response = this.client.target(this.analysisUri).path(AnalysisConnector.PATH_ANALYSIS_EXECUTION)
+            try (var response = this.client.target(this.analysisUri).path(SecurityAnalysisConnector.PATH_ANALYSIS_EXECUTION)
                     .request(MediaType.APPLICATION_JSON_TYPE)
                     .post(Entity.entity(jsonString, MediaType.APPLICATION_JSON))) {
                 String jsonResponse = response.readEntity(String.class);
@@ -159,7 +159,7 @@ public class AnalysisConnector {
                 multiPart.bodyPart(new FileDataBodyPart(file.getName(), file));
             }
 
-            try (var response = this.client.target(this.analysisUri).path(AnalysisConnector.PATH_MODEL_TRANSMISSION + modelPath.getName()).request().post(Entity.entity(multiPart, multiPart.getMediaType()))) {
+            try (var response = this.client.target(this.analysisUri).path(SecurityAnalysisConnector.PATH_MODEL_TRANSMISSION + modelPath.getName()).request().post(Entity.entity(multiPart, multiPart.getMediaType()))) {
                 return new Pair<>(response.getStatus(), response.readEntity(String.class));
             }
         } catch (IOException e) {

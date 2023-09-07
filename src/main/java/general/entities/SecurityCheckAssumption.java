@@ -1,7 +1,7 @@
 package general.entities;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import io.AssumptionViews;
+import io.securitycheck.AssumptionViews;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -188,7 +188,7 @@ public class SecurityCheckAssumption implements Cloneable {
     }
 
     /**
-     * Clones this {@link io.AssumptionViews.SecurityCheckAnalysisView} instance.
+     * Clones this {@link AssumptionViews.SecurityCheckAnalysisView} instance.
      *
      * @return The created clone.
      */

@@ -9,8 +9,8 @@ import general.entities.Assumption;
 import general.entities.AssumptionType;
 import general.entities.Configuration;
 import general.entities.SecurityCheckAssumption;
-import io.AnalysisConnector;
-import io.ConfigManager;
+import io.local.ConfigManager;
+import io.securitycheck.SecurityAnalysisConnector;
 import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -40,8 +40,10 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -71,27 +73,27 @@ public class MainScreenController {
     /**
      * The {@link Configuration} that is being edited by the user.
      */
-    private Configuration currentConfiguration;
+    private @NotNull Configuration currentConfiguration;
     /**
      * The last {@link Configuration}-state that is persisted on disk.
      */
-    private Configuration savedConfiguration;
+    private @NotNull Configuration savedConfiguration;
     /**
      * Connector allowing for communication with a (potentially) remote analysis microservice.
      */
-    private AnalysisConnector analysisConnector;
+    private @Nullable SecurityAnalysisConnector securityAnalysisConnector;
     /**
      * Service that periodically checks the connection to the analysis.
      */
-    private final ScheduledExecutorService connectionTestService;
+    private final @NotNull ScheduledExecutorService connectionTestService;
     /**
      * Services allowing access to e.g. the default browser of the host system.
      */
-    private HostServices hostServices;
+    private @Nullable HostServices hostServices;
     /**
      * The actual {@link File} to which changes are persisted upon a save-operation.
      */
-    private File saveFile;
+    private @Nullable File saveFile;
 
     // FXML controls.
     @FXML
@@ -144,8 +146,8 @@ public class MainScreenController {
 
         this.connectionTestService = Executors.newSingleThreadScheduledExecutor();
         connectionTestService.scheduleAtFixedRate(() -> {
-            if (MainScreenController.this.analysisConnector != null) {
-                var connectionTestCode = MainScreenController.this.analysisConnector.testConnection().getKey();
+            if (MainScreenController.this.securityAnalysisConnector != null) {
+                var connectionTestCode = MainScreenController.this.securityAnalysisConnector.testConnection().getKey();
                 Platform.runLater(() -> MainScreenController.this.connectionStatusLabel.setText(
                         connectionTestCode == 200 ? Constants.CONNECTION_SUCCESS_TEXT : Constants.CONNECTION_FAILURE_TEXT));
             }
@@ -162,24 +164,18 @@ public class MainScreenController {
     }
 
     /**
-     * Checks for unsaved changes in the current configuration and alerts the user if necessary.
-     *
-     * @param alertContent The {@link String} that should be shown as part of the {@link Alert} pop-up in case
-     *                     of unsaved changes.
+     * TODO
      */
-    public void alertUserOfUnsavedChanges(@NotNull String alertContent) {
-        if (this.hasUnsavedChanges()) {
-            var confirmationResult = Utilities.showAlert(Alert.AlertType.CONFIRMATION,
-                    "Unsaved Changes",
-                    "There exist unsaved changed in the current configuration",
-                    alertContent,
-                    new ButtonType("Save Changes", ButtonBar.ButtonData.YES),
-                    new ButtonType("Discard Changes", ButtonBar.ButtonData.NO));
+    public @NotNull Configuration getCurrentConfig(){
+        return this.currentConfiguration;
+    }
 
-            if (confirmationResult.isPresent() && confirmationResult.get().getButtonData() == ButtonBar.ButtonData.YES) {
-                this.saveToFile();
-            }
-        }
+    /**
+     * Handles an exit request by the user, initiated by a click on the X button of the window.
+     */
+    public void handleExitRequest() {
+        this.alertUserOfUnsavedChanges("Save changes before exiting?");
+        this.connectionTestService.shutdown();
     }
 
     /**
@@ -187,7 +183,7 @@ public class MainScreenController {
      *
      * @param stage The {@link Stage} whose title should change upon the selection of a previous save-file.
      */
-    public void addSaveFileToPreviouslyOpened(@NotNull Stage stage) {
+    private void addSaveFileToPreviouslyOpened(@NotNull Stage stage) {
         File currentSaveFile = this.saveFile;
         if (currentSaveFile != null && currentSaveFile.exists()) {
             // Check whether the save-file is already present and abort if so.
@@ -214,11 +210,24 @@ public class MainScreenController {
     }
 
     /**
-     * Handles an exit request by the user, initiated by a click on the X button of the window.
+     * Checks for unsaved changes in the current configuration and alerts the user if necessary.
+     *
+     * @param alertContent The {@link String} that should be shown as part of the {@link Alert} pop-up in case
+     *                     of unsaved changes.
      */
-    public void handleExitRequest() {
-        this.alertUserOfUnsavedChanges("Save changes before exiting?");
-        this.connectionTestService.shutdown();
+    private void alertUserOfUnsavedChanges(@NotNull String alertContent) {
+        if (this.hasUnsavedChanges()) {
+            var confirmationResult = Utilities.showAlert(Alert.AlertType.CONFIRMATION,
+                    "Unsaved Changes",
+                    "There exist unsaved changed in the current configuration",
+                    alertContent,
+                    new ButtonType("Save Changes", ButtonBar.ButtonData.YES),
+                    new ButtonType("Discard Changes", ButtonBar.ButtonData.NO));
+
+            if (confirmationResult.isPresent() && confirmationResult.get().getButtonData() == ButtonBar.ButtonData.YES) {
+                this.saveToFile();
+            }
+        }
     }
 
     /**
@@ -302,7 +311,7 @@ public class MainScreenController {
 
             // Analysis path and connector
             this.analysisPathLabel.setText(this.currentConfiguration.getAnalysisPath());
-            this.analysisConnector = new AnalysisConnector(this.currentConfiguration.getAnalysisPath());
+            this.securityAnalysisConnector = new SecurityAnalysisConnector(this.currentConfiguration.getAnalysisPath());
 
             // Model
             if (this.currentConfiguration.getModelPath() != null) {
@@ -588,7 +597,7 @@ public class MainScreenController {
         stage.setTitle(Constants.DEFAULT_STAGE_TITLE);
         this.currentConfiguration = new Configuration();
         this.savedConfiguration = new Configuration();
-        this.analysisConnector = null;
+        this.securityAnalysisConnector = null;
         this.saveFile = null;
 
         this.resetControlElements();
@@ -663,20 +672,9 @@ public class MainScreenController {
     }
 
     @FXML
-    private void handleQuit() {
-        if (this.hasUnsavedChanges()) {
-            var confirmationResult = Utilities.showAlert(Alert.AlertType.CONFIRMATION,
-                    "Unsaved Changes",
-                    "There exist unsaved changed in the current configuration",
-                    "Quit and discard the changes?");
-
-            if (confirmationResult.isPresent() && confirmationResult.get() == ButtonType.CANCEL) {
-                return;
-            }
-        }
-
-        this.connectionTestService.shutdown();
-        Platform.exit();
+    private void handleQuit(ActionEvent actionEvent) {
+        var stage = Utilities.getStageOfMenuItem((MenuItem) actionEvent.getSource());
+        stage.fireEvent(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
     @FXML
@@ -691,9 +689,9 @@ public class MainScreenController {
             this.statusLabel.setText("Trying to connect to analysis...");
 
             // Execute manual connection test to analysis.
-            if (this.analysisConnector != null && this.analysisConnector.testConnection().getKey() == 200) {
+            if (this.securityAnalysisConnector != null && this.securityAnalysisConnector.testConnection().getKey() == 200) {
                 this.statusLabel.setText("Transmit selected model to the analysis...");
-                Pair<Integer, String> modelTransferResponse = this.analysisConnector.transferModelFiles(
+                Pair<Integer, String> modelTransferResponse = this.securityAnalysisConnector.transferModelFiles(
                         new File(Objects.requireNonNull(this.currentConfiguration.getModelPath())));
                 if (modelTransferResponse.getKey() != 200) {
                     this.statusLabel.setText("Analysis aborted.");
@@ -702,7 +700,7 @@ public class MainScreenController {
                 }
 
                 this.statusLabel.setText("Starting analysis...");
-                Pair<Integer, AnalysisConnector.AnalysisOutput> analysisResponse = this.analysisConnector.performAnalysis(this.currentConfiguration.getModelPath(), this.currentConfiguration.getAssumptions());
+                Pair<Integer, SecurityAnalysisConnector.AnalysisOutput> analysisResponse = this.securityAnalysisConnector.performAnalysis(this.currentConfiguration.getModelPath(), this.currentConfiguration.getAssumptions());
                 String analysisResponseLog = analysisResponse.getValue().outputLog();
                 Collection<SecurityCheckAssumption> analysisResponseAssumptions = analysisResponse.getValue().assumptions();
 
@@ -756,7 +754,7 @@ public class MainScreenController {
         userInput.ifPresent(input -> {
             this.currentConfiguration.setAnalysisPath(input);
             this.analysisPathLabel.setText(input);
-            this.analysisConnector = new AnalysisConnector(input);
+            this.securityAnalysisConnector = new SecurityAnalysisConnector(input);
             this.performAnalysisButton.setDisable(this.currentConfiguration.isMissingAnalysisParameters());
         });
     }
