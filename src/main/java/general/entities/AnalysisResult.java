@@ -19,7 +19,6 @@ public class AnalysisResult implements Cloneable {
      * The output log received from of the analysis.
      */
     private @NotNull String result;
-
     /**
      * Default constructor as <b>required</b> for Jackson deserialization.
      */

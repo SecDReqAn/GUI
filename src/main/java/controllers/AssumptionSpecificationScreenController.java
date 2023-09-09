@@ -27,6 +27,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.Collection;
@@ -38,7 +39,7 @@ import java.util.UUID;
  */
 public class AssumptionSpecificationScreenController {
     /**
-     * The {@link Assumption} that is being specified.
+     * The {@link Assumption} that is being specified / edited.
      */
     private Assumption assumption;
     /**
@@ -104,11 +105,14 @@ public class AssumptionSpecificationScreenController {
     /**
      * Initializes the controller with data required for the assumption specification process.
      *
-     * @param specifiedAssumptions The {@link Collection} of {@link Assumption}s that the user has already entered into the application.
+     * @param specifiedAssumptions The {@link Collection} of {@link Assumption}s that the user has already entered
+     *                             into the application.
      * @param assumption           The {@link Assumption} instance that should be filled with data by the user.
      * @param modelPath            The absolute path to the folder of the PCM model.
      */
-    public void initWithMainData(Collection<Assumption> specifiedAssumptions, Assumption assumption, String modelPath) {
+    public void initWithMainData(@NotNull Collection<Assumption> specifiedAssumptions,
+                                 @NotNull Assumption assumption,
+                                 @NotNull String modelPath) {
         this.assumption = assumption;
         this.specifiedAssumptions = specifiedAssumptions;
         // Initialize UI with (existing) assumption data.
@@ -144,9 +148,11 @@ public class AssumptionSpecificationScreenController {
      */
     private void initializeUIElements() {
         this.nameTextField.setText(this.assumption.getName() != null ? this.assumption.getName() : "");
-        this.descriptionTextArea.setText(this.assumption.getDescription() != null ? this.assumption.getDescription() : "");
+        this.descriptionTextArea.setText(this.assumption.getDescription() != null ?
+                this.assumption.getDescription() : "");
         this.riskTextField.setText(this.assumption.getRisk() != null ? String.valueOf(this.assumption.getRisk()) : "");
-        this.violationProbabilityTextField.setText(this.assumption.getProbabilityOfViolation() != null ? String.valueOf(this.assumption.getProbabilityOfViolation()) : "");
+        this.violationProbabilityTextField.setText(this.assumption.getProbabilityOfViolation() != null ?
+                String.valueOf(this.assumption.getProbabilityOfViolation()) : "");
         this.impactTextArea.setText(this.assumption.getImpact() != null ? this.assumption.getImpact() : "");
         this.riskTextField.setText(this.assumption.getRisk() != null ? String.valueOf(this.assumption.getRisk()) : "");
 
@@ -164,7 +170,8 @@ public class AssumptionSpecificationScreenController {
         this.specifiedAssumptions.forEach(specifiedAssumption -> {
             // Do not allow a dependency on itself.
             if (!this.assumption.getId().equals(specifiedAssumption.getId())) {
-                var dependencyCheckMenuItem = new CheckMenuItem(specifiedAssumption.getName() + " (Id: " + specifiedAssumption.getId().toString().substring(0, 5) + "...)");
+                var dependencyCheckMenuItem = new CheckMenuItem(specifiedAssumption.getName() +
+                        " (Id: " + specifiedAssumption.getId().toString().substring(0, 5) + "...)");
                 Collection<UUID> dependenciesOfCurrentAssumption = this.assumption.getDependencies();
 
                 // Set CheckMenuItem to selected id dependency is already present.
@@ -235,7 +242,7 @@ public class AssumptionSpecificationScreenController {
     }
 
     /**
-     * Initializes various GUI control elements on creation of the scene.
+     * Initializer function called on scene creation.
      */
     @FXML
     private void initialize() {

@@ -58,7 +58,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-// TODO: IMPORTANT Introduce AssumptionGraphAnalysisAPI
 // TODO: Make use of @NotNull and @Nullable annotations to avoid NullPointer-Exceptions.
 // TODO: Investigate why EvalScenario2Recreation does not produce right output
 
@@ -66,10 +65,6 @@ import java.util.concurrent.TimeUnit;
  * The controller managing the main screen that is entered on start-up of the application.
  */
 public class MainScreenController {
-    /**
-     * A {@link String} specifying the default path for the save-file.
-     */
-    private final String defaultSaveLocation = Constants.USER_HOME_PATH + Constants.FILE_SYSTEM_SEPARATOR + Constants.DEFAULT_SAVE_FILE_NAME;
     /**
      * The {@link Configuration} that is being edited by the user.
      */
@@ -164,9 +159,9 @@ public class MainScreenController {
     }
 
     /**
-     * TODO
+     * Gets the current {@link Configuration} managed by this controller.
      */
-    public @NotNull Configuration getCurrentConfig(){
+    public @NotNull Configuration getCurrentConfig() {
         return this.currentConfiguration;
     }
 
@@ -225,8 +220,42 @@ public class MainScreenController {
                     new ButtonType("Discard Changes", ButtonBar.ButtonData.NO));
 
             if (confirmationResult.isPresent() && confirmationResult.get().getButtonData() == ButtonBar.ButtonData.YES) {
-                this.saveToFile();
+                this.writeToSaveFile();
             }
+        }
+    }
+
+    /**
+     * Writes the {@link MainScreenController#currentConfiguration} to {@link MainScreenController#saveFile}, if
+     * already set. Otherwise, writes the {@link Configuration} to the default location ({@link Constants#DEFAULT_SAVE_LOCATION}).
+     */
+    private void writeToSaveFile() {
+        // Use default file if not otherwise set by the user.
+        if (this.saveFile == null) {
+            this.saveFile = new File(Constants.DEFAULT_SAVE_LOCATION);
+        }
+
+        // Avoid overwriting in case a file with the default name already exists.
+        if (this.saveFile.exists() && this.saveFile.getAbsolutePath().equals(Constants.DEFAULT_SAVE_LOCATION)) {
+            // Add number suffix until there is no conflict.
+            int suffix = 1;
+            do {
+                this.saveFile = new File(Constants.DEFAULT_SAVE_LOCATION.substring(
+                        0, Constants.DEFAULT_SAVE_LOCATION.length() - 4) + suffix + ".json");
+                suffix++;
+            } while (this.saveFile.exists());
+        }
+
+        // Write to save-file.
+        try {
+            this.saveFile.createNewFile();
+            ConfigManager.writeConfig(this.saveFile, this.currentConfiguration);
+            this.savedConfiguration = this.currentConfiguration;
+
+            Stage stage = (Stage) this.assumptionTableView.getScene().getWindow();
+            stage.setTitle(Constants.APPLICATION_NAME + " — " + this.saveFile.getName());
+        } catch (IOException e) {
+            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Saving failed", "Could not write to file!");
         }
     }
 
@@ -629,37 +658,12 @@ public class MainScreenController {
     }
 
     @FXML
-    private void saveToFile() {
-        // Use default file if not otherwise set by the user.
-        if (this.saveFile == null) {
-            this.saveFile = new File(this.defaultSaveLocation);
-        }
-
-        // Avoid overwriting in case a file with the default name already exists.
-        if (this.saveFile.exists() && this.saveFile.getAbsolutePath().equals(this.defaultSaveLocation)) {
-            // Add number suffix until there is no conflict.
-            int suffix = 1;
-            do {
-                this.saveFile = new File(this.defaultSaveLocation.substring(0, this.defaultSaveLocation.length() - 4) + suffix + ".xml");
-                suffix++;
-            } while (this.saveFile.exists());
-        }
-
-        // Write to save-file.
-        try {
-            this.saveFile.createNewFile();
-            ConfigManager.writeConfig(this.saveFile, this.currentConfiguration);
-            this.savedConfiguration = this.currentConfiguration;
-
-            Stage stage = (Stage) this.assumptionTableView.getScene().getWindow();
-            stage.setTitle(Constants.APPLICATION_NAME + " — " + this.saveFile.getName());
-        } catch (IOException e) {
-            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Saving failed", "Could not write to file!");
-        }
+    private void handleSave() {
+        this.writeToSaveFile();
     }
 
     @FXML
-    private void saveAs(@NotNull ActionEvent actionEvent) {
+    private void handleSaveAs(@NotNull ActionEvent actionEvent) {
         var stage = Utilities.getStageOfMenuItem((MenuItem) actionEvent.getSource());
 
         FileChooser fileChooser = new FileChooser();
@@ -668,7 +672,7 @@ public class MainScreenController {
         fileChooser.setInitialDirectory(new File(Constants.USER_HOME_PATH));
         this.saveFile = fileChooser.showSaveDialog(stage);
 
-        this.saveToFile();
+        this.writeToSaveFile();
     }
 
     @FXML
@@ -678,8 +682,15 @@ public class MainScreenController {
     }
 
     @FXML
-    private void openDocumentation() {
-        this.hostServices.showDocument(Constants.DOCUMENTATION_URL);
+    private void handleOpenDocumentation() {
+        if (this.hostServices != null) {
+            this.hostServices.showDocument(Constants.DOCUMENTATION_URL);
+        } else {
+            Utilities.showAlert(Alert.AlertType.ERROR,
+                    "Error",
+                    "Unable to open documentation",
+                    "Cannot invoke the default browser of the system as host services are unavailable.");
+        }
     }
 
     @FXML
