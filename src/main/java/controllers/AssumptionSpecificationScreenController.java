@@ -273,19 +273,19 @@ public class AssumptionSpecificationScreenController {
         // Listen for changes of the text in the probability of violation TextField.
         this.violationProbabilityTextField.textProperty().addListener((observable, oldText, newText) -> {
             if (newText == null || newText.isEmpty()) {
-                this.assumption.setProbabilityOfViolation(null);
                 return;
-            } else {
-                try {
-                    this.assumption.setProbabilityOfViolation(Double.parseDouble(newText));
+            }
 
-                    // Clear potential red error border.
-                    this.violationProbabilityTextField.getStyleClass().removeIf(style -> style.equals("text-input-error"));
-                } catch (NullPointerException | NumberFormatException exception) {
-                    if (!this.violationProbabilityTextField.getStyleClass().contains("text-input-error")) {
-                        this.violationProbabilityTextField.getStyleClass().add("text-input-error");
-                    }
+            try {
+                this.assumption.setProbabilityOfViolation(Double.parseDouble(newText));
+
+                // Clear potential red error border.
+                this.violationProbabilityTextField.getStyleClass().removeIf(style -> style.equals("text-input-error"));
+            } catch (NullPointerException | NumberFormatException exception) {
+                if (!this.violationProbabilityTextField.getStyleClass().contains("text-input-error")) {
+                    this.violationProbabilityTextField.getStyleClass().add("text-input-error");
                 }
+
             }
 
             this.checkForCompletenessOfSpecification();
@@ -294,18 +294,17 @@ public class AssumptionSpecificationScreenController {
         // Listen for changes of the text in the risk TextField.
         this.riskTextField.textProperty().addListener((observable, oldText, newText) -> {
             if (newText == null || newText.isEmpty()) {
-                this.assumption.setRisk(null);
                 return;
-            } else {
-                try {
-                    this.assumption.setRisk(Double.parseDouble(newText));
+            }
 
-                    // Clear potential red error border.
-                    this.riskTextField.getStyleClass().removeIf(style -> style.equals("text-input-error"));
-                } catch (NullPointerException | NumberFormatException exception) {
-                    if (!this.riskTextField.getStyleClass().contains("text-input-error")) {
-                        this.riskTextField.getStyleClass().add("text-input-error");
-                    }
+            try {
+                this.assumption.setRisk(Double.parseDouble(newText));
+
+                // Clear potential red error border.
+                this.riskTextField.getStyleClass().removeIf(style -> style.equals("text-input-error"));
+            } catch (NullPointerException | NumberFormatException exception) {
+                if (!this.riskTextField.getStyleClass().contains("text-input-error")) {
+                    this.riskTextField.getStyleClass().add("text-input-error");
                 }
             }
 

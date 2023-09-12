@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.securitycheck.AssumptionViews;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -72,34 +73,77 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable {
         // Implicitly set all other fields to null.
     }
 
+    /**
+     * Gets the name of the {@link Assumption}.
+     *
+     * @return The name of the assumption.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the name of the {@link Assumption}.
+     *
+     * @param name The name that should be set.
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Gets the <code>manuallyAnalyzed</code> property of the {@link Assumption}.
+     *
+     * @return The <code>manuallyAnalyzed</code> property.
+     */
     public boolean getManuallyAnalyzed() {
         return this.manuallyAnalyzed;
     }
 
+    /**
+     * Sets the <code>manuallyAnalyzed</code> property of the {@link Assumption}.
+     *
+     * @param manuallyAnalyzed The state that should be set.
+     */
     public void setManuallyAnalyzed(boolean manuallyAnalyzed) {
         this.manuallyAnalyzed = manuallyAnalyzed;
     }
 
-    public void setRisk(Double risk) {
-        this.risk = risk;
-    }
-
-    public Collection<UUID> getDependencies() {
-        return this.dependencies;
-    }
-
+    /**
+     * Gets the numerical risk associated with the {@link Assumption}.
+     *
+     * @return The risk that associated with the assumption.
+     */
     public Double getRisk() {
         return this.risk;
     }
 
+    /**
+     * Sets the numerical risk associated with the {@link Assumption}.
+     *
+     * @param risk The risk that should be set.
+     */
+    public void setRisk(double risk) {
+        this.risk = risk;
+    }
+
+    /**
+     * Gets the {@link Collection} containing the {@link UUID}s of the {@link Assumption}s on which this
+     * {@link Assumption} is depending.
+     *
+     * @return The {@link Collection} containing the {@link UUID}s.
+     */
+    public Collection<UUID> getDependencies() {
+        return this.dependencies;
+    }
+
+    /**
+     * Checks whether all mandatory fields of the {@link Assumption} (i.e., <code>type</code>, <code>name</code>,
+     * and <code>description</code> have been sufficiently specified).
+     *
+     * @return <code>true</code> if all the mandatory fields are sufficiently specified and <code>false</code>
+     * otherwise.
+     */
     @JsonIgnore
     public boolean isSufficientlySpecified() {
         return this.type != null &&
@@ -109,8 +153,19 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable {
                 !this.description.isEmpty();
     }
 
-    public boolean semanticallyEqualTo(Assumption otherAssumption) {
-        return Objects.equals(this.getId(), otherAssumption.getId()) &&
+    /**
+     * Checks whether this {@link Assumption} is semantically equal to <code>otherAssumption</code>,
+     * meaning that they both contain the same semantic values.
+     *
+     * <p><b>Note</b>: Even two different {@link Assumption} instances can be semantically equal if they contain the
+     * same values (w.r.t. <code>equals</code> of the individual fields).</p>
+     *
+     * @param otherAssumption The {@link Assumption} that should be semantically compared to this {@link Assumption}.
+     * @return <code>true</code> if both {@link Assumption}s are semantically equal and <code>false</code> otherwise.
+     */
+    public boolean semanticallyEqualTo(@Nullable Assumption otherAssumption) {
+        return otherAssumption != null &&
+                Objects.equals(this.getId(), otherAssumption.getId()) &&
                 Objects.equals(this.name, otherAssumption.name) &&
                 Objects.equals(this.type, otherAssumption.type) &&
                 Objects.equals(this.affectedEntities, otherAssumption.affectedEntities) &&
@@ -123,7 +178,14 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable {
                 this.manuallyAnalyzed == otherAssumption.manuallyAnalyzed;
     }
 
-    public void updateWith(SecurityCheckAssumption securityCheckAssumption) {
+    /**
+     * Updates the fields of this {@link Assumption} based on the information contained in the specified
+     * {@link SecurityCheckAssumption}.
+     *
+     * @param securityCheckAssumption The {@link SecurityCheckAssumption} instance with whose information this
+     *                                {@link Assumption} should be updated.
+     */
+    public void updateWith(@NotNull SecurityCheckAssumption securityCheckAssumption) {
         assert securityCheckAssumption.getId().equals(this.getId());
 
         this.type = securityCheckAssumption.type;
@@ -134,8 +196,13 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable {
         this.analyzed = securityCheckAssumption.analyzed;
     }
 
+    /**
+     * Creates a clone of this {@link Assumption}.
+     *
+     * @return The created clone.
+     */
     @Override
-    public Assumption clone() {
+    public @NotNull Assumption clone() {
         Assumption clone = (Assumption) super.clone();
 
         // UUID, String and primitive wrapper instances are immutable.
