@@ -31,7 +31,8 @@ public class ApplicationMain extends Application {
         LOGGER.info("Successfully initialized main scene and associated controller.");
 
         // Init AssumptionGraph API
-        var assumptionGraphUri = UriBuilder.fromUri("http://localhost/").port(2407).build();
+        var assumptionGraphUri = UriBuilder.fromUri("http://localhost/")
+                .port(Constants.DEFAULT_ANALYSIS_GRAPH_API_PORT).build();
         var assumptionGrapjServer = JettyHttpContainerFactory.createServer(assumptionGraphUri,
                 new AssumptionGraphServerConfig(mainScreenController));
         assumptionGrapjServer.setStopAtShutdown(true);

@@ -59,7 +59,7 @@ public class ModelReader {
     /**
      * A {@link Map} linking the model view {@link File}s contained in the model to their read root {@link TreeItem}.
      */
-    private final Map<File, TreeItem<ModelEntity>> modelFileParsedItemMap;
+    private final @NotNull Map<File, TreeItem<ModelEntity>> modelFileParsedItemMap;
 
     /**
      * Initializes the {@link ModelReader} instance with a model folder.
@@ -103,24 +103,36 @@ public class ModelReader {
         return Optional.empty();
     }
 
-    private void tryToResolveHref(Attribute href, TreeItem<ModelEntity> encompassingTreeItem) {
+    /**
+     * Tries to resolve the href contained in the specified {@link Attribute} within the available PCM views and, upon
+     * success, adds the name of the referenced entity to the name of the {@link ModelEntity} contained within the
+     * specified {@link TreeItem}.
+     *
+     * @param href The {@link Attribute} containing the href that should be searched within the PCM views.
+     * @param encompassingTreeItem The {@link TreeItem} containing the {@link ModelEntity} that encompasses the href.
+     */
+    private void tryToResolveHref(@NotNull Attribute href, @NotNull TreeItem<ModelEntity> encompassingTreeItem) {
         String[] hrefComponents = href.getValue().split("#");
         if (hrefComponents.length == 2) {
             String hrefFile = hrefComponents[0];
             String hrefId = hrefComponents[1];
 
             // Check whether href can be resolved by searching in one of the model files.
-            var referencedModelFile = this.modelFileParsedItemMap.keySet().stream().filter(file -> file.getName().equals(hrefFile)).findFirst();
+            var referencedModelFile = this.modelFileParsedItemMap.keySet().stream()
+                    .filter(file -> file.getName().equals(hrefFile)).findFirst();
+
             if (referencedModelFile.isPresent()) {
                 Optional<TreeItem<ModelEntity>> rootOfReferencedModelFile = this.readFromModelFile(referencedModelFile.get());
+
                 if (rootOfReferencedModelFile.isPresent()) {
                     var referencedTreeItem = this.searchTreeItemByElementId(rootOfReferencedModelFile.get(), hrefId);
 
                     if (referencedTreeItem.isPresent() && referencedTreeItem.get().getValue().hasOwnName()) {
-                        StringBuilder newNameOfEntity = (encompassingTreeItem.getValue().getName() == null) ? new StringBuilder() : new StringBuilder(encompassingTreeItem.getValue().getName());
+                        var newNameOfEntity = (encompassingTreeItem.getValue().getName() == null) ?
+                                new StringBuilder() : new StringBuilder(encompassingTreeItem.getValue().getName());
 
                         if (newNameOfEntity.isEmpty()) {
-                            newNameOfEntity = new StringBuilder("Entity with hrefs to: ");
+                            newNameOfEntity = new StringBuilder("Entity with href to: ");
                         }
 
                         String nameOfReferencedEntity = referencedTreeItem.get().getValue().getName();
@@ -151,8 +163,11 @@ public class ModelReader {
      * Reads the specified {@link File} (if it is a valid model file) and builds the contained tree structure.
      *
      * @param modelFile The {@link File} that should be read.
-     * @return An {@link Optional} containing the root {@link TreeItem} read from the file or {@link Optional#empty()} if the specified file was either empty or not contained in the collection of valid model files, obtained via {@link ModelReader#getModelFiles()}.
-     * @implNote Requires more memory this way (loading all entities at once) but is faster (and less complex) than trying to reparse specific segments of the XML-file on-demand.
+     * @return An {@link Optional} containing the root {@link TreeItem} read from the file or {@link Optional#empty()}
+     * if the specified file was either empty or not contained in the collection of valid model files, obtained via
+     * {@link ModelReader#getModelFiles()}.
+     * @implNote Requires more memory this way (loading all entities at once) but is faster (and less complex) than
+     * trying to reparse specific segments of the XML-file on-demand.
      */
     public @NotNull Optional<TreeItem<ModelEntity>> readFromModelFile(@NotNull File modelFile) {
         // Only allow reading from a file within the specified model folder.
@@ -174,7 +189,11 @@ public class ModelReader {
                 XMLEvent nextEvent = eventReader.nextEvent();
                 if (nextEvent.isStartElement()) {
                     StartElement startElement = nextEvent.asStartElement();
-                    Attribute type = startElement.getAttributeByName(new QName(startElement.getNamespaceContext().getNamespaceURI("xsi"), "type", "xsi"));
+                    Attribute type = startElement.getAttributeByName(
+                            new QName(startElement.getNamespaceContext().getNamespaceURI("xsi"),
+                                    "type",
+                                    "xsi"));
+
                     Attribute id = startElement.getAttributeByName(new QName("id"));
                     Attribute name = startElement.getAttributeByName(new QName("entityName"));
 
@@ -205,6 +224,7 @@ public class ModelReader {
             }
 
         } catch (XMLStreamException | IOException ignored) {
+            // Ignore errors resulting from reading incompatible files.
         }
 
         this.modelFileParsedItemMap.put(modelFile, currentlySurroundingItem);

@@ -15,6 +15,8 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +28,12 @@ import java.util.stream.Stream;
  * Class responsible for managing a connection to one analysis whose URI is specified on construction.
  */
 public class SecurityAnalysisConnector {
+    /**
+     * Class {@link org.slf4j.Logger}.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityAnalysisConnector.class); // TODO: Use
+
+    // REST API paths.
     private static final String PATH_CONNECTION_TEST = "test";
     private static final String PATH_ANALYSIS_EXECUTION = "run";
     private static final String PATH_MODEL_TRANSMISSION = "set/model/";

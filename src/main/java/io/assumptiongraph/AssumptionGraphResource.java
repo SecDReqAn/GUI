@@ -9,6 +9,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,13 +20,16 @@ import java.util.Collection;
  */
 @Path("/assumption-graph")
 public class AssumptionGraphResource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AssumptionGraphResource.class);
+    /**
+     * Class {@link Logger}.
+     */
+    private static final @NotNull Logger LOGGER = LoggerFactory.getLogger(AssumptionGraphResource.class);
     /**
      * The {@link MainScreenController} used to retrieve the current {@link general.entities.Configuration} of
      * Assumption Analyzer.
      */
     @Inject
-    private MainScreenController mainScreenController;
+    private @NotNull MainScreenController mainScreenController;
 
     /**
      * The <code>/assumption-graph/assumptions</code> endpoint used for retrieving the currently

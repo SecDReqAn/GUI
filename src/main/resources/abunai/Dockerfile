@@ -1,3 +1,5 @@
+# The Dockerfile that can be used to build the container of the Abunai microservice.
+
 # Use a base image with a Java runtime.
 FROM openjdk:17
 
