@@ -1,7 +1,7 @@
 @import "CommonStyle.css";
+@import "AssumptionTableView.css";
 @import "SubtleTableView.css";
 
-/* TODO: Refactor */
 .menu-bar {
     -fx-padding: 0;
 }
@@ -22,7 +22,7 @@
 
 .menu-item:focused {
     -fx-background-color: -fx-accent-color;
-    -fx-border-color: #2B2B2B;
+    -fx-border-color: -fx-alternative-background-color;
 }
 
 .context-menu {
@@ -31,7 +31,7 @@
 }
 
 .context-menu .separator:horizontal .line {
-    -fx-border-color: #2B2B2B;
+    -fx-border-color: -fx-alternative-background-color;
     -fx-border-insets: 1 0 0 0;
 }
 
@@ -46,71 +46,6 @@
 
 .text-node {
     -fx-fill: -fx-main-font-color;
-}
-
-.primary-table-view {
-    -fx-background-color: -fx-view-background-color;
-}
-
-.primary-table-view .column-header {
-    -fx-background-color: #888888;
-    -fx-border-color: -fx-subtle-font-color;
-    -fx-border-width: 1pt 1pt 1pt 1pt;
-}
-
-.primary-table-view .column-header-background .filler {
-    -fx-background-color: #888888;
-}
-
-.primary-table-view .placeholder .label {
-    -fx-text-fill: -fx-main-font-color;
-}
-
-.primary-table-view .table-cell {
-    -fx-text-fill: -fx-main-font-color;
-    -fx-border-color: -fx-subtle-font-color;
-}
-
-.primary-table-view .table-row-cell:odd {
-    -fx-background-color: #4c4c4f;
-}
-
-.primary-table-view .table-row-cell:even {
-    -fx-background-color: #495257;
-}
-
-.manually-analyzed-row {
-    -fx-background-color: rgba(1, 87, 1, 0.25);
-}
-
-.primary-table-view .table-row-cell:empty, .table-row-cell:empty .table-cell {
-    -fx-background-color: transparent;
-    -fx-border-width: 0;
-}
-
-.primary-table-view .table-row-cell:selected {
-    -fx-background-color: -fx-accent-color;
-}
-
-.primary-table-view .column-header .label {
-    -fx-text-fill: white;
-}
-
-.primary-table-view .virtual-flow .corner {
-    -fx-background-color: #888888;
-}
-
-.primary-table-view .virtual-flow .scroll-bar {
-    -fx-background-color: #888888;
-}
-
-.primary-table-view .virtual-flow .scroll-bar .thumb {
-    -fx-background-color: -fx-focus-border-color;
-}
-
-.primary-table-view .virtual-flow .scroll-bar .increment-button:hover,
-.primary-table-view .virtual-flow .scroll-bar .decrement-button:hover {
-    -fx-background-color: -fx-accent-color;
 }
 
 .text-area, .text-area:focused {
@@ -167,11 +102,11 @@
 }
 
 .text-area {
-    -fx-text-fill: #B2AEAD;
+    -fx-text-fill: -fx-main-font-color;
 }
 
 .text-area .content {
-    -fx-background-color: #2B2B2B;
+    -fx-background-color: -fx-alternative-background-color;
 }
 
 .split-pane > .split-pane-divider {

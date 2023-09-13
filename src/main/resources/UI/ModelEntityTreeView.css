@@ -1,0 +1,39 @@
+@import "CommonStyle.css";
+
+.model-entity-tree-view .virtual-flow .corner {
+    -fx-background-color: -fx-foreground-color;
+}
+
+.model-entity-tree-view .virtual-flow .scroll-bar {
+    -fx-background-color: -fx-foreground-color;
+}
+
+.model-entity-tree-view .virtual-flow .scroll-bar .thumb {
+    -fx-background-color: -fx-subtle-font-color;
+}
+
+.model-entity-tree-view .virtual-flow .scroll-bar .increment-button:hover,
+.model-entity-tree-view .virtual-flow .scroll-bar .decrement-button:hover {
+    -fx-background-color: -fx-accent-color;
+}
+
+.model-entity-tree-view {
+    -fx-background-color: -fx-view-background-color;
+}
+
+.model-entity-tree-view .tree-cell {
+    -fx-background-color: -fx-view-background-color;
+    -fx-text-fill: -fx-main-font-color;
+}
+
+.model-entity-tree-view .non-addable-tree-cell {
+    -fx-text-fill: -fx-subtle-font-color;
+}
+
+.model-entity-tree-view .tree-cell:selected {
+    -fx-background-color: -fx-accent-color;
+}
+
+.model-entity-tree-view .tree-cell > .tree-disclosure-node > .arrow {
+    -fx-background-color: -fx-main-font-color;
+}

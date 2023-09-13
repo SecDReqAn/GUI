@@ -124,14 +124,6 @@ public class AssumptionSpecificationScreenController {
     }
 
     /**
-     * Checks whether the mandatory fields of the {@link Assumption} instance have been filled and enables a
-     * button to exit the pop-up window.
-     */
-    private void checkForCompletenessOfSpecification() {
-        this.insertButton.setDisable(!this.assumption.isSufficientlySpecified());
-    }
-
-    /**
      * Gets the boolean indicating whether the user confirmed his input.
      *
      * @return The boolean, indicating whether the user confirmed his input (<code>true</code>) or whether
@@ -139,6 +131,14 @@ public class AssumptionSpecificationScreenController {
      */
     public boolean getUserConfirmation() {
         return this.userConfirmation;
+    }
+
+    /**
+     * Checks whether the mandatory fields of the {@link Assumption} instance have been filled and enables a
+     * button to exit the pop-up window.
+     */
+    private void checkForCompletenessOfSpecification() {
+        this.insertButton.setDisable(!this.assumption.isSufficientlySpecified());
     }
 
     /**

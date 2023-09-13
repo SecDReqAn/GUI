@@ -1,6 +1,7 @@
 @import "CommonStyle.css";
-
-/* TODO: Refactor */
+@import "SubtleTableView.css";
+@import "ModelEntityTableView.css";
+@import "ModelEntityTreeView.css";
 
 .text-field:focused {
     -fx-border-color: -fx-focus-border-color;
@@ -27,7 +28,7 @@
 
 .menu-item:focused {
     -fx-background-color: -fx-accent-color;
-    -fx-border-color: #2B2B2B;
+    -fx-border-color: -fx-alternative-background-color;
 }
 
 .check-menu-item {
@@ -36,6 +37,10 @@
 
 .radio-button, .check-box {
     -fx-text-fill: -fx-main-font-color;
+}
+
+.text-input-error {
+    -fx-text-fill: red;
 }
 
 .text-area, .text-area:focused, .text-field {
@@ -49,11 +54,8 @@
     -fx-border-radius: 4pt;
 }
 
-.text-area .scroll-pane {
-    -fx-background-color: transparent;
-}
-
-.text-area .scroll-pane .viewport {
+.text-area .scroll-pane,
+.text-area .scroll-pane .viewport{
     -fx-background-color: transparent;
 }
 
@@ -61,108 +63,20 @@
     -fx-background-color: -fx-focus-border-color;
 }
 
-.text-input-error {
-    -fx-text-fill: red;
-}
-
-.table-view {
-    -fx-background-color: -fx-view-background-color;
-}
-
-.table-view .column-header {
-    -fx-background-color: -fx-foreground-color;
-}
-
-.table-view .column-header .label {
-    -fx-text-fill: -fx-main-font-color;
-}
-
-.table-view .column-header-background {
-    -fx-background-color: -fx-foreground-color;
-}
-
-.table-view .column-header-background .filler,
-.table-view .virtual-flow .corner,
-.tree-view .virtual-flow .corner {
-    -fx-background-color: -fx-foreground-color;
-}
-
-.table-view .placeholder .label {
-    -fx-text-fill: -fx-main-font-color;
-}
-
-.table-cell {
-    -fx-text-fill: -fx-main-font-color;
-}
-
-.table-row-cell:odd {
-    -fx-background-color: -fx-foreground-color;
-}
-
-.table-row-cell:even {
-    -fx-background-color: -fx-accent-pale-color;
-}
-
-.table-row-cell:selected {
-    -fx-background-color: -fx-accent-color;
-}
-
-.table-row-cell:empty > *.table-cell {
-    -fx-background-color: -fx-view-background-color;
-    -fx-border-width: 0;
-}
-
-.table-view .virtual-flow .scroll-bar,
-.tree-view .virtual-flow .scroll-bar,
 .text-area .scroll-bar {
     -fx-background-color: -fx-foreground-color;
 }
 
-.table-view .virtual-flow .scroll-bar .thumb,
-.tree-view .virtual-flow .scroll-bar .thumb,
 .text-area .scroll-bar .thumb {
     -fx-background-color: -fx-subtle-font-color;
 }
 
-.table-view .virtual-flow .scroll-bar .increment-button:hover,
-.table-view .virtual-flow .scroll-bar .decrement-button:hover,
-.tree-view .virtual-flow .scroll-bar .increment-button:hover,
-.tree-view .virtual-flow .scroll-bar .decrement-button:hover,
 .text-area .scroll-bar .increment-button:hover,
 .text-area .scroll-bar .decrement-button:hover {
     -fx-background-color: -fx-accent-color;
 }
 
-#modelViewTableView .table-row-cell {
-    -fx-background-color: -fx-view-background-color;
-}
-
-#modelViewTableView .table-row-cell:focused {
-    -fx-background-color: -fx-accent-color;
-}
-
 .split-pane > .split-pane-divider {
     -fx-background-color: -fx-foreground-color;
-}
-
-.tree-view {
-    -fx-background-color: -fx-view-background-color;
-}
-
-.tree-cell {
-    -fx-background-color: -fx-view-background-color;
-    -fx-text-fill: -fx-main-font-color;
-}
-
-.non-addable-tree-cell {
-    -fx-text-fill: -fx-subtle-font-color;
-}
-
-.tree-cell:selected {
-    -fx-background-color: -fx-accent-color;
-}
-
-.tree-cell > .tree-disclosure-node > .arrow {
-    -fx-background-color: -fx-main-font-color;
 }
 

@@ -109,7 +109,7 @@
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <TableView fx:id="affectedEntityTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                                    <TableView fx:id="affectedEntityTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="model-entity-table-view">
                                       <placeholder>
                                           <Label text="No model entities specified" />
                                       </placeholder>
@@ -122,7 +122,7 @@
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                        </columnResizePolicy>
                                     </TableView>
-                                    <TableView fx:id="modelViewTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1">
+                                    <TableView fx:id="modelViewTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="subtle-table-view" GridPane.columnIndex="1">
                                       <placeholder>
                                         <Label text="No model view found" />
                                       </placeholder>
@@ -139,7 +139,7 @@
                         </AnchorPane>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                            <children>
-                              <TreeView fx:id="modelEntityTreeView" prefHeight="86.0" prefWidth="523.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <TreeView fx:id="modelEntityTreeView" prefHeight="86.0" prefWidth="523.0" styleClass="model-entity-tree-view" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                            </children>
                         </AnchorPane>
                     </items>

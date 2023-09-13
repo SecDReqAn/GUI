@@ -1,0 +1,61 @@
+@import "CommonStyle.css";
+
+.model-entity-table-view {
+    -fx-background-color: -fx-view-background-color;
+}
+
+.model-entity-table-view .column-header {
+    -fx-background-color: -fx-foreground-color;
+}
+
+.model-entity-table-view .column-header .label {
+    -fx-text-fill: -fx-main-font-color;
+}
+
+.model-entity-table-view .column-header-background {
+    -fx-background-color: -fx-foreground-color;
+}
+
+.model-entity-table-view .column-header-background .filler,
+.model-entity-table-view .virtual-flow .corner,
+.model-entity-table-view .virtual-flow .corner {
+    -fx-background-color: -fx-foreground-color;
+}
+
+.model-entity-table-view .placeholder .label {
+    -fx-text-fill: -fx-main-font-color;
+}
+
+.model-entity-table-view .table-cell {
+    -fx-text-fill: -fx-main-font-color;
+}
+
+.model-entity-table-view .table-row-cell:odd {
+    -fx-background-color: -fx-foreground-color;
+}
+
+.model-entity-table-view .table-row-cell:even {
+    -fx-background-color: -fx-accent-pale-color;
+}
+
+.model-entity-table-view .table-row-cell:selected {
+    -fx-background-color: -fx-accent-color;
+}
+
+.model-entity-table-view .table-row-cell:empty > *.table-cell {
+    -fx-background-color: -fx-view-background-color;
+    -fx-border-width: 0;
+}
+
+.model-entity-table-view .virtual-flow .scroll-bar {
+    -fx-background-color: -fx-foreground-color;
+}
+
+.model-entity-table-view .virtual-flow .scroll-bar .thumb {
+    -fx-background-color: -fx-subtle-font-color;
+}
+
+.model-entity-table-view .virtual-flow .scroll-bar .increment-button:hover,
+.model-entity-table-view .virtual-flow .scroll-bar .decrement-button:hover {
+    -fx-background-color: -fx-accent-color;
+}
