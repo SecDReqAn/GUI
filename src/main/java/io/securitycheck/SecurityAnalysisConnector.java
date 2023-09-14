@@ -31,7 +31,7 @@ public class SecurityAnalysisConnector {
     /**
      * Class {@link org.slf4j.Logger}.
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityAnalysisConnector.class); // TODO: Use
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityAnalysisConnector.class);
 
     // REST API paths.
     private static final String PATH_CONNECTION_TEST = "test";
@@ -93,15 +93,23 @@ public class SecurityAnalysisConnector {
      */
     public @NotNull Pair<Integer, String> testConnection() {
         Pair<Integer, String> codeMessagePair;
+        LOGGER.info("Testing connection to analysis with URI \"" + this.analysisUri + "\"");
 
-        try (var response = this.client.target(this.analysisUri).path(SecurityAnalysisConnector.PATH_CONNECTION_TEST).request(MediaType.TEXT_PLAIN).get()) {
+        try (var response = this.client.target(this.analysisUri)
+                .path(SecurityAnalysisConnector.PATH_CONNECTION_TEST)
+                .request(MediaType.TEXT_PLAIN).get()) {
             codeMessagePair = new Pair<>(response.getStatus(), response.readEntity(String.class));
         } catch (IllegalArgumentException | NullPointerException e) {
+            LOGGER.debug("Connection test to analysis with URI \"" + this.analysisUri
+                                + "\" failed due to malformed URI", e);
             codeMessagePair = new Pair<>(0, "The specified URI is invalid.");
         } catch (ProcessingException e) {
+            LOGGER.debug("Connection test to analysis with URI \"" + this.analysisUri + "\" was unsuccessful", e);
             codeMessagePair = new Pair<>(0, "Connection to analysis could not be established.");
         }
 
+        LOGGER.info("Connection test to analysis with URI \"" + this.analysisUri
+                            + "\" resulted in code " + codeMessagePair.getKey());
         return codeMessagePair;
     }
 
@@ -121,22 +129,33 @@ public class SecurityAnalysisConnector {
      * @return A {@link Pair} encompassing a status code accessible via {@link Pair#getKey()} and the output log of the
      * analysis accessible via {@link Pair#getValue()}.
      */
-    public Pair<Integer, AnalysisOutput> performAnalysis(@NotNull String modelPath, @NotNull Collection<Assumption> assumptions) {
+    public Pair<Integer, AnalysisOutput> performAnalysis(@NotNull String modelPath,
+                                                         @NotNull Collection<Assumption> assumptions) {
+        LOGGER.info("Performing analysis on model with path \"" + modelPath + "\" with analysis \""
+                            + this.analysisUri + "\"");
+
         try {
             var jsonString = this.objectMapper.writerWithView(AssumptionViews.SecurityCheckAnalysisView.class)
                     .writeValueAsString(new AnalysisParameter(modelPath, assumptions));
 
-            try (var response = this.client.target(this.analysisUri).path(SecurityAnalysisConnector.PATH_ANALYSIS_EXECUTION)
+            try (var response = this.client.target(this.analysisUri)
+                    .path(SecurityAnalysisConnector.PATH_ANALYSIS_EXECUTION)
                     .request(MediaType.APPLICATION_JSON_TYPE)
                     .post(Entity.entity(jsonString, MediaType.APPLICATION_JSON))) {
                 String jsonResponse = response.readEntity(String.class);
-                return new Pair<>(response.getStatus(), this.objectMapper.readValue(jsonResponse, AnalysisOutput.class));
+
+                var codeMessagePair = new Pair<>(response.getStatus(), this.objectMapper.readValue(jsonResponse,
+                                                                                                   AnalysisOutput.class));
+                LOGGER.info("Analysis execution on security analysis \"" + this.analysisUri
+                                    + "\" resulted in code " + codeMessagePair.getKey());
+                return codeMessagePair;
             }
         } catch (JsonProcessingException e) {
+            LOGGER.error("Error due to malformed analysis parameters when trying to execute analysis", e);
             return new Pair<>(0, new AnalysisOutput("Marshalling failed due to malformed analysis parameters.", null));
         } catch (ProcessingException e) {
+            LOGGER.error("Error due to processing exception when trying to execute analysis", e);
             return new Pair<>(0, new AnalysisOutput("Processing Exception: " + e.getMessage(), null));
-
         }
     }
 
@@ -153,7 +172,8 @@ public class SecurityAnalysisConnector {
 
         if (filesInModelFolder == null || filesInModelFolder.length == 0) {
             // Abort.
-            return new Pair<>(0, "The model could not be transmitted to the analysis as there are no files contained in the specified model folder.");
+            return new Pair<>(0, "The model could not be transmitted to the analysis as there are no files contained " +
+                    "in the specified model folder.");
         }
 
         // Do not consider folders and nested / hidden files.
@@ -167,11 +187,20 @@ public class SecurityAnalysisConnector {
                 multiPart.bodyPart(new FileDataBodyPart(file.getName(), file));
             }
 
-            try (var response = this.client.target(this.analysisUri).path(SecurityAnalysisConnector.PATH_MODEL_TRANSMISSION + modelPath.getName()).request().post(Entity.entity(multiPart, multiPart.getMediaType()))) {
-                return new Pair<>(response.getStatus(), response.readEntity(String.class));
+            LOGGER.info("Transferring model with path \"" + modelPath.getAbsolutePath() + "\" to analysis with URI " +
+                                "\"" + this.analysisUri + "\"");
+            try (var response = this.client.target(this.analysisUri)
+                    .path(SecurityAnalysisConnector.PATH_MODEL_TRANSMISSION + modelPath.getName())
+                    .request().post(Entity.entity(multiPart, multiPart.getMediaType()))) {
+                var codeMessagePair = new Pair<>(response.getStatus(), response.readEntity(String.class));
+                LOGGER.info("Model transfer to analysis with URI \"" + this.analysisUri + "\" resulted in code "
+                                    + codeMessagePair.getKey());
+                return codeMessagePair;
             }
         } catch (IOException e) {
+            LOGGER.error("Error creating multi-part object for model transfer", e);
             return new Pair<>(0, "Could not create a multi-part object for sending the model to the analysis.");
         }
+
     }
 }

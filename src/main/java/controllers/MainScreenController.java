@@ -60,7 +60,6 @@ import java.util.concurrent.TimeUnit;
 
 // TODO: Make use of @NotNull and @Nullable annotations to avoid NullPointer-Exceptions.
 // TODO: Investigate why EvalScenario2Recreation does not produce right output
-// TODO: Remove Preferences MenuItem in top menu.
 
 /**
  * The controller managing the main screen that is entered on start-up of the application.

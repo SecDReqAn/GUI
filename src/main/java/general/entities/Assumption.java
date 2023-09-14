@@ -18,6 +18,11 @@ import java.util.UUID;
 /**
  * An extended assumption that extends a {@link SecurityCheckAssumption} by some properties tailored towards a
  * more high-level analysis.
+ *
+ * <p><b>Note</b>: @{@link Nullable} and @{@link NotNull} annotations for the fields are intentionally omitted as, on
+ * initialization of the object, nearly all fields are <code>null</code>. However,
+ * {@link controllers.AssumptionSpecificationScreenController} ensures that the the mandatory fields are always set
+ * during the specification.</p>
  */
 public class Assumption extends SecurityCheckAssumption implements Cloneable {
     /**

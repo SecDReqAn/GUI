@@ -8,7 +8,8 @@ public enum AssumptionType {
 
     @Override
     public String toString() {
-        if(this == INTRODUCE_UNCERTAINTY){
+        // Used to display the enum variables in the assumption TableView.
+        if (this == INTRODUCE_UNCERTAINTY) {
             return "Introduce Uncertainty";
         } else {
             return "Resolve Uncertainty";

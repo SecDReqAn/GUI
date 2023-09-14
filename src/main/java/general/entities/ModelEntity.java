@@ -4,12 +4,39 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Class representing a model entity found within a PCM.
+ */
 public class ModelEntity {
-    @Nullable private String id;
-    @NotNull private String modelView;
-    @NotNull private String elementName;
-    @Nullable private String name;
-    @Nullable private String type;
+    /**
+     * The unique id of the entity within the PCM.
+     */
+    @Nullable
+    private String id;
+    /**
+     * The view in which the entity was specified.
+     */
+    @NotNull
+    private String modelView;
+    /**
+     * The name of the XML element that declared the entity.
+     */
+    @NotNull
+    private String elementName;
+    /**
+     * The name of the entity.
+     */
+    @Nullable
+    private String name;
+    /**
+     * The type of the entity.
+     */
+    @Nullable
+    private String type;
+    /**
+     * A property indicating whether the definition of this entity (read from one of the PCM files) contained a name
+     * specification.
+     */
     @JsonIgnore
     private boolean ownName;
 
@@ -20,7 +47,8 @@ public class ModelEntity {
     private ModelEntity() {
     }
 
-    public ModelEntity(@Nullable String id, @NotNull String modelView, @NotNull String elementName, @Nullable String name, @Nullable String type) {
+    public ModelEntity(@Nullable String id, @NotNull String modelView, @NotNull String elementName,
+                       @Nullable String name, @Nullable String type) {
         this.id = id;
         this.modelView = modelView;
         this.elementName = elementName;
