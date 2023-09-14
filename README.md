@@ -4,8 +4,6 @@
 ## <center>Thema: Anforderungsprüfung</center>
 ## <center>Tim Bächle</center>
 
-***
-
 ## Installation
 
 - Clone this repository
@@ -14,8 +12,6 @@
   - Select the <code>Maven</code> option
   - Select <code>Reload project</code>
 - Assumption Analyzer can then be started by executing <code>src/main/java/Main.java</code>
-
-***
 
 ## Further Documentation
 
@@ -26,8 +22,6 @@ For further resources please refer to the <code>documentation</code> directory l
 - [Ausarbeitung_Praktikum_WAM.pdf](documentation/Ausarbeitung_Praktikum_WAM.pdf): A detailed description of Assumption Analyzer, detailing its goal, architecture, usage, and selected design decisions can 
 be found in the <code>documentation</code> directory.
 - [Ausarbeitung_Praktikum_WAM.zip](documentation/Ausarbeitung_Praktikum_WAM.zip): The LaTeX source files used to create the pdf mentioned above.
-
-***
 
 ## Quick Links
 
