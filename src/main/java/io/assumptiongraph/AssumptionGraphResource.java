@@ -44,7 +44,7 @@ public class AssumptionGraphResource {
     public Response getFullAssumptionSet(@Context HttpHeaders headers) {
         Collection<String> hostStrings = headers.getRequestHeader("host");
         LOGGER.info("Received request for assumption set from host \""
-                + (hostStrings == null ? "unknown" : hostStrings) + "\"");
+                            + (hostStrings == null ? "unknown" : hostStrings) + "\"");
 
         var assumptions = this.mainScreenController.getCurrentConfig().getAssumptions();
         return Response.ok(assumptions).build();
@@ -63,7 +63,7 @@ public class AssumptionGraphResource {
     public Response getSecurityAnalysisResults(@Context HttpHeaders headers) {
         Collection<String> hostStrings = headers.getRequestHeader("host");
         LOGGER.info("Received request for security analysis result set from host \""
-                + (hostStrings == null ? "unknown" : hostStrings) + "\"");
+                            + (hostStrings == null ? "unknown" : hostStrings) + "\"");
 
         var securityAnalysisResults = this.mainScreenController.getCurrentConfig().getAnalysisResults();
         return Response.ok(securityAnalysisResults).build();
@@ -82,7 +82,7 @@ public class AssumptionGraphResource {
     public Response getModelPath(@Context HttpHeaders headers) {
         Collection<String> hostStrings = headers.getRequestHeader("host");
         LOGGER.info("Received request for model path from host \""
-                + (hostStrings == null ? "unknown" : hostStrings) + "\"");
+                            + (hostStrings == null ? "unknown" : hostStrings) + "\"");
 
         var modelPath = this.mainScreenController.getCurrentConfig().getModelPath();
         return Response.ok(modelPath).build();
@@ -101,7 +101,7 @@ public class AssumptionGraphResource {
     public Response getSecurityAnalysisUri(@Context HttpHeaders headers) {
         Collection<String> hostStrings = headers.getRequestHeader("host");
         LOGGER.info("Received request for security analysis uri from host \""
-                + (hostStrings == null ? "unknown" : hostStrings) + "\"");
+                            + (hostStrings == null ? "unknown" : hostStrings) + "\"");
 
         var analysisUri = this.mainScreenController.getCurrentConfig().getAnalysisPath();
         return Response.ok(analysisUri).build();

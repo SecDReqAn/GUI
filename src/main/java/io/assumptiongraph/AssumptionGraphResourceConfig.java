@@ -6,16 +6,19 @@ import jakarta.ws.rs.ApplicationPath;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 
+/**
+ * Custom {@link ResourceConfig} that configures the {@link AssumptionGraphResource}.
+ */
 @ApplicationPath("/")
-public class AssumptionGraphServerConfig extends ResourceConfig {
+public class AssumptionGraphResourceConfig extends ResourceConfig {
     /**
-     * Constructs a new {@link AssumptionGraphServerConfig} instance with the specified {@link MainScreenController} to
-     * inject.
+     * Constructs a new {@link AssumptionGraphResourceConfig} instance with the specified
+     * {@link MainScreenController} to inject.
      *
      * @param mainScreenController The {@link MainScreenController} which should be injected into the
      *                             {@link AssumptionGraphResource}.
      */
-    public AssumptionGraphServerConfig(MainScreenController mainScreenController) {
+    public AssumptionGraphResourceConfig(MainScreenController mainScreenController) {
         // Enable JSON.
         register(JacksonFeature.class);
         // Register resource.

@@ -67,7 +67,8 @@ public class ModelReader {
      * Note: This does not include the parsing of the model files.
      * </p>
      *
-     * @param modelFolder The {@link File} describing the root folder of the model (i.e., the one containing the view-files).
+     * @param modelFolder The {@link File} describing the root folder of the model (i.e., the one containing the
+     *                    view-files).
      */
     public ModelReader(@NotNull File modelFolder) {
         this.modelFileParsedItemMap = new HashMap<>();
@@ -82,13 +83,16 @@ public class ModelReader {
     }
 
     /**
-     * Searches for a {@link TreeItem} containing a {@link ModelEntity} with a specified id by using depth first search (DFS) starting from a given root node.
+     * Searches for a {@link TreeItem} containing a {@link ModelEntity} with a specified id by using depth first
+     * search (DFS) starting from a given root node.
      *
      * @param root The {@link TreeItem} acting as the starting point for the DFS.
      * @param id   The id of the {@link ModelEntity} in the desired {@link TreeItem}.
-     * @return An {@link Optional} containing the found {@link TreeItem} if the search was successful. Otherwise, returns {@link Optional#empty()}.
+     * @return An {@link Optional} containing the found {@link TreeItem} if the search was successful. Otherwise,
+     * returns {@link Optional#empty()}.
      */
-    private @NotNull Optional<TreeItem<ModelEntity>> searchTreeItemByElementId(@NotNull TreeItem<ModelEntity> root, @NotNull String id) {
+    private @NotNull Optional<TreeItem<ModelEntity>> searchTreeItemByElementId(@NotNull TreeItem<ModelEntity> root,
+                                                                               @NotNull String id) {
         String rootId = root.getValue().getId();
         if (rootId != null && rootId.equals(id)) {
             return Optional.of(root);
@@ -108,7 +112,8 @@ public class ModelReader {
      * success, adds the name of the referenced entity to the name of the {@link ModelEntity} contained within the
      * specified {@link TreeItem}.
      *
-     * @param href The {@link Attribute} containing the href that should be searched within the PCM views.
+     * @param href                 The {@link Attribute} containing the href that should be searched within the PCM
+     *                             views.
      * @param encompassingTreeItem The {@link TreeItem} containing the {@link ModelEntity} that encompasses the href.
      */
     private void tryToResolveHref(@NotNull Attribute href, @NotNull TreeItem<ModelEntity> encompassingTreeItem) {
@@ -122,7 +127,8 @@ public class ModelReader {
                     .filter(file -> file.getName().equals(hrefFile)).findFirst();
 
             if (referencedModelFile.isPresent()) {
-                Optional<TreeItem<ModelEntity>> rootOfReferencedModelFile = this.readFromModelFile(referencedModelFile.get());
+                Optional<TreeItem<ModelEntity>> rootOfReferencedModelFile = this.readFromModelFile(
+                        referencedModelFile.get());
 
                 if (rootOfReferencedModelFile.isPresent()) {
                     var referencedTreeItem = this.searchTreeItemByElementId(rootOfReferencedModelFile.get(), hrefId);
@@ -191,8 +197,8 @@ public class ModelReader {
                     StartElement startElement = nextEvent.asStartElement();
                     Attribute type = startElement.getAttributeByName(
                             new QName(startElement.getNamespaceContext().getNamespaceURI("xsi"),
-                                    "type",
-                                    "xsi"));
+                                      "type",
+                                      "xsi"));
 
                     Attribute id = startElement.getAttributeByName(new QName("id"));
                     Attribute name = startElement.getAttributeByName(new QName("entityName"));

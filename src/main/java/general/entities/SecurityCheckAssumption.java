@@ -143,7 +143,7 @@ public class SecurityCheckAssumption implements Cloneable {
     /**
      * Sets the probability of violation for the {@link SecurityCheckAssumption}.
      *
-     * @param probabilityOfViolation The probability that sould be set.
+     * @param probabilityOfViolation The probability that should be set.
      */
     public void setProbabilityOfViolation(@Nullable Double probabilityOfViolation) {
         this.probabilityOfViolation = probabilityOfViolation;
@@ -152,8 +152,8 @@ public class SecurityCheckAssumption implements Cloneable {
     /**
      * Gets the textual description of the {@link SecurityCheckAssumption}'s impact.
      *
-     * @return The textual description of the {@link SecurityCheckAssumption}'s impact as a {@link String} or <code>null</code> if the impact
-     * was not yet specified.
+     * @return The textual description of the {@link SecurityCheckAssumption}'s impact as a {@link String} or
+     * <code>null</code> if the impact was not yet specified.
      */
     public @Nullable String getImpact() {
         return impact;

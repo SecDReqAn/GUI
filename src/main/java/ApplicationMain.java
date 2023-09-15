@@ -1,6 +1,6 @@
 import controllers.MainScreenController;
 import general.Constants;
-import io.assumptiongraph.AssumptionGraphServerConfig;
+import io.assumptiongraph.AssumptionGraphResourceConfig;
 import jakarta.ws.rs.core.UriBuilder;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -34,7 +34,8 @@ public class ApplicationMain extends Application {
         var assumptionGraphUri = UriBuilder.fromUri("http://localhost/")
                 .port(Constants.DEFAULT_ANALYSIS_GRAPH_API_PORT).build();
         var assumptionGrapjServer = JettyHttpContainerFactory.createServer(assumptionGraphUri,
-                new AssumptionGraphServerConfig(mainScreenController));
+                                                                           new AssumptionGraphResourceConfig(
+                                                                                   mainScreenController));
         assumptionGrapjServer.setStopAtShutdown(true);
 
         try {

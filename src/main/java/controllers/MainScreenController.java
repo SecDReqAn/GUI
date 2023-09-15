@@ -58,7 +58,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-// TODO: Make use of @NotNull and @Nullable annotations to avoid NullPointer-Exceptions.
 // TODO: Investigate why EvalScenario2Recreation does not produce right output
 
 /**
@@ -219,7 +218,8 @@ public class MainScreenController {
                     new ButtonType("Save Changes", ButtonBar.ButtonData.YES),
                     new ButtonType("Discard Changes", ButtonBar.ButtonData.NO));
 
-            if (confirmationResult.isPresent() && confirmationResult.get().getButtonData() == ButtonBar.ButtonData.YES) {
+            if (confirmationResult.isPresent()
+                    && confirmationResult.get().getButtonData() == ButtonBar.ButtonData.YES) {
                 this.writeToSaveFile();
             }
         }
@@ -227,7 +227,8 @@ public class MainScreenController {
 
     /**
      * Writes the {@link MainScreenController#currentConfiguration} to {@link MainScreenController#saveFile}, if
-     * already set. Otherwise, writes the {@link Configuration} to the default location ({@link Constants#DEFAULT_SAVE_LOCATION}).
+     * already set. Otherwise, writes the {@link Configuration} to the default location
+     * ({@link Constants#DEFAULT_SAVE_LOCATION}).
      */
     private void writeToSaveFile() {
         // Use default file if not otherwise set by the user.
@@ -247,15 +248,19 @@ public class MainScreenController {
         }
 
         // Write to save-file.
+        boolean saveFileExisted = false;
         try {
-            this.saveFile.createNewFile();
+            saveFileExisted = this.saveFile.createNewFile();
             ConfigManager.writeConfig(this.saveFile, this.currentConfiguration);
             this.savedConfiguration = this.currentConfiguration;
 
             Stage stage = (Stage) this.assumptionTableView.getScene().getWindow();
             stage.setTitle(Constants.APPLICATION_NAME + " — " + this.saveFile.getName());
         } catch (IOException e) {
-            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Saving failed", "Could not write to file!");
+            Utilities.showAlert(Alert.AlertType.ERROR,
+                                "Error",
+                                "Saving failed",
+                                "Could not write to " + (saveFileExisted ? "existing" : "new") + " save-file!");
         }
     }
 
@@ -268,14 +273,18 @@ public class MainScreenController {
      * @return An {@link Optional} holding an {@link Assumption} the specified / edited {@link Assumption} or
      * {@link Optional#empty()} if the user aborted the specification / editing.
      */
-    private @NotNull Optional<Assumption> showAssumptionSpecificationScreen(@NotNull Assumption assumption, @NotNull Window owner) {
+    private @NotNull Optional<Assumption> showAssumptionSpecificationScreen(@NotNull Assumption assumption,
+                                                                            @NotNull Window owner) {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("../UI/AssumptionSpecificationScreen.fxml"));
             AnchorPane root = loader.load();
 
             AssumptionSpecificationScreenController controller = loader.getController();
-            controller.initWithMainData(this.currentConfiguration.getAssumptions(), assumption, this.currentConfiguration.getModelPath());
+            // Should only be able to add an Assumption if a model path was previously set.
+            assert this.currentConfiguration.getModelPath() != null;
+            controller.initWithMainData(
+                    this.currentConfiguration.getAssumptions(), assumption, this.currentConfiguration.getModelPath());
 
             var stage = new Stage();
             stage.setScene(new Scene(root));
@@ -299,7 +308,8 @@ public class MainScreenController {
      * Convenience function that shows the assumption specification screen pre-initialized with
      * the fields contained in the specified {@link Assumption}.
      *
-     * <p><b>Note</b>: The {@link Assumption} specified via <code>assumption</code> is not altered by the users inputs.</p>
+     * <p><b>Note</b>: The {@link Assumption} specified via <code>assumption</code> is not altered
+     * by the users inputs.</p>
      *
      * @param assumption The {@link Assumption} whose fields should be used to initialize the
      *                   assumption specification screen.
@@ -313,12 +323,13 @@ public class MainScreenController {
     }
 
     /**
-     * Convenience function that shows an empty assumption specification for the specification of a new {@link Assumption}
+     * Convenience function that shows an empty assumption specification for the specification of a new
+     * {@link Assumption}
      *
      * @param owner The owner {@link Window} of the to be shown assumption specification screen (required for
      *              modal-window functionality).
-     * @return An {@link Optional} containing the newly specified {@link Assumption} instance or {@link Optional#empty()} if
-     * the assumption specification screen could not be opened or the user aborted the specification.
+     * @return An {@link Optional} containing the newly specified {@link Assumption} instance or{@link Optional#empty()}
+     * if the assumption specification screen could not be opened or the user aborted the specification.
      */
     private @NotNull Optional<Assumption> specifyNewAssumption(@NotNull Window owner) {
         return this.showAssumptionSpecificationScreen(new Assumption(), owner);
@@ -344,7 +355,8 @@ public class MainScreenController {
 
             // Model
             if (this.currentConfiguration.getModelPath() != null) {
-                var folders = this.currentConfiguration.getModelPath().split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
+                var folders = this.currentConfiguration.getModelPath()
+                        .split(Constants.FILE_SYSTEM_SEPARATOR.equals("\\") ? "\\\\" : Constants.FILE_SYSTEM_SEPARATOR);
                 this.modelNameLabel.setText(folders[folders.length - 1]);
             }
 
@@ -364,13 +376,25 @@ public class MainScreenController {
             this.performAnalysisButton.setDisable(this.currentConfiguration.isMissingAnalysisParameters());
             ownerStage.setTitle(Constants.APPLICATION_NAME + " — " + this.saveFile.getName());
         } catch (StreamReadException e) {
-            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "The specified file exhibits an invalid structure.");
+            Utilities.showAlert(Alert.AlertType.ERROR,
+                                "Error",
+                                "Opening file failed",
+                                "The specified file exhibits an invalid structure.");
         } catch (DatabindException e) {
-            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not map the contents of the specified file to a valid Configuration.");
+            Utilities.showAlert(Alert.AlertType.ERROR,
+                                "Error",
+                                "Opening file failed",
+                                "Could not map the contents of the specified file to a valid Configuration.");
         } catch (FileNotFoundException e) {
-            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Could not find the repository file associated with the the specified model.");
+            Utilities.showAlert(Alert.AlertType.ERROR,
+                                "Error",
+                                "Opening file failed",
+                                "Could not find the repository file associated with the the specified model.");
         } catch (IOException e) {
-            Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Opening file failed", "Encountered a low-level I/O problem when trying to read from the file.");
+            Utilities.showAlert(Alert.AlertType.ERROR,
+                                "Error",
+                                "Opening file failed",
+                                "Encountered a low-level I/O problem when trying to read from the file.");
         }
     }
 
@@ -414,7 +438,7 @@ public class MainScreenController {
         this.analyzedColumn.setCellValueFactory(new PropertyValueFactory<>("analyzed"));
 
         // Deal with columns that contain collections.
-        Utilities.setCellValueFactoryForCollectionElement(this.entitiesColumn, assumption -> {
+        Utilities.setCellValueFactoryForAssumptionColumn(this.entitiesColumn, assumption -> {
             var stringBuilder = new StringBuilder();
             assumption.getAffectedEntities().forEach(affectedEntity -> {
                 stringBuilder.append(affectedEntity.getId());
@@ -422,19 +446,23 @@ public class MainScreenController {
             });
             return stringBuilder.isEmpty() ? "" : stringBuilder.substring(0, stringBuilder.length() - 2);
         });
-        Utilities.setCellValueFactoryForCollectionElement(this.dependenciesColumn, assumption -> {
+        Utilities.setCellValueFactoryForAssumptionColumn(this.dependenciesColumn, assumption -> {
             var stringBuilder = new StringBuilder();
-            assumption.getDependencies().forEach(dependency -> {
-                Optional<Assumption> associatedAssumption = this.currentConfiguration.getAssumptions().stream()
-                        .filter(assumptionInConfig -> assumptionInConfig.getId().equals(dependency)).findFirst();
 
-                if (associatedAssumption.isPresent()) {
-                    stringBuilder.append("\"").append(associatedAssumption.get().getName()).append("\"");
-                    stringBuilder.append(" (Id: ");
-                    stringBuilder.append(dependency.toString(), 0, Math.min(5, dependency.toString().length()));
-                    stringBuilder.append("...),\n");
-                }
-            });
+            if(assumption.getDependencies() != null) {
+                assumption.getDependencies().forEach(dependency -> {
+                    Optional<Assumption> associatedAssumption = this.currentConfiguration.getAssumptions().stream()
+                            .filter(assumptionInConfig -> assumptionInConfig.getId().equals(dependency)).findFirst();
+
+                    if (associatedAssumption.isPresent()) {
+                        stringBuilder.append("\"").append(associatedAssumption.get().getName()).append("\"");
+                        stringBuilder.append(" (Id: ");
+                        stringBuilder.append(dependency.toString(), 0, Math.min(5, dependency.toString().length()));
+                        stringBuilder.append("...),\n");
+                    }
+                });
+            }
+
             return stringBuilder.isEmpty() ? "" : stringBuilder.substring(0, stringBuilder.length() - 2);
         });
 
@@ -449,11 +477,13 @@ public class MainScreenController {
             Assumption selectedAssumption = this.assumptionTableView.getSelectionModel().getSelectedItem();
 
             if (selectedAssumption != null) {
-                Optional<Assumption> editedAssumption = this.editAssumption(selectedAssumption, this.assumptionTableView.getScene().getWindow());
+                Optional<Assumption> editedAssumption =
+                        this.editAssumption(selectedAssumption, this.assumptionTableView.getScene().getWindow());
 
                 if (editedAssumption.isPresent()) {
                     // Remove old assumption from TableView and Configuration and replace with edited one.
-                    Optional<Assumption> assumptionToBeReplaced = this.currentConfiguration.getAssumptions().stream().filter(assumption -> assumption.getId().equals(editedAssumption.get().getId())).findFirst();
+                    Optional<Assumption> assumptionToBeReplaced = this.currentConfiguration.getAssumptions().stream()
+                            .filter(assumption -> assumption.getId().equals(editedAssumption.get().getId())).findFirst();
 
                     if (assumptionToBeReplaced.isPresent()) {
                         this.currentConfiguration.getAssumptions().remove(assumptionToBeReplaced.get());
@@ -469,21 +499,29 @@ public class MainScreenController {
         };
 
         // Context menu item for editing assumptions within the table view.
-        Utilities.addFunctionalityToContextMenu(this.assumptionTableView, "Edit Assumption", (ActionEvent actionEvent) -> retrieveAssumptionAndOpenSpecificationScreen.run());
+        Utilities.addFunctionalityToContextMenu(this.assumptionTableView,
+                                                "Edit Assumption",
+                                                (ActionEvent actionEvent) -> retrieveAssumptionAndOpenSpecificationScreen.run());
         // Context menu item for marking an assumption as "manually analyzed".
-        Utilities.addFunctionalityToContextMenu(this.assumptionTableView, "Toggle manually analyzed", (ActionEvent actionEvent) -> {
+        Utilities.addFunctionalityToContextMenu(this.assumptionTableView,
+                                                "Toggle manually analyzed",
+                                                (ActionEvent actionEvent) -> {
             Assumption selectedAssumption = this.assumptionTableView.getSelectionModel().getSelectedItem();
             selectedAssumption.setManuallyAnalyzed(!selectedAssumption.getManuallyAnalyzed());
         });
+
         Utilities.addSeparatorToContextMenu(this.assumptionTableView);
 
         // Context menu item for removing an assumptions from the table view.
-        Utilities.addFunctionalityToContextMenu(this.assumptionTableView, "Remove Assumption", (ActionEvent actionEvent) -> {
+        Utilities.addFunctionalityToContextMenu(this.assumptionTableView,
+                                                "Remove Assumption",
+                                                (ActionEvent actionEvent) -> {
             Assumption assumptionForDeletion = this.assumptionTableView.getSelectionModel().getSelectedItem();
 
             if (assumptionForDeletion != null && this.currentConfiguration.getAssumptions().remove(assumptionForDeletion)) {
                 // Remove deleted assumption from dependency lists of other assumptions if necessary.
-                this.currentConfiguration.getAssumptions().forEach(specifiedAssumption -> assumptionForDeletion.getDependencies().remove(assumptionForDeletion.getId()));
+                this.currentConfiguration.getAssumptions()
+                        .forEach(specifiedAssumption -> assumptionForDeletion.getDependencies().remove(assumptionForDeletion.getId()));
 
                 this.assumptionTableView.getItems().remove(assumptionForDeletion);
                 this.assumptionTableView.refresh();
@@ -502,11 +540,13 @@ public class MainScreenController {
                         if (!this.getStyleClass().contains("manually-analyzed-row")) {
                             this.getStyleClass().add("manually-analyzed-row");
                         }
-                        this.pseudoClassStateChanged(PseudoClass.getPseudoClass(this.getIndex() % 2 == 0 ? "even" : "odd"), false);
+                        this.pseudoClassStateChanged(
+                                PseudoClass.getPseudoClass(this.getIndex() % 2 == 0 ? "even" : "odd"), false);
                     } else {
                         // Disable custom styling and turn even / odd styling back on.
                         this.getStyleClass().removeIf(styleClass -> styleClass.equals("manually-analyzed-row"));
-                        this.pseudoClassStateChanged(PseudoClass.getPseudoClass(this.getIndex() % 2 == 0 ? "even" : "odd"), true);
+                        this.pseudoClassStateChanged(
+                                PseudoClass.getPseudoClass(this.getIndex() % 2 == 0 ? "even" : "odd"), true);
                     }
                 }
             };
@@ -532,10 +572,13 @@ public class MainScreenController {
         });
 
         // Context menu for removing an existing analysis result.
-        Utilities.addFunctionalityToContextMenu(this.analysisOutputTableView, "Remove Analysis Output", (ActionEvent actionEvent) -> {
+        Utilities.addFunctionalityToContextMenu(this.analysisOutputTableView,
+                                                "Remove Analysis Output",
+                                                (ActionEvent actionEvent) -> {
             AnalysisResult analysisResultForDeletion = this.analysisOutputTableView.getSelectionModel().getSelectedItem();
 
-            if (analysisResultForDeletion != null && this.currentConfiguration.getAnalysisResults().remove(analysisResultForDeletion)) {
+            if (analysisResultForDeletion != null
+                    && this.currentConfiguration.getAnalysisResults().remove(analysisResultForDeletion)) {
                 this.analysisOutputTableView.getItems().remove(analysisResultForDeletion);
 
                 // Deal with TextArea if necessary.
@@ -595,9 +638,15 @@ public class MainScreenController {
         });
     }
 
+    /**
+     * Handles a click on the "New Assumption" menu item in the menu bar.
+     *
+     * @param actionEvent The {@link ActionEvent} triggered by the click.
+     */
     @FXML
     private void handleNewAssumption(ActionEvent actionEvent) {
-        if (this.currentConfiguration.getModelPath() == null || !(new File(this.currentConfiguration.getModelPath()).exists())) {
+        if (this.currentConfiguration.getModelPath() == null
+                || !(new File(this.currentConfiguration.getModelPath()).exists())) {
             Utilities.showAlert(Alert.AlertType.WARNING,
                     "Warning",
                     "Unable to create a new assumption!",
@@ -606,7 +655,8 @@ public class MainScreenController {
         }
 
         // Create new modal window for entry of assumption parameters.
-        Optional<Assumption> newAssumption = this.specifyNewAssumption(((MenuItem) actionEvent.getSource()).getParentPopup().getOwnerWindow());
+        Optional<Assumption> newAssumption = this.specifyNewAssumption(((MenuItem) actionEvent.getSource())
+                                                                               .getParentPopup().getOwnerWindow());
 
         // Only add assumption in case it was fully specified by the user.
         if (newAssumption.isPresent() && newAssumption.get().isSufficientlySpecified()) {
@@ -616,6 +666,11 @@ public class MainScreenController {
         }
     }
 
+    /**
+     * Handles a click on the "New Configuration" menu item in the menu bar.
+     *
+     * @param actionEvent The {@link ActionEvent} triggered by the click.
+     */
     @FXML
     private void handleNewConfiguration(ActionEvent actionEvent) {
         var stage = Utilities.getStageOfMenuItem((MenuItem) actionEvent.getSource());
@@ -632,6 +687,11 @@ public class MainScreenController {
         this.resetControlElements();
     }
 
+    /**
+     * Handles a click on the "Open Configuration..." menu item in the menu bar.
+     *
+     * @param actionEvent The {@link ActionEvent} triggered by the click.
+     */
     @FXML
     private void handleOpenFromFile(@NotNull ActionEvent actionEvent) {
         var stage = Utilities.getStageOfMenuItem((MenuItem) actionEvent.getSource());
@@ -649,7 +709,10 @@ public class MainScreenController {
         }
 
         if (!selectedFile.exists() || !selectedFile.isFile()) {
-            Utilities.showAlert(Alert.AlertType.WARNING, "Warning", "Loading Failed", "The specified file could not be read!");
+            Utilities.showAlert(Alert.AlertType.WARNING,
+                                "Warning",
+                                "Loading Failed",
+                                "The specified file could not be read!");
         }
 
         this.addSaveFileToPreviouslyOpened(stage);
@@ -657,11 +720,19 @@ public class MainScreenController {
         this.loadSaveFile(selectedFile, stage);
     }
 
+    /**
+     * Handles a click on the "Save Configuration" menu item in the menu bar.
+     */
     @FXML
     private void handleSave() {
         this.writeToSaveFile();
     }
 
+    /**
+     * Handles a click on the "Save Documentation As..." menu item in the menu bar.
+     *
+     * @param actionEvent The {@link ActionEvent} triggered by the click.
+     */
     @FXML
     private void handleSaveAs(@NotNull ActionEvent actionEvent) {
         var stage = Utilities.getStageOfMenuItem((MenuItem) actionEvent.getSource());
@@ -675,24 +746,35 @@ public class MainScreenController {
         this.writeToSaveFile();
     }
 
+    /**
+     * Handles a click on the "Quit" menu item in the menu bar.
+     *
+     * @param actionEvent The {@link ActionEvent} triggered by the click.
+     */
     @FXML
     private void handleQuit(ActionEvent actionEvent) {
         var stage = Utilities.getStageOfMenuItem((MenuItem) actionEvent.getSource());
         stage.fireEvent(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
+    /**
+     * Handles a click on the "Documentation" menu item in the menu bar.
+     */
     @FXML
     private void handleOpenDocumentation() {
         if (this.hostServices != null) {
             this.hostServices.showDocument(Constants.DOCUMENTATION_URL);
         } else {
             Utilities.showAlert(Alert.AlertType.ERROR,
-                    "Error",
-                    "Unable to open documentation",
-                    "Cannot invoke the default browser of the system as host services are unavailable.");
+                                "Error",
+                                "Unable to open documentation",
+                                "Cannot invoke the default browser of the system as host services are unavailable.");
         }
     }
 
+    /**
+     * Handles a click on {@link MainScreenController#performAnalysisButton}.
+     */
     @FXML
     private void handleAnalysisExecution() {
         // Sanity check (analysis should only be executable once the configuration is sufficiently specified).
@@ -706,12 +788,19 @@ public class MainScreenController {
                         new File(Objects.requireNonNull(this.currentConfiguration.getModelPath())));
                 if (modelTransferResponse.getKey() != 200) {
                     this.statusLabel.setText("Analysis aborted.");
-                    Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Transmission of the selected model to the analysis failed.", modelTransferResponse.getValue());
+                    Utilities.showAlert(Alert.AlertType.ERROR,
+                                        "Error",
+                                        "Transmission of the selected model to the analysis failed.",
+                                        modelTransferResponse.getValue());
                     return;
                 }
 
                 this.statusLabel.setText("Starting analysis...");
-                Pair<Integer, SecurityAnalysisConnector.AnalysisOutput> analysisResponse = this.securityAnalysisConnector.performAnalysis(this.currentConfiguration.getModelPath(), this.currentConfiguration.getAssumptions());
+
+                Pair<Integer, SecurityAnalysisConnector.AnalysisOutput> analysisResponse =
+                        this.securityAnalysisConnector.performAnalysis(
+                                this.currentConfiguration.getModelPath(), this.currentConfiguration.getAssumptions());
+
                 String analysisResponseLog = analysisResponse.getValue().outputLog();
                 Collection<SecurityCheckAssumption> analysisResponseAssumptions = analysisResponse.getValue().assumptions();
 
@@ -731,7 +820,8 @@ public class MainScreenController {
                     if (analysisResponseAssumptions != null) {
                         this.assumptionTableView.getItems().clear();
 
-                        analysisResponseAssumptions.forEach(securityCheckAssumption -> this.currentConfiguration.getAssumptions().stream()
+                        analysisResponseAssumptions
+                                .forEach(securityCheckAssumption -> this.currentConfiguration.getAssumptions().stream()
                                 .filter(assumption -> assumption.getId().equals(securityCheckAssumption.getId()))
                                 .findFirst().ifPresent(matchingAssumption -> matchingAssumption.updateWith(securityCheckAssumption)));
                         this.assumptionTableView.setItems(FXCollections.observableArrayList(this.currentConfiguration.getAssumptions()));
@@ -739,11 +829,17 @@ public class MainScreenController {
                     }
                 } else {
                     this.statusLabel.setText("Received invalid response from the analysis.");
-                    Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Communication with the analysis failed.", analysisResponseLog);
+                    Utilities.showAlert(Alert.AlertType.ERROR,
+                                        "Error",
+                                        "Communication with the analysis failed.",
+                                        analysisResponseLog);
                 }
             } else {
                 this.statusLabel.setText("Analysis aborted.");
-                Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Communication with the analysis failed.", "Connection to the analysis could not be established.");
+                Utilities.showAlert(Alert.AlertType.ERROR,
+                                    "Error",
+                                    "Communication with the analysis failed.",
+                                    "Connection to the analysis could not be established.");
             }
         } else {
             Utilities.showAlert(Alert.AlertType.WARNING,
@@ -753,9 +849,15 @@ public class MainScreenController {
         }
     }
 
+    /**
+     * Handles a click on {@link MainScreenController#analysisPathLabel}.
+     */
     @FXML
     private void handleAnalysisPathSelection() {
-        var textInputDialog = new TextInputDialog(this.currentConfiguration.getAnalysisPath() == null ? Constants.DEFAULT_ANALYSIS_PATH : this.currentConfiguration.getAnalysisPath());
+        var textInputDialog = new TextInputDialog(
+                this.currentConfiguration.getAnalysisPath() == null ?
+                        Constants.DEFAULT_ANALYSIS_PATH : this.currentConfiguration.getAnalysisPath());
+
         textInputDialog.setTitle("Analysis URI");
         textInputDialog.setHeaderText("Please provide the web-service URI of the analysis.");
         textInputDialog.setContentText("URI:");
@@ -770,6 +872,11 @@ public class MainScreenController {
         });
     }
 
+    /**
+     * Handles a click on {@link MainScreenController#modelNameLabel}.
+     *
+     * @param mouseEvent The {@link MouseEvent} triggered by the click.
+     */
     @FXML
     private void handleModelNameSelection(MouseEvent mouseEvent) {
         var originatingLabel = (Label) mouseEvent.getSource();
@@ -797,7 +904,9 @@ public class MainScreenController {
                 this.performAnalysisButton.setDisable(this.currentConfiguration.isMissingAnalysisParameters());
             } else {
                 // Invalid selection due to missing repository file.
-                Utilities.showAlert(Alert.AlertType.ERROR, "Error", "Loading model entities failed", "The repository file (default.repository) of the specified model could not be found.");
+                Utilities.showAlert(Alert.AlertType.ERROR,
+                                    "Error", "Loading model entities failed",
+                                    "The repository file (default.repository) of the specified model could not be found.");
             }
         }
     }

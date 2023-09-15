@@ -63,6 +63,7 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable {
      */
     public Assumption() {
         super();
+        this.dependencies = new HashSet<>();
     }
 
     /**

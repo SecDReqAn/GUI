@@ -35,7 +35,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * The dedicated controller managing the assumption-specification screen that is initiated by {@link MainScreenController}.
+ * The dedicated controller managing the assumption-specification screen that is initiated by
+ * {@link MainScreenController}.
  */
 public class AssumptionSpecificationScreenController {
     /**
@@ -216,10 +217,14 @@ public class AssumptionSpecificationScreenController {
                     return;
                 }
 
-                Utilities.addFunctionalityToContextMenu(this.modelEntityTreeView, "Add to Affected Model Entities", (ActionEvent actionEvent) -> {
-                    TreeItem<ModelEntity> selectedItemDuringContextInitiation = this.modelEntityTreeView.getSelectionModel().getSelectedItem();
+                Utilities.addFunctionalityToContextMenu(this.modelEntityTreeView,
+                                                        "Add to Affected Model Entities",
+                                                        (ActionEvent actionEvent) -> {
+                    TreeItem<ModelEntity> selectedItemDuringContextInitiation =
+                            this.modelEntityTreeView.getSelectionModel().getSelectedItem();
 
-                    if (selectedItemDuringContextInitiation != null && this.assumption.getAffectedEntities().add(selectedItemDuringContextInitiation.getValue())) {
+                    if (selectedItemDuringContextInitiation != null
+                            && this.assumption.getAffectedEntities().add(selectedItemDuringContextInitiation.getValue())) {
                         this.affectedEntityTableView.getItems().add(selectedItemDuringContextInitiation.getValue());
                         this.affectedEntityTableView.scrollTo(this.affectedEntityTableView.getItems().size() - 1);
                         this.checkForCompletenessOfSpecification();
@@ -232,7 +237,9 @@ public class AssumptionSpecificationScreenController {
         });
 
         // Context menu for removing affected model entity within the table view.
-        Utilities.addFunctionalityToContextMenu(this.affectedEntityTableView, "Remove Model Entity", (ActionEvent actionEvent) -> {
+        Utilities.addFunctionalityToContextMenu(this.affectedEntityTableView,
+                                                "Remove Model Entity",
+                                                (ActionEvent actionEvent) -> {
             ModelEntity selectedModelEntity = this.affectedEntityTableView.getSelectionModel().getSelectedItem();
 
             if (selectedModelEntity != null && this.assumption.getAffectedEntities().remove(selectedModelEntity)) {
@@ -340,9 +347,9 @@ public class AssumptionSpecificationScreenController {
     }
 
     /**
-     * Handles a press on the "Analyzed" check box.
+     * Handles a click on the "Analyzed" check box.
      *
-     * @param actionEvent The {@link ActionEvent} triggered through the press.
+     * @param actionEvent The {@link ActionEvent} triggered by the click.
      */
     @FXML
     private void handleAnalyzedToggle(ActionEvent actionEvent) {
@@ -352,9 +359,9 @@ public class AssumptionSpecificationScreenController {
     }
 
     /**
-     * Handles a press on the "Insert" button at the bottom of the scene.
+     * Handles a click on the "Insert" button at the bottom of the scene.
      *
-     * @param actionEvent The triggered {@link ActionEvent} through the press.
+     * @param actionEvent The {@link ActionEvent} triggered by the click.
      */
     @FXML
     private void handleInsertButton(ActionEvent actionEvent) {

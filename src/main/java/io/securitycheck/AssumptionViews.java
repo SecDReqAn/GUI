@@ -8,7 +8,7 @@ public class AssumptionViews {
     /**
      * View that contains only the properties potentially relevant for a security analysis.
      */
-    public static class SecurityCheckAnalysisView{
+    public static class SecurityCheckAnalysisView {
     }
 
     /**

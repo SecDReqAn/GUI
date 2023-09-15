@@ -101,7 +101,7 @@ public class SecurityAnalysisConnector {
             codeMessagePair = new Pair<>(response.getStatus(), response.readEntity(String.class));
         } catch (IllegalArgumentException | NullPointerException e) {
             LOGGER.debug("Connection test to analysis with URI \"" + this.analysisUri
-                                + "\" failed due to malformed URI", e);
+                                 + "\" failed due to malformed URI", e);
             codeMessagePair = new Pair<>(0, "The specified URI is invalid.");
         } catch (ProcessingException e) {
             LOGGER.debug("Connection test to analysis with URI \"" + this.analysisUri + "\" was unsuccessful", e);

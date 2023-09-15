@@ -25,7 +25,7 @@ import java.util.function.Function;
  */
 public class Utilities {
     /**
-     * Utility function that shows an {@link Alert} to the user with the specified attributes.
+     * Convenience function that shows an {@link Alert} to the user with the specified attributes.
      *
      * @param type        The {@link javafx.scene.control.Alert.AlertType} that should be used.
      * @param title       The title {@link String} that should be displayed.
@@ -45,9 +45,19 @@ public class Utilities {
         return alert.showAndWait();
     }
 
-    public static void addFunctionalityToContextMenu(@NotNull Control controlElement, @NotNull String prompt, @NotNull Consumer<ActionEvent> actionHandling) {
+    /**
+     * Convenience function that adds a new context menu item to the specified {@link Control} element.
+     *
+     * @param controlElement The {@link Control} element to which the context menu item should be added.
+     * @param prompt         The prompt text that gets displayed for the item in the context menu.
+     * @param callback       A {@link Consumer} specifying a callback function that should be called on selection of
+     *                       the new context menu item.
+     */
+    public static void addFunctionalityToContextMenu(@NotNull Control controlElement,
+                                                     @NotNull String prompt,
+                                                     @NotNull Consumer<ActionEvent> callback) {
         var menuItem = new MenuItem(prompt);
-        menuItem.setOnAction(actionHandling::accept);
+        menuItem.setOnAction(callback::accept);
 
         if (controlElement.getContextMenu() == null) {
             var contextMenu = new ContextMenu();
@@ -60,18 +70,27 @@ public class Utilities {
     }
 
     /**
-     * Utility function that adds a new {@link SeparatorMenuItem} to the {@link ContextMenu} of the specified {@link Control} element.
+     * Convenience function that adds a new {@link SeparatorMenuItem} to the {@link ContextMenu} of the specified
+     * {@link Control} element.
      *
-     * @param controlElement The {@link Control} element to whose {@link ContextMenu} the {@link SeparatorMenuItem} should be added.
+     * @param controlElement The {@link Control} element to whose {@link ContextMenu} the {@link SeparatorMenuItem}
+     *                       should be added.
      */
     public static void addSeparatorToContextMenu(@NotNull Control controlElement) {
         controlElement.getContextMenu().getItems().add(new SeparatorMenuItem());
     }
 
-    public static void enableTextWrapForTableColumn(@NotNull TableColumn<Assumption, String> column) {
+    /**
+     * Convenience function that enables text-wrap for the specified {@link TableColumn}.
+     *
+     * @param column The {@link TableColumn} (containing {@link Assumption}s and displaying {@link String}s) for
+     *               which text-wrap should be enabled.
+     */
+    public static void enableTextWrapForTableColumn(@NotNull TableColumn<Assumption, @NotNull String> column) {
         column.setCellFactory(tc -> {
             var tableCell = new TableCell<Assumption, String>();
             var text = new Text();
+
             tableCell.setGraphic(text);
             tableCell.setPrefHeight(Control.USE_COMPUTED_SIZE);
             text.wrappingWidthProperty().bind(column.widthProperty());
@@ -82,15 +101,25 @@ public class Utilities {
         });
     }
 
-    public static void setCellValueFactoryForCollectionElement(@NotNull TableColumn<Assumption, String> column, @NotNull Function<Assumption, String> transformation) {
+    /**
+     * Convenience function that adds a custom cell value factory to the specified {@link TableColumn}, which
+     * transforms the contained {@link Assumption}s according to the specified callback {@link Function}.
+     *
+     * @param column                 The {@link TableColumn} (containing {@link Assumption}s and displaying
+     *                               {@link String}s) whose cell value factory should be set.
+     * @param transformationCallback The callback {@link Function} that should be used to transform
+     *                               {@link Assumption}s into the {@link String}s displayed in the {@link TableColumn}.
+     */
+    public static void setCellValueFactoryForAssumptionColumn(@NotNull TableColumn<Assumption, @NotNull String> column,
+                                                              @NotNull Function<Assumption, String> transformationCallback) {
         column.setCellValueFactory(cellData -> {
             Assumption assumption = cellData.getValue();
-            return new ReadOnlyStringWrapper(transformation.apply(assumption));
+            return new ReadOnlyStringWrapper(transformationCallback.apply(assumption));
         });
     }
 
     /**
-     * Utility function that retrieves the {@link Stage} associated with a given {@link MenuItem}.
+     * Convenience function that retrieves the {@link Stage} associated with a given {@link MenuItem}.
      *
      * @param menuItem The {@link MenuItem} whose associated {@link Stage} should be retrieved.
      * @return The associated {@link Stage}.
@@ -100,7 +129,7 @@ public class Utilities {
     }
 
     /**
-     * Compares two strings for order. This comparison considers null values
+     * Convenience function that compares two strings. This comparison considers null values
      * and uses lexicographic ordering for non-null values.
      *
      * @param s1 The first {@link String} for the comparison.
@@ -112,10 +141,10 @@ public class Utilities {
      */
     public static int compareStrings(@Nullable String s1, @Nullable String s2) {
         if (s1 != null && s2 == null) {
-            // Second null.
+            // s2 null.
             return -1;
         } else if (s1 == null && s2 != null) {
-            // First null.
+            // s1 null.
             return 1;
         } else if (s1 != null) {
             // Both not null.
