@@ -61,17 +61,6 @@ public class GraphAssumption extends SecurityCheckAssumption implements Cloneabl
     public GraphAssumption() {
         super();
         this.dependencies = new HashSet<>();
-    }
-
-    /**
-     * Constructor which sets the <code>id</code> of the {@link GraphAssumption} to the specified {@link UUID}
-     * and minimally initializes the other fields.
-     *
-     * @param id The {@link UUID} that should be used as the {@link GraphAssumption}'s <code>id</code>.
-     */
-    public GraphAssumption(@NotNull UUID id) {
-        super(id);
-        this.dependencies = new HashSet<>();
         this.manuallyAnalyzed = false;
         // Implicitly set all other fields to null.
     }
@@ -126,7 +115,7 @@ public class GraphAssumption extends SecurityCheckAssumption implements Cloneabl
      *
      * @param risk The risk that should be set.
      */
-    public void setRisk(double risk) {
+    public void setRisk(Double risk) {
         this.risk = risk;
     }
 
