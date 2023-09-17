@@ -1,6 +1,6 @@
 package general;
 
-import general.entities.Assumption;
+import general.entities.GraphAssumption;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
@@ -83,12 +83,12 @@ public class Utilities {
     /**
      * Convenience function that enables text-wrap for the specified {@link TableColumn}.
      *
-     * @param column The {@link TableColumn} (containing {@link Assumption}s and displaying {@link String}s) for
+     * @param column The {@link TableColumn} (containing {@link GraphAssumption}s and displaying {@link String}s) for
      *               which text-wrap should be enabled.
      */
-    public static void enableTextWrapForTableColumn(@NotNull TableColumn<Assumption, @NotNull String> column) {
+    public static void enableTextWrapForTableColumn(@NotNull TableColumn<GraphAssumption, @NotNull String> column) {
         column.setCellFactory(tc -> {
-            var tableCell = new TableCell<Assumption, String>();
+            var tableCell = new TableCell<GraphAssumption, String>();
             var text = new Text();
 
             tableCell.setGraphic(text);
@@ -103,17 +103,17 @@ public class Utilities {
 
     /**
      * Convenience function that adds a custom cell value factory to the specified {@link TableColumn}, which
-     * transforms the contained {@link Assumption}s according to the specified callback {@link Function}.
+     * transforms the contained {@link GraphAssumption}s according to the specified callback {@link Function}.
      *
-     * @param column                 The {@link TableColumn} (containing {@link Assumption}s and displaying
+     * @param column                 The {@link TableColumn} (containing {@link GraphAssumption}s and displaying
      *                               {@link String}s) whose cell value factory should be set.
      * @param transformationCallback The callback {@link Function} that should be used to transform
-     *                               {@link Assumption}s into the {@link String}s displayed in the {@link TableColumn}.
+     *                               {@link GraphAssumption}s into the {@link String}s displayed in the {@link TableColumn}.
      */
-    public static void setCellValueFactoryForAssumptionColumn(@NotNull TableColumn<Assumption, @NotNull String> column,
-                                                              @NotNull Function<Assumption, String> transformationCallback) {
+    public static void setCellValueFactoryForAssumptionColumn(@NotNull TableColumn<GraphAssumption, @NotNull String> column,
+                                                              @NotNull Function<GraphAssumption, String> transformationCallback) {
         column.setCellValueFactory(cellData -> {
-            Assumption assumption = cellData.getValue();
+            GraphAssumption assumption = cellData.getValue();
             return new ReadOnlyStringWrapper(transformationCallback.apply(assumption));
         });
     }

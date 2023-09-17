@@ -1,6 +1,7 @@
 package io.assumptiongraph;
 
 import controllers.MainScreenController;
+import general.entities.GraphAssumption;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -33,10 +34,10 @@ public class AssumptionGraphResource {
 
     /**
      * The <code>/assumption-graph/assumptions</code> endpoint used for retrieving the currently
-     * active {@link general.entities.Assumption} set.
+     * active {@link GraphAssumption} set.
      *
      * @param headers The {@link HttpHeaders} of the request.
-     * @return A {@link Response} containing the {@link general.entities.Assumption}s serialized as JSON.
+     * @return A {@link Response} containing the {@link GraphAssumption}s serialized as JSON.
      */
     @GET
     @Path("/assumptions")

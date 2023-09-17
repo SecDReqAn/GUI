@@ -13,66 +13,63 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-// TODO Find better name for class.
-
 /**
- * An extended assumption that extends a {@link SecurityCheckAssumption} by some properties tailored towards a
- * more high-level analysis.
+ * An extended {@link SecurityCheckAssumption} adding properties tailored towards a more high-level analysis.
  *
  * <p><b>Note</b>: @{@link Nullable} and @{@link NotNull} annotations for the fields are intentionally omitted as, on
  * initialization of the object, nearly all fields are <code>null</code>. However,
  * {@link controllers.AssumptionSpecificationScreenController} ensures that the the mandatory fields are always set
  * during the specification.</p>
  */
-public class Assumption extends SecurityCheckAssumption implements Cloneable {
+public class GraphAssumption extends SecurityCheckAssumption implements Cloneable {
     /**
-     * Custom {@link Comparator} that compares {@link Assumption}s based on their unique IDs.
+     * Custom {@link Comparator} that compares {@link GraphAssumption}s based on their unique IDs.
      */
-    public static class AssumptionComparator implements Comparator<Assumption> {
+    public static class AssumptionComparator implements Comparator<GraphAssumption> {
         @Override
-        public int compare(Assumption a1, Assumption a2) {
+        public int compare(GraphAssumption a1, GraphAssumption a2) {
             return a1.getId().compareTo(a2.getId());
         }
     }
 
     /**
-     * The user-specified name of the {@link Assumption}.
+     * The user-specified name of the {@link GraphAssumption}.
      */
     @JsonView(AssumptionViews.AssumptionGraphAnalysisView.class)
     private String name;
     /**
-     * A flag indicating whether the user marked the {@link Assumption} as manually analyzed.
+     * A flag indicating whether the user marked the {@link GraphAssumption} as manually analyzed.
      */
     @JsonView(AssumptionViews.AssumptionGraphAnalysisView.class)
     private boolean manuallyAnalyzed;
     /**
-     * A {@link Set} containing the unique <code>id</code>s of all {@link Assumption}s on which this
-     * {@link Assumption} depends.
+     * A {@link Set} containing the unique <code>id</code>s of all {@link GraphAssumption}s on which this
+     * {@link GraphAssumption} depends.
      */
     @JsonView(AssumptionViews.AssumptionGraphAnalysisView.class)
     private Set<UUID> dependencies;
     /**
-     * The risk associated with the {@link Assumption}.
+     * The risk associated with the {@link GraphAssumption}.
      */
     @JsonView(AssumptionViews.AssumptionGraphAnalysisView.class)
     private Double risk; // -
 
     /**
-     * Default constructor that only initializes the <code>id</code> of the {@link Assumption}
+     * Default constructor that only initializes the <code>id</code> of the {@link GraphAssumption}
      * with a randomly generated {@link UUID}.
      */
-    public Assumption() {
+    public GraphAssumption() {
         super();
         this.dependencies = new HashSet<>();
     }
 
     /**
-     * Constructor which sets the <code>id</code> of the {@link Assumption} to the specified {@link UUID}
+     * Constructor which sets the <code>id</code> of the {@link GraphAssumption} to the specified {@link UUID}
      * and minimally initializes the other fields.
      *
-     * @param id The {@link UUID} that should be used as the {@link Assumption}'s <code>id</code>.
+     * @param id The {@link UUID} that should be used as the {@link GraphAssumption}'s <code>id</code>.
      */
-    public Assumption(@NotNull UUID id) {
+    public GraphAssumption(@NotNull UUID id) {
         super(id);
         this.dependencies = new HashSet<>();
         this.manuallyAnalyzed = false;
@@ -80,7 +77,7 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable {
     }
 
     /**
-     * Gets the name of the {@link Assumption}.
+     * Gets the name of the {@link GraphAssumption}.
      *
      * @return The name of the assumption.
      */
@@ -89,7 +86,7 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable {
     }
 
     /**
-     * Sets the name of the {@link Assumption}.
+     * Sets the name of the {@link GraphAssumption}.
      *
      * @param name The name that should be set.
      */
@@ -98,7 +95,7 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable {
     }
 
     /**
-     * Gets the <code>manuallyAnalyzed</code> property of the {@link Assumption}.
+     * Gets the <code>manuallyAnalyzed</code> property of the {@link GraphAssumption}.
      *
      * @return The <code>manuallyAnalyzed</code> property.
      */
@@ -107,7 +104,7 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable {
     }
 
     /**
-     * Sets the <code>manuallyAnalyzed</code> property of the {@link Assumption}.
+     * Sets the <code>manuallyAnalyzed</code> property of the {@link GraphAssumption}.
      *
      * @param manuallyAnalyzed The state that should be set.
      */
@@ -116,7 +113,7 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable {
     }
 
     /**
-     * Gets the numerical risk associated with the {@link Assumption}.
+     * Gets the numerical risk associated with the {@link GraphAssumption}.
      *
      * @return The risk that associated with the assumption.
      */
@@ -125,7 +122,7 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable {
     }
 
     /**
-     * Sets the numerical risk associated with the {@link Assumption}.
+     * Sets the numerical risk associated with the {@link GraphAssumption}.
      *
      * @param risk The risk that should be set.
      */
@@ -134,8 +131,8 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable {
     }
 
     /**
-     * Gets the {@link Collection} containing the {@link UUID}s of the {@link Assumption}s on which this
-     * {@link Assumption} is depending.
+     * Gets the {@link Collection} containing the {@link UUID}s of the {@link GraphAssumption}s on which this
+     * {@link GraphAssumption} is depending.
      *
      * @return The {@link Collection} containing the {@link UUID}s.
      */
@@ -144,7 +141,7 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable {
     }
 
     /**
-     * Checks whether all mandatory fields of the {@link Assumption} (i.e., <code>type</code>, <code>name</code>,
+     * Checks whether all mandatory fields of the {@link GraphAssumption} (i.e., <code>type</code>, <code>name</code>,
      * and <code>description</code> have been sufficiently specified).
      *
      * @return <code>true</code> if all the mandatory fields are sufficiently specified and <code>false</code>
@@ -160,16 +157,16 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable {
     }
 
     /**
-     * Checks whether this {@link Assumption} is semantically equal to <code>otherAssumption</code>,
+     * Checks whether this {@link GraphAssumption} is semantically equal to <code>otherAssumption</code>,
      * meaning that they both contain the same semantic values.
      *
-     * <p><b>Note</b>: Even two different {@link Assumption} instances can be semantically equal if they contain the
+     * <p><b>Note</b>: Even two different {@link GraphAssumption} instances can be semantically equal if they contain the
      * same values (w.r.t. <code>equals</code> of the individual fields).</p>
      *
-     * @param otherAssumption The {@link Assumption} that should be semantically compared to this {@link Assumption}.
-     * @return <code>true</code> if both {@link Assumption}s are semantically equal and <code>false</code> otherwise.
+     * @param otherAssumption The {@link GraphAssumption} that should be semantically compared to this {@link GraphAssumption}.
+     * @return <code>true</code> if both {@link GraphAssumption}s are semantically equal and <code>false</code> otherwise.
      */
-    public boolean semanticallyEqualTo(@Nullable Assumption otherAssumption) {
+    public boolean semanticallyEqualTo(@Nullable GraphAssumption otherAssumption) {
         return otherAssumption != null &&
                 Objects.equals(this.getId(), otherAssumption.getId()) &&
                 Objects.equals(this.name, otherAssumption.name) &&
@@ -185,11 +182,11 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable {
     }
 
     /**
-     * Updates the fields of this {@link Assumption} based on the information contained in the specified
+     * Updates the fields of this {@link GraphAssumption} based on the information contained in the specified
      * {@link SecurityCheckAssumption}.
      *
      * @param securityCheckAssumption The {@link SecurityCheckAssumption} instance with whose information this
-     *                                {@link Assumption} should be updated.
+     *                                {@link GraphAssumption} should be updated.
      */
     public void updateWith(@NotNull SecurityCheckAssumption securityCheckAssumption) {
         assert securityCheckAssumption.getId().equals(this.getId());
@@ -203,13 +200,13 @@ public class Assumption extends SecurityCheckAssumption implements Cloneable {
     }
 
     /**
-     * Creates a clone of this {@link Assumption}.
+     * Creates a clone of this {@link GraphAssumption}.
      *
      * @return The created clone.
      */
     @Override
-    public @NotNull Assumption clone() {
-        Assumption clone = (Assumption) super.clone();
+    public @NotNull GraphAssumption clone() {
+        GraphAssumption clone = (GraphAssumption) super.clone();
 
         // UUID, String and primitive wrapper instances are immutable.
         clone.name = this.name;

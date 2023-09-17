@@ -2,7 +2,7 @@ package controllers;
 
 import general.ModelEntityTreeCell;
 import general.Utilities;
-import general.entities.Assumption;
+import general.entities.GraphAssumption;
 import general.entities.AssumptionType;
 import general.entities.ModelEntity;
 import io.local.ModelReader;
@@ -40,13 +40,13 @@ import java.util.UUID;
  */
 public class AssumptionSpecificationScreenController {
     /**
-     * The {@link Assumption} that is being specified / edited.
+     * The {@link GraphAssumption} that is being specified / edited.
      */
-    private Assumption assumption;
+    private GraphAssumption assumption;
     /**
-     * The {@link Collection} of already specified {@link Assumption}s.
+     * The {@link Collection} of already specified {@link GraphAssumption}s.
      */
-    private Collection<Assumption> specifiedAssumptions;
+    private Collection<GraphAssumption> specifiedAssumptions;
     /**
      * The {@link ModelReader} that is used for accessing model entities.
      */
@@ -106,13 +106,13 @@ public class AssumptionSpecificationScreenController {
     /**
      * Initializes the controller with data required for the assumption specification process.
      *
-     * @param specifiedAssumptions The {@link Collection} of {@link Assumption}s that the user has already entered
+     * @param specifiedAssumptions The {@link Collection} of {@link GraphAssumption}s that the user has already entered
      *                             into the application.
-     * @param assumption           The {@link Assumption} instance that should be filled with data by the user.
+     * @param assumption           The {@link GraphAssumption} instance that should be filled with data by the user.
      * @param modelPath            The absolute path to the folder of the PCM model.
      */
-    public void initWithMainData(@NotNull Collection<Assumption> specifiedAssumptions,
-                                 @NotNull Assumption assumption,
+    public void initWithMainData(@NotNull Collection<GraphAssumption> specifiedAssumptions,
+                                 @NotNull GraphAssumption assumption,
                                  @NotNull String modelPath) {
         this.assumption = assumption;
         this.specifiedAssumptions = specifiedAssumptions;
@@ -135,7 +135,7 @@ public class AssumptionSpecificationScreenController {
     }
 
     /**
-     * Checks whether the mandatory fields of the {@link Assumption} instance have been filled and enables a
+     * Checks whether the mandatory fields of the {@link GraphAssumption} instance have been filled and enables a
      * button to exit the pop-up window.
      */
     private void checkForCompletenessOfSpecification() {
@@ -145,7 +145,7 @@ public class AssumptionSpecificationScreenController {
     /**
      * Populates the GUI control elements with existing values in case
      * {@link AssumptionSpecificationScreenController#assumption} already contains data. This is the case if the user
-     * decided to edit an already existing {@link Assumption}.
+     * decided to edit an already existing {@link GraphAssumption}.
      */
     private void initializeUIElements() {
         this.nameTextField.setText(this.assumption.getName() != null ? this.assumption.getName() : "");

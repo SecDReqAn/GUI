@@ -2,7 +2,7 @@ package io.securitycheck;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import general.entities.Assumption;
+import general.entities.GraphAssumption;
 import general.entities.SecurityCheckAssumption;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
@@ -42,16 +42,16 @@ public class SecurityAnalysisConnector {
      * The data type that is sent to the analysis for the actual execution.
      *
      * @param modelPath   The path to the model to be analyzed.
-     * @param assumptions The {@link Collection} of {@link Assumption}s for the analysis.
+     * @param assumptions The {@link Collection} of {@link GraphAssumption}s for the analysis.
      */
-    private record AnalysisParameter(String modelPath, Collection<Assumption> assumptions) {
+    private record AnalysisParameter(String modelPath, Collection<GraphAssumption> assumptions) {
     }
 
     /**
      * The data type that is received from the analysis after an execution.
      *
      * @param outputLog   The log produced by the analysis (e.g., the console output) or a potential error message.
-     * @param assumptions The (potentially changed) {@link Assumption}s.
+     * @param assumptions The (potentially changed) {@link GraphAssumption}s.
      */
     public record AnalysisOutput(String outputLog, Collection<SecurityCheckAssumption> assumptions) {
     }
@@ -116,21 +116,21 @@ public class SecurityAnalysisConnector {
     /**
      * Sends the specified data to the previously specified security analysis and initiates the actual analysis.
      * <p>
-     * <b>Note</b>: Changes of the {@link Assumption}s caused by the security analysis (e.g., the <code>analyzed</code>
-     * field) will be reflected in the {@link Assumption}s specified by the <code>assumptions</code> parameter.
+     * <b>Note</b>: Changes of the {@link GraphAssumption}s caused by the security analysis (e.g., the <code>analyzed</code>
+     * field) will be reflected in the {@link GraphAssumption}s specified by the <code>assumptions</code> parameter.
      * <br/>
-     * <b>Note</b>: The {@link Assumption}s specified via <code>assumptions</code> are not sent to the security analysis
-     * in full. Instead, {@link AssumptionViews.SecurityCheckAnalysisView} (cf. annotations in {@link Assumption})
+     * <b>Note</b>: The {@link GraphAssumption}s specified via <code>assumptions</code> are not sent to the security analysis
+     * in full. Instead, {@link AssumptionViews.SecurityCheckAnalysisView} (cf. annotations in {@link GraphAssumption})
      * is used to only serialize the necessary fields.
      * </p>
      *
      * @param modelPath   The path to the PCM model that should be used for the analysis.
-     * @param assumptions The {@link Collection} of {@link Assumption}s that should be used for the analysis.
+     * @param assumptions The {@link Collection} of {@link GraphAssumption}s that should be used for the analysis.
      * @return A {@link Pair} encompassing a status code accessible via {@link Pair#getKey()} and the output log of the
      * analysis accessible via {@link Pair#getValue()}.
      */
     public Pair<Integer, AnalysisOutput> performAnalysis(@NotNull String modelPath,
-                                                         @NotNull Collection<Assumption> assumptions) {
+                                                         @NotNull Collection<GraphAssumption> assumptions) {
         LOGGER.info("Performing analysis on model with path \"" + modelPath + "\" with analysis \""
                             + this.analysisUri + "\"");
 

@@ -1,8 +1,10 @@
 package io.securitycheck;
 
+import general.entities.GraphAssumption;
+
 /**
  * Views that can be used to restrict certain
- * {@link general.entities.Assumption} properties from being serialized by the object mapper.
+ * {@link GraphAssumption} properties from being serialized by the object mapper.
  */
 public class AssumptionViews {
     /**

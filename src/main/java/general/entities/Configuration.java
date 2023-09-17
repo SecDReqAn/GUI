@@ -26,10 +26,10 @@ public class Configuration implements Cloneable {
     @Nullable
     private String modelPath;
     /**
-     * The {@link Set} of specified {@link Assumption}s.
+     * The {@link Set} of specified {@link GraphAssumption}s.
      */
     @NotNull
-    private Set<Assumption> assumptions;
+    private Set<GraphAssumption> assumptions;
     /**
      * The {@link Set} of previous {@link AnalysisResult}s.
      */
@@ -49,11 +49,11 @@ public class Configuration implements Cloneable {
      *
      * @param analysisPath    The URI {@link String} to the security analysis that should be set.
      * @param modelPath       The absolute path to the PCM that should be set.
-     * @param assumptions     The {@link Set} of specified {@link Assumption}s that should be set.
+     * @param assumptions     The {@link Set} of specified {@link GraphAssumption}s that should be set.
      * @param analysisResults The {@link Set} of previous {@link AnalysisResult}s that should be set.
      */
     public Configuration(@Nullable String analysisPath, @Nullable String modelPath,
-                         @NotNull Set<Assumption> assumptions, @NotNull Set<AnalysisResult> analysisResults) {
+                         @NotNull Set<GraphAssumption> assumptions, @NotNull Set<AnalysisResult> analysisResults) {
         this.analysisPath = analysisPath;
         this.modelPath = modelPath;
         this.analysisResults = new HashSet<>();
@@ -112,11 +112,11 @@ public class Configuration implements Cloneable {
     }
 
     /**
-     * Gets the {@link Set} of specified {@link Assumption}s.
+     * Gets the {@link Set} of specified {@link GraphAssumption}s.
      *
-     * @return The {@link Set} of {@link Assumption}s
+     * @return The {@link Set} of {@link GraphAssumption}s
      */
-    public @NotNull Set<Assumption> getAssumptions() {
+    public @NotNull Set<GraphAssumption> getAssumptions() {
         return assumptions;
     }
 
@@ -147,9 +147,9 @@ public class Configuration implements Cloneable {
             return false;
         }
 
-        ArrayList<Assumption> assumptionsThis = new ArrayList<>(this.assumptions);
-        ArrayList<Assumption> assumptionsOther = new ArrayList<>(otherConfiguration.assumptions);
-        var assumptionComparator = new Assumption.AssumptionComparator();
+        ArrayList<GraphAssumption> assumptionsThis = new ArrayList<>(this.assumptions);
+        ArrayList<GraphAssumption> assumptionsOther = new ArrayList<>(otherConfiguration.assumptions);
+        var assumptionComparator = new GraphAssumption.AssumptionComparator();
         assumptionsThis.sort(assumptionComparator);
         assumptionsOther.sort(assumptionComparator);
         for (int i = 0; i < assumptionsThis.size(); i++) {

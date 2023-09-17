@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.DatabindException;
 import general.Constants;
 import general.Utilities;
 import general.entities.AnalysisResult;
-import general.entities.Assumption;
+import general.entities.GraphAssumption;
 import general.entities.AssumptionType;
 import general.entities.Configuration;
 import general.entities.SecurityCheckAssumption;
@@ -58,8 +58,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-// TODO: Investigate why EvalScenario2Recreation does not produce right output
-
 /**
  * The controller managing the main screen that is entered on start-up of the application.
  */
@@ -93,27 +91,27 @@ public class MainScreenController {
     @FXML
     private Menu openRecentConfigMenu;
     @FXML
-    private TableView<Assumption> assumptionTableView;
+    private TableView<GraphAssumption> assumptionTableView;
     @FXML
-    private TableColumn<Assumption, UUID> idColumn;
+    private TableColumn<GraphAssumption, UUID> idColumn;
     @FXML
-    private TableColumn<Assumption, String> nameColumn;
+    private TableColumn<GraphAssumption, String> nameColumn;
     @FXML
-    private TableColumn<Assumption, AssumptionType> typeColumn;
+    private TableColumn<GraphAssumption, AssumptionType> typeColumn;
     @FXML
-    private TableColumn<Assumption, String> descriptionColumn;
+    private TableColumn<GraphAssumption, String> descriptionColumn;
     @FXML
-    private TableColumn<Assumption, String> entitiesColumn;
+    private TableColumn<GraphAssumption, String> entitiesColumn;
     @FXML
-    private TableColumn<Assumption, String> dependenciesColumn;
+    private TableColumn<GraphAssumption, String> dependenciesColumn;
     @FXML
-    private TableColumn<Assumption, Double> violationProbabilityColumn;
+    private TableColumn<GraphAssumption, Double> violationProbabilityColumn;
     @FXML
-    private TableColumn<Assumption, Double> riskColumn;
+    private TableColumn<GraphAssumption, Double> riskColumn;
     @FXML
-    private TableColumn<Assumption, String> impactColumn;
+    private TableColumn<GraphAssumption, String> impactColumn;
     @FXML
-    private TableColumn<Assumption, Boolean> analyzedColumn;
+    private TableColumn<GraphAssumption, Boolean> analyzedColumn;
     @FXML
     private TextArea analysisOutputTextArea;
     @FXML
@@ -267,14 +265,14 @@ public class MainScreenController {
     /**
      * Opens modal window for the assumption specification-screen.
      *
-     * @param assumption The {@link Assumption} instance that can be specified / edited through the assumption
+     * @param assumption The {@link GraphAssumption} instance that can be specified / edited through the assumption
      *                   specification-screen.
      * @param owner      The {@link Window} owning the modal window to be created.
-     * @return An {@link Optional} holding an {@link Assumption} the specified / edited {@link Assumption} or
+     * @return An {@link Optional} holding an {@link GraphAssumption} the specified / edited {@link GraphAssumption} or
      * {@link Optional#empty()} if the user aborted the specification / editing.
      */
-    private @NotNull Optional<Assumption> showAssumptionSpecificationScreen(@NotNull Assumption assumption,
-                                                                            @NotNull Window owner) {
+    private @NotNull Optional<GraphAssumption> showAssumptionSpecificationScreen(@NotNull GraphAssumption assumption,
+                                                                                 @NotNull Window owner) {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("../UI/AssumptionSpecificationScreen.fxml"));
@@ -306,33 +304,33 @@ public class MainScreenController {
 
     /**
      * Convenience function that shows the assumption specification screen pre-initialized with
-     * the fields contained in the specified {@link Assumption}.
+     * the fields contained in the specified {@link GraphAssumption}.
      *
-     * <p><b>Note</b>: The {@link Assumption} specified via <code>assumption</code> is not altered
+     * <p><b>Note</b>: The {@link GraphAssumption} specified via <code>assumption</code> is not altered
      * by the users inputs.</p>
      *
-     * @param assumption The {@link Assumption} whose fields should be used to initialize the
+     * @param assumption The {@link GraphAssumption} whose fields should be used to initialize the
      *                   assumption specification screen.
      * @param owner      The owner {@link Window} of the to be shown assumption specification screen (required for
      *                   modal-window functionality).
-     * @return An {@link Optional} containing the edited {@link Assumption} instance or {@link Optional#empty()} if
+     * @return An {@link Optional} containing the edited {@link GraphAssumption} instance or {@link Optional#empty()} if
      * the assumption specification screen could not be opened or the user aborted the specification.
      */
-    private @NotNull Optional<Assumption> editAssumption(@NotNull Assumption assumption, @NotNull Window owner) {
+    private @NotNull Optional<GraphAssumption> editAssumption(@NotNull GraphAssumption assumption, @NotNull Window owner) {
         return this.showAssumptionSpecificationScreen(assumption.clone(), owner);
     }
 
     /**
      * Convenience function that shows an empty assumption specification for the specification of a new
-     * {@link Assumption}
+     * {@link GraphAssumption}
      *
      * @param owner The owner {@link Window} of the to be shown assumption specification screen (required for
      *              modal-window functionality).
-     * @return An {@link Optional} containing the newly specified {@link Assumption} instance or{@link Optional#empty()}
+     * @return An {@link Optional} containing the newly specified {@link GraphAssumption} instance or{@link Optional#empty()}
      * if the assumption specification screen could not be opened or the user aborted the specification.
      */
-    private @NotNull Optional<Assumption> specifyNewAssumption(@NotNull Window owner) {
-        return this.showAssumptionSpecificationScreen(new Assumption(), owner);
+    private @NotNull Optional<GraphAssumption> specifyNewAssumption(@NotNull Window owner) {
+        return this.showAssumptionSpecificationScreen(new GraphAssumption(), owner);
     }
 
     /**
@@ -451,7 +449,7 @@ public class MainScreenController {
 
             if(assumption.getDependencies() != null) {
                 assumption.getDependencies().forEach(dependency -> {
-                    Optional<Assumption> associatedAssumption = this.currentConfiguration.getAssumptions().stream()
+                    Optional<GraphAssumption> associatedAssumption = this.currentConfiguration.getAssumptions().stream()
                             .filter(assumptionInConfig -> assumptionInConfig.getId().equals(dependency)).findFirst();
 
                     if (associatedAssumption.isPresent()) {
@@ -474,15 +472,15 @@ public class MainScreenController {
 
         // Anonymous helper function used in the ContextMenu and on double click.
         Runnable retrieveAssumptionAndOpenSpecificationScreen = () -> {
-            Assumption selectedAssumption = this.assumptionTableView.getSelectionModel().getSelectedItem();
+            GraphAssumption selectedAssumption = this.assumptionTableView.getSelectionModel().getSelectedItem();
 
             if (selectedAssumption != null) {
-                Optional<Assumption> editedAssumption =
+                Optional<GraphAssumption> editedAssumption =
                         this.editAssumption(selectedAssumption, this.assumptionTableView.getScene().getWindow());
 
                 if (editedAssumption.isPresent()) {
                     // Remove old assumption from TableView and Configuration and replace with edited one.
-                    Optional<Assumption> assumptionToBeReplaced = this.currentConfiguration.getAssumptions().stream()
+                    Optional<GraphAssumption> assumptionToBeReplaced = this.currentConfiguration.getAssumptions().stream()
                             .filter(assumption -> assumption.getId().equals(editedAssumption.get().getId())).findFirst();
 
                     if (assumptionToBeReplaced.isPresent()) {
@@ -506,7 +504,7 @@ public class MainScreenController {
         Utilities.addFunctionalityToContextMenu(this.assumptionTableView,
                                                 "Toggle manually analyzed",
                                                 (ActionEvent actionEvent) -> {
-            Assumption selectedAssumption = this.assumptionTableView.getSelectionModel().getSelectedItem();
+            GraphAssumption selectedAssumption = this.assumptionTableView.getSelectionModel().getSelectedItem();
             selectedAssumption.setManuallyAnalyzed(!selectedAssumption.getManuallyAnalyzed());
         });
 
@@ -516,7 +514,7 @@ public class MainScreenController {
         Utilities.addFunctionalityToContextMenu(this.assumptionTableView,
                                                 "Remove Assumption",
                                                 (ActionEvent actionEvent) -> {
-            Assumption assumptionForDeletion = this.assumptionTableView.getSelectionModel().getSelectedItem();
+            GraphAssumption assumptionForDeletion = this.assumptionTableView.getSelectionModel().getSelectedItem();
 
             if (assumptionForDeletion != null && this.currentConfiguration.getAssumptions().remove(assumptionForDeletion)) {
                 // Remove deleted assumption from dependency lists of other assumptions if necessary.
@@ -530,9 +528,9 @@ public class MainScreenController {
 
         // Custom RowFactory for double-click functionality and custom styling based on "manuallyAnalyzed" property.
         this.assumptionTableView.setRowFactory(tv -> {
-            var row = new TableRow<Assumption>() {
+            var row = new TableRow<GraphAssumption>() {
                 @Override
-                protected void updateItem(Assumption assumption, boolean empty) {
+                protected void updateItem(GraphAssumption assumption, boolean empty) {
                     super.updateItem(assumption, empty);
 
                     if (assumption != null && assumption.getManuallyAnalyzed()) {
@@ -655,7 +653,7 @@ public class MainScreenController {
         }
 
         // Create new modal window for entry of assumption parameters.
-        Optional<Assumption> newAssumption = this.specifyNewAssumption(((MenuItem) actionEvent.getSource())
+        Optional<GraphAssumption> newAssumption = this.specifyNewAssumption(((MenuItem) actionEvent.getSource())
                                                                                .getParentPopup().getOwnerWindow());
 
         // Only add assumption in case it was fully specified by the user.
