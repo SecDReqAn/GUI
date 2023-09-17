@@ -19,8 +19,7 @@ For further resources please refer to the <code>documentation</code> directory l
 
 - [Praesentation_Praktikum_WAM.pdf](documentation/Praesentation_Praktikum_WAM.pdf): The slides used for the final presentation on 09/18/23.
 - [Praesentation_Praktikum_WAM.zip](documentation/Praesentation_Praktikum_WAM.zip): The LaTeX source files used to create the pdf mentioned above.
-- [Ausarbeitung_Praktikum_WAM.pdf](documentation/Ausarbeitung_Praktikum_WAM.pdf): A detailed description of Assumption Analyzer, detailing its goal, architecture, usage, and selected design decisions can 
-be found in the <code>documentation</code> directory.
+- [Ausarbeitung_Praktikum_WAM.pdf](documentation/Ausarbeitung_Praktikum_WAM.pdf): A detailed description of Assumption Analyzer, detailing its goal, architecture, usage, and selected design decisions.
 - [Ausarbeitung_Praktikum_WAM.zip](documentation/Ausarbeitung_Praktikum_WAM.zip): The LaTeX source files used to create the pdf mentioned above.
 
 ## Quick Links
