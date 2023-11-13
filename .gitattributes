@@ -1,1 +1,1 @@
-*AbunaiContainerImage filter=lfs diff=lfs merge=lfs -text
+src/main/resources/abunai/AbunaiContainerImage filter=lfs diff=lfs merge=lfs -text
