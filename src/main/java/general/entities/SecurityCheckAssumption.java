@@ -31,6 +31,11 @@ public class SecurityCheckAssumption implements Cloneable {
     @JsonView(AssumptionViews.SecurityCheckAnalysisView.class)
     protected @Nullable String description;
     /**
+     * A textual description of constraint of the {@link SecurityCheckAssumption}.
+     */
+    @JsonView(AssumptionViews.SecurityCheckAnalysisView.class)
+    protected @Nullable String constraint;
+    /**
      * A {@link Set} containing the model entities (i.e., {@link ModelEntity} instances) that are affected by
      * the {@link SecurityCheckAssumption}.
      */
@@ -110,6 +115,15 @@ public class SecurityCheckAssumption implements Cloneable {
     public @Nullable String getDescription() {
         return description;
     }
+    /**
+     * Gets the description of constraint of the {@link SecurityCheckAssumption}.
+     *
+     * @return The textual description of constraint as a {@link String} or <code>null</code> if the description
+     * was not yet specified.
+     */
+    public @Nullable String getConstraint() {
+        return constraint;
+    }
 
     /**
      * Sets the description of the {@link SecurityCheckAssumption} to the specified value.
@@ -118,6 +132,14 @@ public class SecurityCheckAssumption implements Cloneable {
      */
     public void setDescription(@Nullable String description) {
         this.description = description;
+    }
+    /**
+     * Sets the description of constraint the {@link SecurityCheckAssumption} to the specified value.
+     *
+     * @param description The description of constraint that should be set.
+     */
+    public void setConstraint(@Nullable String constraint) {
+        this.constraint = constraint;
     }
 
     /**
@@ -201,6 +223,7 @@ public class SecurityCheckAssumption implements Cloneable {
             clone.id = this.id;
             clone.type = this.type;
             clone.description = this.description;
+            clone.constraint = this.constraint;
             clone.affectedEntities = new HashSet<>(this.affectedEntities);
             clone.probabilityOfViolation = this.probabilityOfViolation;
             clone.impact = this.impact;

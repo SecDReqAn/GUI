@@ -74,6 +74,8 @@ public class AssumptionSpecificationScreenController {
     @FXML
     private TextArea descriptionTextArea;
     @FXML
+    private TextArea constraintTextArea;
+    @FXML
     private TextField violationProbabilityTextField;
     @FXML
     private TextField riskTextField;
@@ -151,6 +153,8 @@ public class AssumptionSpecificationScreenController {
         this.nameTextField.setText(this.assumption.getName() != null ? this.assumption.getName() : "");
         this.descriptionTextArea.setText(this.assumption.getDescription() != null ?
                 this.assumption.getDescription() : "");
+        this.constraintTextArea.setText(this.assumption.getConstraint() != null ?
+                this.assumption.getConstraint() : "");
         this.riskTextField.setText(this.assumption.getRisk() != null ? String.valueOf(this.assumption.getRisk()) : "");
         this.violationProbabilityTextField.setText(this.assumption.getProbabilityOfViolation() != null ?
                 String.valueOf(this.assumption.getProbabilityOfViolation()) : "");
@@ -274,6 +278,11 @@ public class AssumptionSpecificationScreenController {
         // Listen for changes of the text in the description TextArea.
         this.descriptionTextArea.textProperty().addListener((observable, oldText, newText) -> {
             this.assumption.setDescription(newText.trim());
+            this.checkForCompletenessOfSpecification();
+        });
+        // Listen for changes of the text in the constraint TextArea.
+        this.constraintTextArea.textProperty().addListener((observable, oldText, newText) -> {
+        	this.assumption.setConstraint(newText.trim());
             this.checkForCompletenessOfSpecification();
         });
 
