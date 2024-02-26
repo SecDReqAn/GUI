@@ -4,7 +4,7 @@
 - Added column "Constraint Desc." to describe individual constraints.
 - Updated to use AssumptionGraph REST API for enhanced functionality.
 
-The associated sub-assumption analyzer, which utilizes this extended AssumptionGraph REST API and performs data-flow analysis, can be found in the following repository: [SubAssumptionAnalyzer](https://github.com/sneg94/DataFlowAnalysis).
+The associated Sub-assumption Analyzer, which leverages the extended AssumptionGraph REST API and conducts data-flow analysis to verify sub-assumptions in order to check whether assumptions are fulfilled, can be found in the following repository: [SubAssumptionAnalyzer](https://github.com/sneg94/DataFlowAnalysis).
 
 
 # <center>Praktikum: Werkzeuge für Agile Modellierung - SS2023</center>
