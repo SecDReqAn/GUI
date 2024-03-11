@@ -1,0 +1,44 @@
+{
+  "analysisPath" : "http://localhost:2406/dataFlowAnalysis",
+  "modelPath" : "/home/sandro/Downloads/Hahner Stuff und alte Test-Configs/CaseStudy-CoronaWarnApp/CoronaWarnApp_UncertaintyScenario2",
+  "assumptions" : [ {
+    "id" : "56178d79-c79c-4e5b-94ea-924300344568",
+    "type" : "RESOLVE_UNCERTAINTY",
+    "description" : "-",
+    "constraint" : "no constraint",
+    "affectedEntities" : [ {
+      "id" : "_JiPBICHdEd6lJo4DCALHMw",
+      "modelView" : "default.allocation",
+      "elementName" : "Allocation",
+      "name" : "defaultAllocation",
+      "type" : null
+    } ],
+    "probabilityOfViolation" : null,
+    "impact" : null,
+    "analyzed" : true,
+    "name" : "sub-Assumption 1",
+    "manuallyAnalyzed" : false,
+    "dependencies" : [ ],
+    "risk" : null
+  }, {
+    "id" : "4c844b9f-cb12-466f-8d8c-f17de38a1f69",
+    "type" : "RESOLVE_UNCERTAINTY",
+    "description" : "-",
+    "constraint" : "no constraint",
+    "affectedEntities" : [ {
+      "id" : "_dqFLECHbEd6tG9VclJz3cw",
+      "modelView" : "default.repository",
+      "elementName" : "Repository",
+      "name" : "defaultRepository",
+      "type" : null
+    } ],
+    "probabilityOfViolation" : null,
+    "impact" : null,
+    "analyzed" : true,
+    "name" : "MainAssumption",
+    "manuallyAnalyzed" : false,
+    "dependencies" : [ "5e965b9a-dccc-4518-97a2-fa28eba339b7", "56178d79-c79c-4e5b-94ea-924300344568" ],
+    "risk" : null
+  } ],
+  "analysisResults" : [ ]
+}

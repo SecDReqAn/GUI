@@ -53,7 +53,7 @@ public class SecurityAnalysisConnector {
      * @param outputLog   The log produced by the analysis (e.g., the console output) or a potential error message.
      * @param assumptions The (potentially changed) {@link GraphAssumption}s.
      */
-    public record AnalysisOutput(String outputLog, Collection<SecurityCheckAssumption> assumptions) {
+    public record AnalysisOutput(String outputLog, Collection<GraphAssumption> assumptions) {
     }
 
     /**
@@ -135,7 +135,7 @@ public class SecurityAnalysisConnector {
                             + this.analysisUri + "\"");
 
         try {
-            var jsonString = this.objectMapper.writerWithView(AssumptionViews.SecurityCheckAnalysisView.class)
+            var jsonString = this.objectMapper.writerWithView(AssumptionViews.AssumptionGraphAnalysisView.class)
                     .writeValueAsString(new AnalysisParameter(modelPath, assumptions));
 
             try (var response = this.client.target(this.analysisUri)

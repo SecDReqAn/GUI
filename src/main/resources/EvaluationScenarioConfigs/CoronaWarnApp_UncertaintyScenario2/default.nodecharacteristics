@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nodecharacteristics:Assignments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:DataDictionaryCharacterized="http://palladiosimulator.org/dataflow/dictionary/characterized/1.0" xmlns:nodecharacteristics="http://www.example.org/nodeCharacteristics">
+  <assignee xsi:type="nodecharacteristics:RessourceAssignee">
+    <characteristics id="_OwkPcAa5Ee680PEp2Dhvig">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@1"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@1.literals@0"/>
+    </characteristics>
+    <resourcecontainer href="default.resourceenvironment#_g7XcgLN2Ee2o46d27a6tVQ"/>
+  </assignee>
+  <assignee xsi:type="nodecharacteristics:RessourceAssignee">
+    <characteristics id="_XHnZ8Aa5Ee680PEp2Dhvig">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@1"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@1.literals@7"/>
+    </characteristics>
+    <resourcecontainer href="default.resourceenvironment#_YzICsLN5Ee2o46d27a6tVQ"/>
+  </assignee>
+  <assignee xsi:type="nodecharacteristics:RessourceAssignee">
+    <characteristics id="_cS4k8Aa5Ee680PEp2Dhvig">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@1"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@1.literals@2"/>
+    </characteristics>
+    <resourcecontainer href="default.resourceenvironment#_pGlxgLN2Ee2o46d27a6tVQ"/>
+  </assignee>
+  <assignee xsi:type="nodecharacteristics:RessourceAssignee">
+    <characteristics id="_gLPWkAa5Ee680PEp2Dhvig">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@1"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@1.literals@4"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@1.literals@0"/>
+    </characteristics>
+    <resourcecontainer href="default.resourceenvironment#_Buy2ULN3Ee2o46d27a6tVQ"/>
+  </assignee>
+  <assignee xsi:type="nodecharacteristics:RessourceAssignee">
+    <characteristics id="_mgaI4Aa5Ee680PEp2Dhvig">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@1"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@1.literals@3"/>
+    </characteristics>
+    <resourcecontainer href="default.resourceenvironment#_rlXhELN2Ee2o46d27a6tVQ"/>
+  </assignee>
+  <assignee xsi:type="nodecharacteristics:RessourceAssignee">
+    <characteristics id="_pYCdUAa5Ee680PEp2Dhvig">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@1"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@1.literals@1"/>
+    </characteristics>
+    <resourcecontainer href="default.resourceenvironment#_itmPILN2Ee2o46d27a6tVQ"/>
+  </assignee>
+  <assignee xsi:type="nodecharacteristics:RessourceAssignee">
+    <characteristics id="_sLBiUAa5Ee680PEp2Dhvig">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@1"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@1.literals@5"/>
+    </characteristics>
+    <resourcecontainer href="default.resourceenvironment#_E9SLkLN3Ee2o46d27a6tVQ"/>
+  </assignee>
+  <assignee xsi:type="nodecharacteristics:RessourceAssignee">
+    <characteristics id="_uSKN8Aa5Ee680PEp2Dhvig">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@1"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@1.literals@6"/>
+    </characteristics>
+    <resourcecontainer href="default.resourceenvironment#_HCgLoLN3Ee2o46d27a6tVQ"/>
+  </assignee>
+  <assignee xsi:type="nodecharacteristics:UsageAsignee">
+    <characteristics id="_6LtO0Aa5Ee680PEp2Dhvig">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@0"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@0.literals@2"/>
+    </characteristics>
+    <usagescenario href="default.usagemodel#_tyGHQLOKEe2o46d27a6tVQ"/>
+  </assignee>
+  <assignee xsi:type="nodecharacteristics:UsageAsignee">
+    <characteristics id="_947HcAa5Ee680PEp2Dhvig">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@0"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@0.literals@1"/>
+    </characteristics>
+    <usagescenario href="default.usagemodel#_FsTsULRJEe25KMRnMCaMfw"/>
+  </assignee>
+  <assignee xsi:type="nodecharacteristics:UsageAsignee">
+    <characteristics id="_Hh-sYAa6Ee680PEp2Dhvig">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@0"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@0.literals@1"/>
+    </characteristics>
+    <usagescenario href="default.usagemodel#_oJ2UALRIEe25KMRnMCaMfw"/>
+  </assignee>
+  <assignee xsi:type="nodecharacteristics:UsageAsignee">
+    <characteristics id="_M4alkAa6Ee680PEp2Dhvig">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@0"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@0.literals@0"/>
+    </characteristics>
+    <usagescenario href="default.usagemodel#_tCK-YLZ4Ee2xLZp9hElpuA"/>
+  </assignee>
+  <assignee xsi:type="nodecharacteristics:UsageAsignee">
+    <characteristics id="_P0vz0Aa6Ee680PEp2Dhvig">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@0"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@0.literals@0"/>
+    </characteristics>
+    <usagescenario href="default.usagemodel#_KL5GkLZ5Ee2xLZp9hElpuA"/>
+  </assignee>
+  <assignee xsi:type="nodecharacteristics:UsageAsignee">
+    <characteristics id="_SaqtMAa6Ee680PEp2Dhvig">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@0"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@0.literals@0"/>
+    </characteristics>
+    <usagescenario href="default.usagemodel#_TcJfELZ7Ee2xLZp9hElpuA"/>
+  </assignee>
+  <assignee xsi:type="nodecharacteristics:UsageAsignee">
+    <characteristics id="_VwxGUAa6Ee680PEp2Dhvig">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@0"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@0.literals@0"/>
+    </characteristics>
+    <usagescenario href="default.usagemodel#_L3WtYLZ6Ee2xLZp9hElpuA"/>
+  </assignee>
+  <assignee xsi:type="nodecharacteristics:UsageAsignee">
+    <characteristics id="_YwpX0Aa6Ee680PEp2Dhvig">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@0"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@0.literals@0"/>
+    </characteristics>
+    <usagescenario href="default.usagemodel#_mA1FwLZ8Ee2xLZp9hElpuA"/>
+  </assignee>
+  <assignee xsi:type="nodecharacteristics:UsageAsignee">
+    <characteristics id="_bYinIAa6Ee680PEp2Dhvig">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@0"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@0.literals@0"/>
+    </characteristics>
+    <usagescenario href="default.usagemodel#_K0XpkLZ-Ee2xLZp9hElpuA"/>
+  </assignee>
+  <assignee xsi:type="nodecharacteristics:RessourceAssignee">
+    <characteristics id="_4tE0AAbBEe6NbJWvWbn74w">
+      <type xsi:type="DataDictionaryCharacterized:EnumCharacteristicType" href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicTypes@4"/>
+      <values href="cwa.pddc#_ZSNvMLHIEe2fRLFFhL_FWA-characteristicEnumerations@4.literals@0"/>
+    </characteristics>
+    <resourcecontainer href="default.resourceenvironment#_wqni4MP5Ee2NifGpaUwYsQ"/>
+  </assignee>
+</nodecharacteristics:Assignments>
